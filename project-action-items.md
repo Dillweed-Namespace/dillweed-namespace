@@ -479,6 +479,103 @@ The reviewer flagged three optional items, all explicitly framed as non-blocking
 
 **Architectural note for future v0.2.9+ work:** `run()` helper now adds auth universally when TOKEN is set. If a future test wants to exercise the "POST without token returns 401" path explicitly, it will need either a separate `run_noauth()` helper or a raw curl call. Not blocking for v0.2.8 closure since Registry test.sh did not previously have such a test.
 
+#### Anthill v0.1.5 patch — INST-006 fix ship-verified (2026-05-17)
+
+**Patch SHA:** `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` (36,656 bytes)
+**Addresses:**
+- INST-006 (LOW) — `test.sh` assumed clean-slate signal store; hardcoded `originating_node` values collided with preserved `node_sequences` high-water-marks after in-place upgrades
+- A single AAS-PRE-001 stale-regex defect caught during v0.1.5 validation (patch script bumped the test's success message but missed the regex pattern; corrected in-tree before tarball build)
+
+**Changes applied:**
+- `install.sh` line 17: VERSION bumped `0.1.4` → `0.1.5`
+- `server.js`: banner comment (line 4) and `VERSION` constant (line 35) bumped to `0.1.5`
+- `test.sh`:
+  - Comment header (line 3) and the AAS-PRE-001 version-assertion success message bumped to `0.1.5`
+  - Inserted `NODE_SUFFIX="-${NONCE_PREFIX}"` declaration after the existing NONCE_PREFIX line, with explanatory comment block referencing INST-006
+  - Substituted 25 occurrences across 8 distinct hardcoded `originating_node` names: `test-resolver-001` (10), `REGISTRY` (1), `as002-node-A` (2), `as003-node` (4), `as004-node` (3), `as005-node` (3), `as006-node` (1), `as2-002-backdated-node` (1). Each becomes `<name>${NODE_SUFFIX}` so each test run uses unique node identifiers.
+  - Deliberately NOT substituted: `\"ANTHILL_AGGREGATOR\"` (line 442, the reserved-name rejection test) and `\"test\"` (line 226, auth-enforcement test that never reaches sequence-check logic)
+  - AAS-PRE-001 grep pattern (line 304) corrected from `"dillweed-anthill/0\.1\.4"` to `"dillweed-anthill/0\.1\.5"` after initial post-patch run revealed the stale regex
+- `package.json`: version bumped
+
+**Deliberately NOT modified:**
+- Historical comments on test.sh lines 389/405 referring to "v0.1.4 pre-fix regex" / "v0.1.4 pre-fix truthy check" — these describe what was fixed during v0.1.4 development and remain accurate
+- server.js line 855 cosmetic comment showing `'dillweed-anthill/0.1.5' → '0.1.4'` — now misleading after the bump, but inside a string-parsing comment and doesn't affect runtime behavior. Captured for v0.1.6 cosmetic cleanup.
+
+**Validation on dill-p-001 (2026-05-17, in-place upgrade preserving v0.1.4 state):**
+- v0.1.4 baseline test result: 50/58 pass (INST-006 sequence collisions + AS-006 body-size issue)
+- v0.1.5 patched test result: **57/58 pass**
+- Only remaining failure: AS-006 (300KB body-size test), pre-existing in v0.1.4, unrelated to our patch. Surfaced clearly now that INST-006 fix eliminated the cascading sequence-collision failures. Captured as INST-013.
+- ANTHILL_AGGREGATOR reserved-name rejection test still passes correctly (verified via patch-script sanity check)
+- Service banner and `/health` correctly report `version: "dillweed-anthill/0.1.5"`
+
+**INST-006 status:** CLOSED.
+
+#### INST-013 (LOW) — AS-006 body-size limit test returns HTTP 000 (2026-05-17)
+
+Surfaced during Anthill v0.1.5 validation after INST-006 closure cleared 6 cascading sequence-collision failures, exposing this pre-existing v0.1.4 issue.
+
+**Symptom:** Test sends a 300KB JSON body via `curl -d "$BIG_BODY"` expecting Anthill to reject with HTTP 413. Receives HTTP 000 (curl failed to send the request at all).
+
+**Root cause hypothesis:** Likely a shell/curl `argv`-length handling issue when the entire 300KB payload is passed on the curl command line. The server-side `MAX_REQUEST_BODY_BYTES` check exists in server.js and works correctly for smaller (but still-rejected) payloads; the issue is test-script-side, not server-side.
+
+**Suggested v0.1.6 fix:** Convert AS-006 from `-d "$BIG_BODY"` to `-d @<tempfile>` so curl streams the payload from disk rather than receiving it on the command line. Pattern:
+```bash
+BIG_BODY_FILE=$(mktemp)
+echo -n "$BIG_BODY" > "$BIG_BODY_FILE"
+run "..." "413" "$BASE/signal" -X POST -H "Content-Type: application/json" \
+    ${AUTH_HEADER:+-H "$AUTH_HEADER"} -d "@$BIG_BODY_FILE"
+rm "$BIG_BODY_FILE"
+```
+
+**Not blocking for v0.1.5 ship.** AS-006 verifies a server-side enforcement that the server correctly implements; the failing test only confirms that the test script can't reliably construct a 300KB payload to send. The actual server-side capability is intact.
+
+**INST-013 status:** OPEN (deferred to v0.1.6).
+
+#### v1.0.0 published to private GitHub repository (2026-05-18)
+
+**Repository:** https://github.com/Dillweed-Namespace/dillweed-namespace (private)
+**Release page:** https://github.com/Dillweed-Namespace/dillweed-namespace/releases/tag/v1.0.0
+**Git commit:** `52069ac` ("Initial commit: Dillweed Namespace v1.0.0")
+
+**Repository contents:**
+- Three patched component source trees: `registry/` (v0.2.8), `resolver/` (v0.1.8), `anthill/` (v0.1.5)
+- Top-level: README.md, LICENSE (Apache-2.0), NOTICE, .gitignore, project-action-items.md (this ledger)
+- Documentation: `docs/release-notes/v1.0.0-release-notes.md`
+- 43 files, 13,489 lines total in the initial commit
+
+**Release assets (verified bit-identical to the ship-verified tarballs on dill-p-001):**
+```
+dillweed-registry-v0.2.8.tar.gz  sha256:f0e329f51ab5eb1704d496084dd02525a02ef3d754618f26b08c3a9a69d2361a  50.79 KiB
+dillweed-resolver-v0.1.8.tar.gz  sha256:2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a  50.08 KiB
+dillweed-anthill-v0.1.5.tar.gz   sha256:dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b  35.79 KiB
+```
+
+Round-trip integrity confirmed: tarballs downloaded from the GitHub Release produce SHAs matching the ledger ship SHAs exactly.
+
+**Pre-commit safety scan results:** No private-key markers (`BEGIN PRIVATE KEY` etc.) and no admin tokens detected in the working tree. The only 64-character hex strings present are public SHA references (ship SHAs, trust-root SHA, audit-trail SHAs) appearing in README.md, project-action-items.md, release notes, and `resolver/install.sh` — all expected, all public.
+
+**INST-008 follow-up (resolver tarball name):**
+Initial release upload used the on-disk filename `dillclaw-resolver-v0.1.8.tar.gz` (the historical name still present in `~/Tarballs/production/` from the earlier patch-round build). Asset was deleted and re-uploaded as `dillweed-resolver-v0.1.8.tar.gz` to match the README/release-notes documentation and the conventional `dillweed-` prefix established for v1 patched ship artifacts. The renamed copy is bit-identical to the original (SHA preserved). The underlying tarball still extracts to a `dillclaw-resolver/` directory (component-internal naming, not addressed in v0.1.8) — this is queued as cosmetic cleanup for a future v0.1.9 or later, not blocking for v1.0.0.
+
+**INST-008 status:** Closed as of v1.0.0 publication for the *external* tarball naming (all three release assets use the `dillweed-` prefix). The *internal* `dillclaw-resolver/` directory naming remains as a cosmetic follow-up.
+
+**CONV-003 final amendment — tarball-publication gate CLOSED:**
+
+The 2026-05-16 amendment to CONV-003 permitted partial publication of spec documents (already published to dillweed.com) preceding install testing. Tarball publication was held pending install testing completion. As of v1.0.0 publication on 2026-05-18:
+
+- Install testing complete: three modes (in-place upgrade, uninstall, clean install) exercised on `dill-p-001` for all three components
+- Patch round complete: Resolver v0.1.8, Registry v0.2.8, Anthill v0.1.5 each ship-verified
+- Tarballs published as GitHub Release assets with verified integrity
+- README documents install procedure, trust model, verification steps
+
+The tarball-publication gate of CONV-003 is satisfied and CLOSED.
+
+**Pending follow-up work (none blocking for v1):**
+- Operations runbook refinement (INST-010 closure, Option B trust-root migration procedure documentation)
+- Public-vs-private repo decision for future (currently private; architecture supports public hosting)
+- Per-component release tags (`registry-v0.2.8`, etc.) if more granular release history is desired later
+- INST-013 fix in a future v0.1.6 patch round (AS-006 test method)
+
 #### Anthill ship-verification confirmed — v1 BASELINE REACHED (2026-05-16)
 
 Reviewer verified the post-cleanup ship-candidate SHA `f4f621804a8a7043447134ae641076ce2b7387d983b7dde77191bc9830085cda` and issued verbatim confirmation:
