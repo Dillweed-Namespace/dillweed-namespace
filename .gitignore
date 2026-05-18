@@ -1,0 +1,70 @@
+# Dillweed Namespace Project — .gitignore
+#
+# Excludes generated artifacts, secrets, and operational state from version
+# control. Source code, READMEs, install scripts, and configuration templates
+# (.env.example) ARE tracked.
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json.bak
+
+# Environment files (only .env.example is tracked; never the live .env)
+.env
+.env.local
+.env.*.local
+
+# Generated databases (SQLite)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Generated cryptographic material
+# (keys/.gitkeep is tracked so the directory structure is preserved)
+keys/*
+!keys/.gitkeep
+
+# Generated runtime data
+data/*
+!data/.gitkeep
+
+# Service and application logs
+logs/*
+!logs/.gitkeep
+*.log
+
+# Resolver trace dumps
+traces/*
+!traces/.gitkeep
+
+# Distribution artifacts — these are built from source, not source-controlled
+# (release tarballs should be uploaded as GitHub release assets, not committed)
+*.tar.gz
+*.tar
+*.tgz
+*.zip
+
+# IDE and editor scratch
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Coverage and test output
+coverage/
+.nyc_output/
+*.lcov
+
+# Anthill signal export staging
+exports/
+*.signal-dump
+
+# Operational scratch
+tmp/
+scratch/

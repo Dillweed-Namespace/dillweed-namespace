@@ -1,0 +1,429 @@
+{
+  "_comment": "DillClaw Local Registry — add your own Capability Records here.",
+  "_spec": "https://dillweed.com/namespace-standard.html §4",
+  "_updated": "2026-05-16",
+  "capabilities": [
+    {
+      "name": "research.market.intel.vendors",
+      "description": "Vendor comparison and analysis — evaluates, scores, and summarizes software vendors against defined criteria.",
+      "endpoint": "https://api.marketintel.example.com/vendors",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "vendors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "criteria": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "vendors"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "rankings": {
+            "type": "array"
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      },
+      "trust_tier": "verified",
+      "permissions": [
+        "query",
+        "summarize",
+        "export"
+      ],
+      "version": "1.2.0",
+      "signature": "dnso_v1_PoLkDID1V0jXdi5tPq-kbB3p1WjuepFpvLT8y0V5khnaSmbRRS51NGZAKx1Zy-VqjBgk23MNyZJVLRr3aA0LBg",
+      "registration_date": "2024-09-15",
+      "last_updated": "2026-01-10T00:00:00Z",
+      "tags": [
+        "research",
+        "procurement",
+        "vendor"
+      ]
+    },
+    {
+      "name": "data.enrichment.company.profile",
+      "description": "Company firmographic enrichment — returns structured data on a company given a name or domain identifier.",
+      "endpoint": "https://api.enrichment.example.com/company",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "company_id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "employees": {
+            "type": "integer"
+          },
+          "industry": {
+            "type": "string"
+          }
+        }
+      },
+      "trust_tier": "verified",
+      "permissions": [
+        "query",
+        "export"
+      ],
+      "version": "2.0.1",
+      "signature": "dnso_v1_LehvJKreA9uqS4JMIzM-QXFu3Qjj8_-60NC2fX-vdYV3wVJ4fC1sbQo9_0fT2_iVnSQMuCT-1dcAjZ1YHDyyBQ",
+      "registration_date": "2024-06-01",
+      "last_updated": "2026-02-14T00:00:00Z",
+      "tags": [
+        "data",
+        "enrichment",
+        "company",
+        "firmographic"
+      ]
+    },
+    {
+      "name": "agents.analysis.financial.reports",
+      "description": "Financial analysis agent — performs structured analysis of financial statements and SEC filings, returns a structured report.",
+      "endpoint": "https://agents.finanalysis.example.com/a2a",
+      "protocol": "a2a",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string"
+          },
+          "analysis_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object"
+          },
+          "risk_factors": {
+            "type": "array"
+          }
+        }
+      },
+      "trust_tier": "trusted",
+      "permissions": [
+        "query",
+        "summarize"
+      ],
+      "version": "1.0.4",
+      "signature": "dnso_v1_TxEnOhxsxvvzdxv2ssxMXAyFF8xTnOAPza0Wq5OvMAdtCGa-d9px_DF56l3EWXq9k5SfQknrANlB-qBxcQNDBg",
+      "registration_date": "2025-01-20",
+      "last_updated": "2026-03-01T00:00:00Z",
+      "tags": [
+        "finance",
+        "analysis",
+        "agent",
+        "a2a"
+      ]
+    },
+    {
+      "name": "tools.search.web-retrieval",
+      "description": "Web search and retrieval tool — returns ranked search results with snippets and source metadata for a given query string.",
+      "endpoint": "https://tools.websearch.example.com/retrieve",
+      "protocol": "mcp",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer",
+            "default": 10
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "snippet": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "trust_tier": "verified",
+      "permissions": [
+        "query"
+      ],
+      "version": "3.1.0",
+      "signature": "dnso_v1_Na0AkM6N3jddI9aTSCvKCGQHhoEhLYiTmWJwiDmbsOcQgnX0sw3Q1M35DRNrliACn5drP4e90OfzLzJUSzLLBg",
+      "registration_date": "2024-03-10",
+      "last_updated": "2026-02-28T00:00:00Z",
+      "tags": [
+        "search",
+        "retrieval",
+        "mcp",
+        "tools"
+      ]
+    },
+    {
+      "name": "tools.search.web-retrieval",
+      "description": "Web search and retrieval — EXPERIMENTAL v4 with neural reranking. Use for testing only.",
+      "endpoint": "https://tools.websearch-beta.example.com/retrieve",
+      "protocol": "mcp",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object"
+      },
+      "trust_tier": "experimental",
+      "permissions": [
+        "query"
+      ],
+      "version": "4.0.0-beta",
+      "signature": null,
+      "registration_date": "2026-03-01",
+      "last_updated": "2026-03-20T00:00:00Z",
+      "tags": [
+        "search",
+        "experimental",
+        "beta"
+      ]
+    },
+    {
+      "name": "data.code.execution.sandbox",
+      "description": "Sandboxed code execution environment — runs Python or JavaScript snippets in an isolated container and returns stdout, stderr, and exit code.",
+      "endpoint": "https://sandbox.codeexec.example.com/run",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "python",
+              "javascript"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "timeout_ms": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "language",
+          "code"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "stdout": {
+            "type": "string"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "duration_ms": {
+            "type": "integer"
+          }
+        }
+      },
+      "trust_tier": "trusted",
+      "permissions": [
+        "execute",
+        "query"
+      ],
+      "version": "2.3.0",
+      "signature": "dnso_v1_Tq6a6ETmd9TVQNfUc7BktZPD9-FOwWFjUueqJIVbnR7bhrXVwx4FofDZmkqU-f470VDl4XkwSh8a9Agjbh5JAg",
+      "registration_date": "2024-11-05",
+      "last_updated": "2026-01-22T00:00:00Z",
+      "tags": [
+        "code",
+        "execution",
+        "sandbox",
+        "tools"
+      ]
+    },
+    {
+      "name": "agents.utility.summarization.document",
+      "description": "Document summarization agent — produces structured summaries of long-form documents, with configurable length and format.",
+      "endpoint": "https://agents.summarize.example.com/document",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "max_words": {
+            "type": "integer",
+            "default": 200
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "prose",
+              "bullets",
+              "structured"
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "key_points": {
+            "type": "array"
+          },
+          "word_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "trust_tier": "verified",
+      "permissions": [
+        "query",
+        "summarize"
+      ],
+      "version": "1.5.2",
+      "signature": "dnso_v1_oI6AeW7rSViSogEtzPCLUGMuuvtHNQtMmIz-Ejht4S-6QRm8wGGeFhTdvROaqHLO7URMfgWN0Mk9NvU7YSKfDQ",
+      "registration_date": "2024-08-30",
+      "last_updated": "2026-03-05T00:00:00Z",
+      "tags": [
+        "summarization",
+        "document",
+        "nlp"
+      ]
+    },
+    {
+      "_comment": "Round-2 RS2-001 test fixture: same-name two-version pair with differing trust tiers. Exercises the post-eligibility version_pref path. With trust_minimum=verified and version_pref=stable, the resolver must pick 1.0.0 (verified) — NOT eliminate 2.0.0 (experimental) at the version step before the trust filter ran.",
+      "name": "tools.order.test",
+      "description": "RS2-001 ordering test fixture — verified 1.0.0 with experimental 2.0.0.",
+      "endpoint": "https://api.example.com/order-test",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "q": { "type": "string" }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "result": { "type": "string" }
+        }
+      },
+      "trust_tier": "verified",
+      "permissions": [
+        "query"
+      ],
+      "version": "1.0.0",
+      "signature": null,
+      "registration_date": "2024-06-01",
+      "last_updated": "2026-04-01T00:00:00Z",
+      "tags": [
+        "test-fixture",
+        "ordering"
+      ]
+    },
+    {
+      "_comment": "Pair with the above — same name, experimental tier, version 2.0.0. The reviewer's specific test case for RS2-001 (round-2). When caller requests trust_minimum=verified version_pref=stable, this record is eliminated by the trust filter, allowing 1.0.0 (verified) to win the version_pref selection.",
+      "name": "tools.order.test",
+      "description": "RS2-001 ordering test fixture — experimental 2.0.0 paired with verified 1.0.0.",
+      "endpoint": "https://api.example.com/order-test",
+      "protocol": "rest",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "q": { "type": "string" }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "result": { "type": "string" }
+        }
+      },
+      "trust_tier": "experimental",
+      "permissions": [
+        "query"
+      ],
+      "version": "2.0.0",
+      "signature": null,
+      "registration_date": "2024-12-01",
+      "last_updated": "2026-04-01T00:00:00Z",
+      "tags": [
+        "test-fixture",
+        "ordering"
+      ]
+    }
+  ]
+}

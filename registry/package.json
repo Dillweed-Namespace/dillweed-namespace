@@ -1,0 +1,26 @@
+{
+  "name": "dillweed-registry",
+  "version": "0.2.8",
+  "description": "Dillweed Namespace Registry \u2014 authoritative capability record store with DNSO signing",
+  "main": "server.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node server.js",
+    "test": "bash test.sh",
+    "rotate": "node rotate-key.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "dillweed",
+    "dillclaw",
+    "namespace",
+    "registry",
+    "agentic-ai"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "better-sqlite3": "^9.4.3"
+  }
+}

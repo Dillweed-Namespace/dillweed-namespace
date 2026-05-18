@@ -1,0 +1,26 @@
+{
+  "name": "dillweed-anthill",
+  "version": "0.1.5",
+  "description": "Dillweed Anthill\u2122 Observability Plane \u2014 reference implementation of the Anthill Observability Plane Specification v0.1",
+  "main": "server.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node server.js",
+    "test": "bash test.sh"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "dillweed",
+    "anthill",
+    "namespace",
+    "observability",
+    "agentic-ai"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "dotenv": "^17.4.2"
+  }
+}

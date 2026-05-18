@@ -1,0 +1,23 @@
+{
+  "name": "dillclaw-resolver",
+  "version": "0.1.8",
+  "description": "DillClaw Resolver \u2014 reference implementation of the DillClaw Resolver Specification v0.1",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "bash test.sh",
+    "generate-keys": "node tools/generate-keys.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "dillweed",
+    "dillclaw",
+    "namespace",
+    "resolver",
+    "agentic-ai"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

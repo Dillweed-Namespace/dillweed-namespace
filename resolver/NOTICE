@@ -1,0 +1,40 @@
+DillClaw Resolver — Reference Implementation
+Part of the Dillweed Namespace Project
+Copyright 2026 Richard McClelland
+
+This product is licensed under the Apache License, Version 2.0
+(see the LICENSE file in this directory, or
+http://www.apache.org/licenses/LICENSE-2.0).
+
+----------------------------------------------------------------------
+Trademark Notice
+----------------------------------------------------------------------
+
+"Dillweed" is a registered trademark of Richard McClelland in the
+United States (Classes 35, 41, and 42). "DillClaw" and "Dillweed
+Anthill" are common-law trademarks.
+
+The Apache License 2.0 under which the source code in this directory
+is distributed does not grant any rights to use these marks. In
+particular:
+
+- You may not use the Dillweed, DillClaw, or Dillweed Anthill names,
+  marks, or branding to identify your own derivative works, services,
+  or deployments without separate written authorization.
+
+- You may use these names in reasonable and customary descriptive
+  reference (for example, "this implementation conforms to the
+  DillClaw Resolver Specification"), per Apache License Section 6.
+
+- Operating a public-facing instance of this service and presenting
+  it as "the DillClaw Resolver" or "the Dillweed Namespace resolver"
+  without DNSO (Dillweed Namespace Stewardship Office) authorization
+  is not permitted.
+
+The canonical Dillweed Namespace is operated by the DNSO, and its
+trust root is verifiable against the DNSO public key published at:
+
+    https://dillweed.com/dnso_public.pem
+
+For inquiries about specification stewardship, partnership, or
+authorized use of the Dillweed marks, see https://dillweed.com.
