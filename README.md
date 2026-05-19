@@ -2,6 +2,8 @@
 
 A capability-registration and resolution system with a publicly verifiable trust root.
 
+This project is in early stewardship phase. Response times may be extended.
+
 The Dillweed Namespace defines how capabilities — addressable, versioned, signed descriptions of what a service can do — are registered, resolved, and audited. Three components implement the v1 specification:
 
 - **Registry** — authoritative store of capability records, signs each record with the canonical DNSO private key, exposes lookup/verify endpoints
@@ -145,20 +147,22 @@ export REGISTRY_ADMIN_TOKEN=$(security find-generic-password -s "dillweed-regist
 cd /usr/local/dillweed/registry/dillweed-registry
 bash test.sh
 
+# Resolver — expect 65/65 integration + 29/29 unit passing (no admin token required)
+cd /usr/local/dillweed/resolver/dillclaw-resolver
+bash test.sh          # 65 integration tests
+node unit-tests.js    # 29 unit tests
+
 # Anthill — expect 57/58 passing (one known issue, see INST-013 in the ledger)
 export ANTHILL_ADMIN_TOKEN=$(security find-generic-password -s "dillweed-anthill" -a "anthill-admin" -w)
 cd /usr/local/dillweed/anthill/dillweed-anthill
 bash test.sh
 ```
 
-The Resolver does not currently ship a test.sh; its conformance is exercised through Registry + Resolver integration (lookup, verify endpoints exercising both components).
-
 ## Known issues
 
 See [`project-action-items.md`](project-action-items.md) for the canonical findings ledger. As of v1.0.0:
 
-- **INST-008 (LOW)** — partially closed; tarball directory naming was fixed in the v1 patch round so all three components now extract to conventional directory names
-- **INST-010 (LOW)** — Keychain query syntax not yet in the operations runbook (documentation work)
+- **INST-008 (LOW)** — partially closed; the Resolver *tarball filename* was corrected from `dillclaw-resolver-v0.1.8.tar.gz` to `dillweed-resolver-v0.1.8.tar.gz` at v1.0.0 publication. The tarball still extracts to a `dillclaw-resolver/` directory (the component-internal name) — this is a cosmetic inconsistency, not a functional issue, and is queued for cleanup in a future release
 - **INST-011 (info)** — admin tokens in launchd plist files are stored plaintext; acceptable for the v1 reference deployment but worth revisiting for multi-operator production scenarios
 - **INST-012 (info)** — Registry tarball ships an unused `resolver-patch.js` artifact; cosmetic
 - **INST-013 (LOW)** — Anthill's AS-006 body-size test sends a 300KB payload via `curl -d "$BIG_BODY"` and gets HTTP 000 due to shell argv-length handling; server-side limit enforcement is intact, only the test method is unreliable. Fix queued for v0.1.6 (`-d @<tempfile>` pattern).
