@@ -40,7 +40,7 @@ with SHA256:
 
 Resolvers and other relying parties fetch this public key (the v0.1.8 installer does this automatically) and verify capability signatures locally before trusting any record. Verification failure is operationally fatal: a Resolver that cannot verify a signature MUST refuse to surface that record.
 
-The Registry never publishes its private key. The canonical public key is the single source of truth for trust-root verification — if the published value ever changes, every Resolver instance must re-fetch and confirm the new SHA via an out-of-band channel.
+The Registry never publishes its private key. The canonical public key is the single source of truth for trust-root verification — if the published value ever changes, any Resolver instance must re-fetch and confirm the new SHA via an out-of-band channel.
 
 ## Repository layout
 
@@ -65,7 +65,7 @@ The Registry never publishes its private key. The canonical public key is the si
 
 ## Installing v1 components
 
-Each component is distributed as a self-contained tarball with an installer for macOS (Linux support is on the v2 roadmap). The recommended order is **Registry first, then Resolver, then Anthill**, since the Resolver fetches records from the Registry and Anthill receives signals from instrumented Resolvers.
+Each component is distributed as a self-contained tarball with an installer for macOS (Linux support anticipated in a future release). The recommended order is **Registry first, then Resolver, then Anthill**, since the Resolver fetches records from the Registry and Anthill receives signals from instrumented Resolvers.
 
 ### Registry (v0.2.8)
 
