@@ -22,7 +22,7 @@ The v1 ship-verified baseline:
 | Resolver | 0.1.8 | `2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a` |
 | Anthill  | 0.1.5 | `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` |
 
-Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on real hardware, and a coordinated patch round — lives in [`project-action-items.md`](project-action-items.md).
+Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`project-action-items.md`](project-action-items.md).
 
 ## Trust model
 
