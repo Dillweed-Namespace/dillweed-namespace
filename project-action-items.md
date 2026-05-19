@@ -2762,6 +2762,129 @@ should:
 
 ---
 
+CONV-004 — Operations runbook refinement; README corrections; pre-publication audit scoping
+Date: 2026-05-18
+Status: CLOSED
+Operator: Richard McClelland
+Summary
+Primary work: operations runbook refined from Version 1 to Version 5 through four rounds of
+external review within the session. README.md corrected on three points. Pre-publication audit
+checklist scoped. Public launch decision deferred to post-vacation. ANS/Identity Digital
+competitive landscape confirmed via web search.
+Runbook — changes from Version 1 to Version 5
+Version 1 was the existing document created 2026-05-13 covering backup, restore, clean reinstall,
+in-place upgrade, and skeletal emergency procedures.
+Version 2 changes (INST findings round):
+
+Section 2 deployment inventory updated to current versions (v0.2.8 / v0.1.8 / v0.1.5)
+Tarball naming convention subsection added (dillweed- prefix rule; cosmetic mismatch on Resolver
+extract directory documented)
+Section 3 Keychain query commands added with INST-010 reference; test suite invocation subsection
+added with correct token-passing patterns
+Section 4.2 public key SHA verification step added; key authority callout and private key
+hardening note (local reference only) added
+Section 6.3 explicit uninstall commands added for all three components
+Section 6.5 tarball names corrected; INST-001 cwd-trap warning added; INST-004 SHA verification
+note added
+Section 6.7 Option B trust-root migration: "follow Section 5 selectively" replaced with full
+10-step procedure, confirmed exercised 2026-05-17 with 79/79 result
+Section 8 (new): Install-Testing Findings — INST-001, INST-004, INST-005, INST-006, INST-008,
+INST-010, each with symptom/root cause/fix/gotcha
+Section 10 operational log: two new entries (2026-05-17 install-testing session; 2026-05-18
+v1.0.0 publication)
+Sections renumbered; footer bumped to Version 2
+
+Version 3 changes (first external review round):
+
+Section 4.8 chmod fix: chmod -R 600 (bug — sets subdirectories non-traversable) replaced with
+find -type d chmod 700 / find -type f chmod 600
+Section 3: weekly quick checklist added with inline SHA verification command
+Section 4.2: key authority callout and private key hardening note added as blockquotes
+Section 6.3: explicit uninstall for all three components with launchctl verification
+Section 6.5: tarball SHA verification step with v1.0.0 expected SHAs added before extraction
+Section 9: "Published public key mismatch" emergency procedure added (most plausible failure mode)
+Section 12 (new): "Operational Safety — Do Not" section, 8 prohibitions
+Section 10: append-only clarification (discipline, not enforcement)
+Option A wording: "simpler and safer" → "operationally simpler, but breaks signature continuity"
+Footer bumped to Version 3; §12 Document Maintenance renumbered to §13
+
+Version 4 changes (second external review round):
+
+Section 6.7 Option A: further qualified — "operationally simpler unless there is a specific reason
+to preserve signature continuity. Option B is required when continuity matters."
+Section 4.11: rm -rf "${BACKUP_DATE}/" → rm -rf "${HOME}/Dillweed-Backups/${BACKUP_DATE}"
+Section 5.6: plist token verification step added after restore (grep plist vs Keychain; mismatch
+consequence: service starts but 401 on all authenticated requests)
+"Anthill immutable signal log" → "Anthill append-only signal log" in §2 table and §4.4 heading
+Restore template §11: full 64-char SHA included (was abbreviated)
+Footer bumped to Version 4
+
+Version 5 changes (third external review round — final):
+
+Restore template §11: remaining "Immutable signal log" → "Append-only signal log"
+Section 5.6: fallback note added — if grep -A1 doesn't show token, open plist and inspect
+EnvironmentVariables block directly
+Footer bumped to Version 5
+
+Version 5 committed to repo at docs/dillweed-operations-runbook.md (confirmed by file inspection
+in session).
+README.md — corrections applied
+Three corrections to README_3.md produced during session:
+
+INST-008 description corrected. Original said "tarball directory naming was fixed so all
+three components now extract to conventional directory names" — backwards. What was fixed is the
+tarball filename (dillclaw- → dillweed-). The extract directory for the Resolver still unpacks
+to dillclaw-resolver/ (cosmetic residual, known). Description corrected to match reality.
+INST-010 removed from Known Issues. Was listed as open ("Keychain query syntax not yet in
+the operations runbook"). Closed by runbook Version 2 and by the README install sections
+themselves, which document the security find-generic-password syntax. Removed from open list.
+Resolver test suite corrected. README said "Resolver does not currently ship a test.sh."
+Contradicted by ledger install-testing results (65/65 integration + 29/29 unit). Verified by
+directory listing: test.sh (31425 bytes) and unit-tests.js (7911 bytes) confirmed present at
+/usr/local/dillweed/resolver/dillclaw-resolver/. README updated to show both invocations:
+bash test.sh       # 65 integration tests
+node unit-tests.js # 29 unit tests
+No admin token required for either.
+
+Cosmetic item noted for future release: test.sh header reads "v0.1.7" — one version behind.
+Queue alongside INST-008 extract-directory cleanup for v0.1.9.
+Pre-publication audit — scoped
+Checklist confirmed from Dillweed-Public-Readiness document. Four areas:
+
+Secret/sensitive material scan
+grep -r "BEGIN PRIVATE KEY" . --include=".md" --include=".js" --include=".json" --include=".sh"
+grep -rE "[0-9a-f]{64}" . — flag any 64-char hex not matching the four known-good SHAs
+Check for REGISTRY_ADMIN_TOKEN, ANTHILL_ADMIN_TOKEN, security find-generic-password in committed files
+.gitignore review — confirm excludes *.db, *.pem, .env, node_modules/, logs/, local state dirs
+README and runbook consistency — version numbers, SHAs, ports, paths (substantially done in session)
+GitHub repo metadata — description set, license displayed, About section points to dillweed.com
+
+Audit to be executed immediately before going public. Public launch deferred to post-vacation
+(three weeks). Rationale: no announcement planned; repo going public is an enabling step, not a
+launch event; better to be present for first-impression window.
+
+Items carried forward
+
+Push ledger update and README corrections to GitHub (do before vacation or immediately after)
+Execute pre-publication audit checklist before going public
+Go public after vacation (three-week family trip)
+Post-vacation: resume Identity Digital outreach (Ram Mohan follow-up or Atallah escalation)
+Post-vacation: broader post-launch action items (server log monitoring, outreach sequencing)
+Future release (v0.1.9 cosmetic): test.sh version label fix; INST-008 extract-directory cleanup
+
+New INST entry
+INST-014 (cosmetic) — Resolver test.sh version label one behind
+Component: DillClaw Resolver
+Status: OPEN — queued for v0.1.9 cosmetic pass alongside INST-008 extract-directory cleanup
+Severity: Cosmetic / info
+Symptom: test.sh header reads "DillClaw Resolver — Test Suite (v0.1.7)" after the v0.1.8
+release. No functional impact.
+Root cause: Version label in test.sh header not updated during the v0.1.7 → v0.1.8 patch round.
+Fix: One-line update to the version string in the test.sh header comment. Queue with
+INST-008 extract-directory rename for a combined cosmetic release.
+
+---
+
 ## NOTES ON THIS FILE
 
 - If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
