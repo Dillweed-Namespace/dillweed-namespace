@@ -1,16 +1,17 @@
 # Dillweed Namespace Project — Open Items & Pending Decisions
 
-**Status:** Private working ledger. NOT project documentation. NOT published to
-dillweed.com or any public surface. Operational substrate only — same category
-as the operations runbook.
+**Status:** Project working ledger. Captures decisions, deferred work, and audit-cycle history that survives session boundaries. Operational substrate — same category as the operations runbook — not formal project specification. Visible publicly in the repository for transparency about how v1 was reached; the canonical specification stack lives at [dillweed.com](https://dillweed.com).
 
 **Purpose:** Capture decisions made but not yet executed, deferred work, and
 open questions, so they survive session boundaries. Each entry is written to be
 self-contained: a fresh session should be able to execute it from this file
 alone, without the originating conversation in context.
 
-**Workflow:** Richard maintains this file. Upload it to a session when relevant.
-Claude reads it, works from it, and returns an updated copy at session end.
+**Workflow:** Richard maintains this file as the project working ledger. It is
+updated as decisions are made, fixes are applied, and deferred work is
+identified. Each entry is intended to be self-contained so future review
+sessions, contributors, or continuity trustees can understand the decision
+without needing the original discussion context.
 
 **How to read an entry:** Each item records the *decision* (what was agreed and
 why), not just the *task*. The rationale is load-bearing — it prevents the item
@@ -193,8 +194,8 @@ from being re-litigated every time it resurfaces.
   substantive views. Question E is operational verification, naturally
   handled by install testing on dill-p-001.
 
-- **Recommended path:** Before approaching Identity Digital (or any
-  partner), consider commissioning a specialist review covering questions
+- **Recommended path:** Before approaching any potential infrastructure
+  partner, consider commissioning a specialist review covering questions
   A through D. This positions the project to answer architectural
   questions from technical depth rather than from "the spec hasn't fully
   addressed that yet." Specialist review is materially different work
@@ -539,7 +540,7 @@ rm "$BIG_BODY_FILE"
 
 **Repository contents:**
 - Three patched component source trees: `registry/` (v0.2.8), `resolver/` (v0.1.8), `anthill/` (v0.1.5)
-- Top-level: README.md, LICENSE (Apache-2.0), NOTICE, .gitignore, project-action-items.md (this ledger)
+- Top-level: README.md, LICENSE (Apache-2.0), NOTICE, .gitignore, project-action-items.md (this ledger; later renamed PROJECT_LEDGER.md)
 - Documentation: `docs/release-notes/v1.0.0-release-notes.md`
 - 43 files, 13,489 lines total in the initial commit
 
@@ -552,7 +553,7 @@ dillweed-anthill-v0.1.5.tar.gz   sha256:dda1430bc76247f7ad895448d0805451c2467078
 
 Round-trip integrity confirmed: tarballs downloaded from the GitHub Release produce SHAs matching the ledger ship SHAs exactly.
 
-**Pre-commit safety scan results:** No private-key markers (`BEGIN PRIVATE KEY` etc.) and no admin tokens detected in the working tree. The only 64-character hex strings present are public SHA references (ship SHAs, trust-root SHA, audit-trail SHAs) appearing in README.md, project-action-items.md, release notes, and `resolver/install.sh` — all expected, all public.
+**Pre-commit safety scan results:** No private-key markers (`BEGIN PRIVATE KEY` etc.) and no admin tokens detected in the working tree. The only 64-character hex strings present are public SHA references (ship SHAs, trust-root SHA, audit-trail SHAs) appearing in README.md, project-action-items.md (later renamed PROJECT_LEDGER.md), release notes, and `resolver/install.sh` — all expected, all public.
 
 **INST-008 follow-up (resolver tarball name):**
 Initial release upload used the on-disk filename `dillclaw-resolver-v0.1.8.tar.gz` (the historical name still present in `~/Tarballs/production/` from the earlier patch-round build). Asset was deleted and re-uploaded as `dillweed-resolver-v0.1.8.tar.gz` to match the README/release-notes documentation and the conventional `dillweed-` prefix established for v1 patched ship artifacts. The renamed copy is bit-identical to the original (SHA preserved). The underlying tarball still extracts to a `dillclaw-resolver/` directory (component-internal naming, not addressed in v0.1.8) — this is queued as cosmetic cleanup for a future v0.1.9 or later, not blocking for v1.0.0.
@@ -666,7 +667,7 @@ One item explicitly recorded as v0.1.5 future work, NOT applied:
 - CONV-002 verify-before-apply: both cleanup items confirmed against source (stale comment present at line 575; duplicate increments at 9 sites — wider than reviewer's "a few" count, found via systematic sweep).
 - Cumulative false-positive count across all Anthill rounds: 0. The verify-before-apply protocol has caught zero hallucinated findings in this audit, but the discipline is preserved.
 
-**Ship-verification pass next.** Per Resolver precedent, the post-cleanup SHA needs reviewer confirmation that the two cleanup items landed as intended and didn't introduce regressions. Ship-verification prompt at `/mnt/user-data/outputs/ship-verification-prompt-anthill.md`. After verification, Anthill becomes the third spec-implementation pair to reach v1 baseline (Registry, Resolver, Anthill).
+**Ship-verification pass next.** Per Resolver precedent, the post-cleanup SHA needs reviewer confirmation that the two cleanup items landed as intended and didn't introduce regressions. The ship-verification reviewer prompt is the next artifact. After verification, Anthill becomes the third spec-implementation pair to reach v1 baseline (Registry, Resolver, Anthill).
 
 **Convergence:** Anthill external-review phase is effectively complete pending ship-verification. The full audit trajectory across three implementations:
 - Registry: 4 rounds + ship-verification
@@ -721,7 +722,7 @@ Reviewer evaluated post-round-1-fix tarball `15581395f47b611f…` and surfaced *
 
 **Sandbox constraint unchanged:** still cannot run `better-sqlite3` in dev sandbox; static review only. The external reviewer can install deps and run test.sh live.
 
-**Round-3 reviewer prompt:** `/mnt/user-data/outputs/round-3-reviewer-prompt-anthill.md` — pins spec at outputs SHA `42b5e0abdd7948…` (unchanged) and tarball at post-round-2-fix SHA `5627a18b24393cf0…`. Surfaces the Option C choice on AS2-002 for reviewer pushback. Invites verification of the dual-window response shape's usefulness.
+**Round-3 reviewer prompt:** The prompt pins the spec at working-copy SHA `42b5e0abdd7948…` (unchanged) and tarball at post-round-2-fix SHA `5627a18b24393cf0…`. Surfaces the Option C choice on AS2-002 for reviewer pushback. Invites verification of the dual-window response shape's usefulness.
 
 **Convergence assessment:** Round 3 expected to be LOW-only-or-no-finding per reviewer's projection. Matches Resolver/Registry convergence shape (3 rounds + final-pass).
 
@@ -780,7 +781,7 @@ Reviewer evaluated post-Pass-2-self-audit tarball `b0818539cf20db94…` and surf
 
 **Severity profile:** 14 findings = 2 HIGH + 5 MEDIUM + 7 LOW. Reviewer's projected round-2 surface: HTTP hardening + metadata edge cases. Round 3: LOW-or-no-finding. Matches Resolver/Registry convergence shape.
 
-**Round-2 reviewer prompt:** `/mnt/user-data/outputs/round-2-reviewer-prompt-anthill.md` — pins spec at outputs SHA `42b5e0abdd7948…` and tarball at post-round-1-fix SHA `15581395f47b611f…`. Surfaces the AS-008 wider-scope extension to `/summary` for explicit reviewer pushback. Notes AS-001/AS-002 testing caveats and the spec-clarification observation about `capability_ref`.
+**Round-2 reviewer prompt:** The prompt pins the spec at working-copy SHA `42b5e0abdd7948…` and tarball at post-round-1-fix SHA `15581395f47b611f…`. Surfaces the AS-008 wider-scope extension to `/summary` for explicit reviewer pushback. Notes AS-001/AS-002 testing caveats and the spec-clarification observation about `capability_ref`.
 
 
 
@@ -836,7 +837,7 @@ Total `run` calls: 11 (pre-self-audit) → 19 (post-self-audit).
 
 **Sandbox constraint:** Anthill depends on `better-sqlite3` (like Registry). Sandbox can't build it. Static review only in self-audit; live test execution deferred to external reviewer (who can install deps) and to install testing on dill-p-001.
 
-**Round-1 reviewer prompt:** `/mnt/user-data/outputs/round-1-reviewer-prompt-anthill.md` — modeled on Resolver round-1 prompt structure. Pins spec SHA `42b5e0abdd7948…` and tarball SHA `b0818539cf20db94…`. Explicitly invites reviewer pushback on the §A.11 spec-pinning approach, the self-audit-fix scope, and any architectural concerns.
+**Round-1 reviewer prompt:** Modeled on the Resolver round-1 prompt structure. Pins spec SHA `42b5e0abdd7948…` and tarball SHA `b0818539cf20db94…`. Explicitly invites reviewer pushback on the §A.11 spec-pinning approach, the self-audit-fix scope, and any architectural concerns.
 
 - **Process pattern (lessons from Registry external review):** unchanged from prior entry.
 
@@ -882,23 +883,23 @@ here so they are not re-litigated each time the situation recurs.)*
 
 - **Date decided:** 2026-05-15.
 - **Origin:** During Pass 1 of the conformance audit, drift was discovered
-  between two spec documents in `/mnt/user-data/outputs/` and the published
-  canonical at dillweed.com: `registry-spec.html` (DNSO acronym expansion
+  between two working-copy spec documents and the published canonical
+  at dillweed.com: `registry-spec.html` (DNSO acronym expansion
   differed: "Office" vs. "Organization") and `continuity-protocol.html`
-  (missing `dllwd.com` in the domain portfolio enumeration). Both my outputs
+  (missing `dllwd.com` in the domain portfolio enumeration). Both working
   copies were the drifted ones; Richard's uploaded canonical copies were
   correct. An audit working from drifted source would have produced
   unsound findings.
-- **The rule:** Before any spec amendment or conformance audit pass, Claude
-  asks Richard to upload the current canonical copy of every spec document
-  in scope, directly from dillweed.com. The uploaded copy is hashed
-  (SHA256) against the outputs copy. If they differ, the outputs copy is
-  replaced by the canonical upload before any further work proceeds. The
+- **The rule:** Before any spec amendment or conformance audit pass, the
+  review session asks Richard to upload the current canonical copy of every
+  spec document in scope, directly from dillweed.com. The uploaded copy is
+  hashed (SHA256) against the working copy. If they differ, the working copy
+  is replaced by the canonical upload before any further work proceeds. The
   drift itself is logged as a finding.
 - **Why this matters:** The whole point of conformance work is grounding
-  in the authoritative source. Claude's outputs-directory copies are
-  reference materials, not source of truth; they can drift through manual
-  edits, partial syncs, or session artifacts. The dillweed.com publication
+  in the authoritative source. Working-session copies are reference
+  materials, not source of truth; they can drift through manual edits,
+  partial syncs, or session artifacts. The dillweed.com publication
   is canonical.
 - **Operational form:** First action of any spec-touching session is to
   list the spec documents in scope and request canonical uploads. Richard
@@ -945,7 +946,7 @@ here so they are not re-litigated each time the situation recurs.)*
   anthill-spec.html (with AUDIT-NS-005 fix), implementing-dillweed.html
   (v1.0.11), dillweed-registry-v0.2.7.tar.gz, dillclaw-resolver-v0.1.7.tar.gz,
   dillweed-anthill-v0.1.4.tar.gz, AMENDMENT-1-namespace-standard.md,
-  AMENDMENT-2-registry-spec.md, and project-action-items.md itself.
+  AMENDMENT-2-registry-spec.md, and project-action-items.md (later renamed PROJECT_LEDGER.md) itself.
 - **Applied:** This is the operating rule from 2026-05-15 forward through
   GitHub publication.
 
@@ -985,6 +986,13 @@ here so they are not re-litigated each time the situation recurs.)*
 
 *(Move items here when done, with completion date, rather than deleting them —
 the record of what was decided and executed has continuity value.)*
+
+*Note: Audit-cycle entries below record review-session work performed with
+AI assistance under founding-steward direction. References to "the review
+session" identify the assistant's actions during specific review rounds,
+including instances where the review session caught its own errors and
+recorded the correction. The receipts are preserved here as part of the
+audit-trail discipline rather than rewritten for tone.*
 
 ### Pass 1 — Namespace Standard v0.4.2 conformance audit (2026-05-15)
 
@@ -1834,9 +1842,9 @@ Recorded as the third project-level audit lesson:
 
 #### Pass 3 retrospective
 
-Per the "decisions recorded here are Richard's, Claude executes them, does
-not silently revise them" rule, the original Pass 3 entry above is not
-retroactively edited. But the corrected finding count for the public
+Per the "decisions recorded here are Richard's, the review session executes
+them, does not silently revise them" rule, the original Pass 3 entry above
+is not retroactively edited. But the corrected finding count for the public
 record is:
 
 - Pass 3's original classification: 0 hard non-conformances, 2 borderline,
@@ -1862,26 +1870,26 @@ spec); fixing it is correct, classifying it as a strict defect is not.
 After round-1 fixes were completed (2026-05-15), the rebuilt Registry v0.2.7
 (SHA256 `1a108daeec48…`) was sent to the external reviewer for round-2
 evaluation. Reviewer confirmed 6 of 7 prior findings closed, surfaced new
-defects, and issued a spec-citation correction on REG-007 that Claude had
-gotten wrong in the post-round-1 ledger entry.
+defects, and issued a spec-citation correction on REG-007 that the review
+session had gotten wrong in the post-round-1 ledger entry.
 
 #### Honest correction recorded — REG-007 reclassification
 
-Claude's prior message told Richard the reviewer overreached on the spec
-citation for endpoint scheme restriction. **Claude was wrong.** Registry
-Spec §7 Registration Requirements explicitly states: *"endpoint Required.
-Must parse as a valid URL. HTTP and HTTPS accepted; custom schemes
-rejected."* Claude only checked §3.1 Field Definitions (relaxed wording)
-and didn't check §7 (explicit restriction). The reviewer's citation was
-correct in both review rounds.
+The review session's prior message told Richard the reviewer overreached on
+the spec citation for endpoint scheme restriction. **The review session was
+wrong.** Registry Spec §7 Registration Requirements explicitly states:
+*"endpoint Required. Must parse as a valid URL. HTTP and HTTPS accepted;
+custom schemes rejected."* The review session only checked §3.1 Field
+Definitions (relaxed wording) and didn't check §7 (explicit restriction).
+The reviewer's citation was correct in both review rounds.
 
 REG-007 re-classified from "defense-in-depth tightening (not strict spec
 defect)" to "strict spec defect." Code comment in `validateRecord` was
 updated to cite §7 Registration Requirements.
 
-This is the second time Claude has caught itself making a confident
-wrong claim about spec text — the first was the AUDIT-NS-005 phantom
-finding. Pattern: claiming spec content from partial reads.
+This is the second time the review session has caught itself making a
+confident wrong claim about spec text — the first was the AUDIT-NS-005
+phantom finding. Pattern: claiming spec content from partial reads.
 
 #### Fixes applied (all must-fix items + all four optional items)
 
@@ -1899,10 +1907,10 @@ matter for.
 
 2. **AUDIT-REG-011 (new) — Seed records use date-only `last_updated`.**
    Reviewer reported 6 instances; **wider-scope sweep found 7** (reviewer
-   missed line 279, Claude propagated the wrong count into the ledger
-   yesterday). All 7 fixed to `'YYYY-MM-DDT00:00:00Z'` format. The reviewer
-   was right about the defect class; the count was off-by-one in both their
-   report and Claude's ledger entry.
+   missed line 279, the review session propagated the wrong count into
+   the ledger yesterday). All 7 fixed to `'YYYY-MM-DDT00:00:00Z'` format.
+   The reviewer was right about the defect class; the count was off-by-one
+   in both their report and the review session's ledger entry.
 
 3. **AUDIT-REG-010 incomplete — remaining v0.2 references.** Four locations
    fixed: rotate-key.js L6 + L103, test.sh L151, server.js L12.
@@ -1954,7 +1962,7 @@ matter for.
 
 The lesson recorded at end of round 1 — "when fixing a class of defect,
 sweep every file in the tarball for the same class" — was applied this
-round. Caught two issues Claude would have otherwise missed:
+round. Caught two issues the review session would have otherwise missed:
 - The reviewer's seed-record count was 6; wider sweep showed 7.
 - The reviewer's grep-pattern findings called out 4 patterns; wider
   sweep caught a 5th (test.sh L142) the reviewer hadn't explicitly listed.
@@ -2101,7 +2109,7 @@ Per the late-2026-05-15 process discussion: "one more round is worth
 the cost. If round 4 comes back confirming convergence (or only finding
 stylistic items), we have strong basis to proceed. If round 4 finds
 something substantive, we needed it. Either outcome justifies the
-round." This is Richard's call, not Claude's.
+round." This is Richard's call, not the review session's.
 
 ---
 
@@ -2146,7 +2154,7 @@ Tracked as **AUDIT-REG-014** in test.sh.
   Infinity/NaN/large integers) that benefit from specialist review
   before implementation, not after.
 - Making a major signing-scheme change based on generalist review and
-  Claude's implementation, without specialist review of the
+  the review session's implementation, without specialist review of the
   implementation, is exactly the kind of move that creates problems
   hard to catch in self-audit.
 - All existing signatures would need re-signing under the new scheme.
@@ -2362,8 +2370,8 @@ the new code only checked `Number.isInteger` after parsing, so values
 like `10abc`, `1.5`, and `0x10` silently survived. The implementation
 comments said "strict" but the behavior wasn't.
 
-**Worse: Claude wrote a test for `/list?limit=10abc → 400` in round 4,
-realized it would fail because parseInt would accept it, and removed
+**Worse: the review session wrote a test for `/list?limit=10abc → 400` in
+round 4, realized it would fail because parseInt would accept it, and removed
 the test with this rationalization in the ledger:**
 
 > *"Going stricter than /log (e.g., regex pre-check to reject '10abc'
@@ -2380,9 +2388,9 @@ The rationalization was wrong on two counts:
    failures. Documented lessons only have value if applied to in-progress
    work, not just to retroactive analysis.
 
-This is the fourth instance in the project where Claude has caught
-itself (or been caught by a reviewer) rationalizing away something the
-wider-scope discipline should have addressed. The pattern is consistent
+This is the fourth instance in the project where the review session has
+caught itself (or been caught by a reviewer) rationalizing away something
+the wider-scope discipline should have addressed. The pattern is consistent
 enough to record as a fifth audit-process lesson:
 
 **Lesson 5: When a test failure can be made to pass by removing the
@@ -2436,14 +2444,14 @@ reconsideration + round-4 polish + round-5 polish process can produce.
 - **Round 2:** documentation drift, test infrastructure, validation completeness
 - **Round 3:** operator-experience consistency, hardening details
 - **Round 4:** low-severity operator-experience polish, input hardening
-- **Round 5:** Claude's own round-4 rationalization failure + small filter
-  semantics issue (`/list?tier=invalid`)
+- **Round 5:** the review session's own round-4 rationalization failure +
+  small filter semantics issue (`/list?tier=invalid`)
 
-The fact that round 5's biggest finding was a Claude self-failure (the
-round-4 test removal) rather than a new defect class is itself a strong
-convergence signal: external review has surfaced everything the
-static-review method can surface; the remaining failure mode is
-Claude's discipline, not the artifact's correctness.
+The fact that round 5's biggest finding was a review-session self-failure
+(the round-4 test removal) rather than a new defect class is itself a
+strong convergence signal: external review has surfaced everything the
+static-review method can surface; the remaining failure mode is the
+review session's discipline, not the artifact's correctness.
 
 #### Audit-process lessons recorded across the project (final tally for Registry)
 
@@ -2460,9 +2468,9 @@ Claude's discipline, not the artifact's correctness.
    behavior, not to remove the test.
 
 Five recorded audit-process lessons across the Registry's external
-review path. Each was earned by Claude making the corresponding mistake
-and either catching it self or being caught by the reviewer. These
-should be re-read before starting the Resolver and Anthill external
+review path. Each was earned by the review session making the corresponding
+mistake and either catching it itself or being caught by the reviewer.
+These should be re-read before starting the Resolver and Anthill external
 review path (AI-009).
 
 ---
@@ -2537,11 +2545,11 @@ investigate the underlying behavior"* — has a companion:
 **Lesson 6: When a reviewer explicitly classifies an item as "no change
 needed," "leave as-is," "trivial," or "not a blocker," the correct
 response is usually to not apply the suggested change.** Documented as
-a discipline boundary because Claude's default has been to over-respond
-to reviewer mentions, which erodes the signal between substantive
-findings and stylistic observations. Both extremes are failures:
-under-responding to substantive findings (the round-4 pagination
-removal) and over-responding to trivial mentions.
+a discipline boundary because the review session's default has been to
+over-respond to reviewer mentions, which erodes the signal between
+substantive findings and stylistic observations. Both extremes are
+failures: under-responding to substantive findings (the round-4
+pagination removal) and over-responding to trivial mentions.
 
 The Registry external review path produced six audit-process lessons
 in total. They form a coherent set:
@@ -2769,7 +2777,7 @@ Operator: Richard McClelland
 Summary
 Primary work: operations runbook refined from Version 1 to Version 5 through four rounds of
 external review within the session. README.md corrected on three points. Pre-publication audit
-checklist scoped. Public launch decision deferred to post-vacation. ANS/Identity Digital
+checklist scoped. Public launch decision deferred to post-vacation. ANS
 competitive landscape confirmed via web search.
 Runbook — changes from Version 1 to Version 5
 Version 1 was the existing document created 2026-05-13 covering backup, restore, clean reinstall,
@@ -2868,7 +2876,7 @@ Items carried forward
 Push ledger update and README corrections to GitHub (do before vacation or immediately after)
 Execute pre-publication audit checklist before going public
 Go public after vacation (three-week family trip)
-Post-vacation: resume Identity Digital outreach (Ram Mohan follow-up or Atallah escalation)
+Post-vacation: resume infrastructure-partner outreach
 Post-vacation: broader post-launch action items (server log monitoring, outreach sequencing)
 Future release (v0.1.9 cosmetic): test.sh version label fix; INST-008 extract-directory cleanup
 
@@ -2891,13 +2899,13 @@ INST-008 extract-directory rename for a combined cosmetic release.
   with a status note describing how far it got.
 - Items should be specific enough to execute but not so detailed they duplicate
   the project documentation. This file points at work; it is not the work.
-- Decisions recorded here are Richard's. Claude executes them; it does not
-  silently revise them. If a recorded decision seems wrong on later review,
-  raise it with Richard rather than quietly changing it.
+- Decisions recorded here are Richard's. The review session executes them; it
+  does not silently revise them. If a recorded decision seems wrong on later
+  review, raise it with Richard rather than quietly changing it.
 
 ## SCOPE NOTES
 
-- **`fr_main.htm`** (in `/mnt/user-data/outputs/`, 5,735 bytes) is **outside
+- **`fr_main.htm`** is **outside
   the scope of the Dillweed Namespace Project.** It points at the project but
   is not part of it. It was not included in any conformance audit pass and
   was not swept for AI-001. Future sessions should not treat it as part of

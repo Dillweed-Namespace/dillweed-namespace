@@ -22,7 +22,7 @@ The v1 ship-verified baseline:
 | Resolver | 0.1.8 | `2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a` |
 | Anthill  | 0.1.5 | `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` |
 
-Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`project-action-items.md`](project-action-items.md).
+Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md).
 
 ## Trust model
 
@@ -49,7 +49,7 @@ The Registry never publishes its private key. The canonical public key is the si
 ├── README.md                       (this file)
 ├── LICENSE                         (Apache-2.0)
 ├── NOTICE                          (third-party attributions)
-├── project-action-items.md         (audit trail / project ledger)
+├── PROJECT_LEDGER.md               (audit trail / project ledger)
 ├── .gitignore
 │
 ├── registry/                       Dillweed Registry — source
@@ -160,7 +160,7 @@ bash test.sh
 
 ## Known issues
 
-See [`project-action-items.md`](project-action-items.md) for the canonical findings ledger. As of v1.0.0:
+See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. As of v1.0.0:
 
 - **INST-008 (LOW)** — partially closed; the Resolver *tarball filename* was corrected from `dillclaw-resolver-v0.1.8.tar.gz` to `dillweed-resolver-v0.1.8.tar.gz` at v1.0.0 publication. The tarball still extracts to a `dillclaw-resolver/` directory (the component-internal name) — this is a cosmetic inconsistency, not a functional issue, and is queued for cleanup in a future release
 - **INST-011 (info)** — admin tokens in launchd plist files are stored plaintext; acceptable for the v1 reference deployment but worth revisiting for multi-operator production scenarios
