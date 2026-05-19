@@ -1,9 +1,13 @@
-Dillweed Registry — Reference Implementation
-Part of the Dillweed Namespace Project
+
+Dillweed Namespace Project — Reference Implementations
 Copyright 2026 Richard McClelland
 
+This repository contains reference implementations for components of the
+Dillweed Namespace Project, including the Dillweed Registry, DillClaw 
+Resolver, and the Dillweed Anthill observability service.
+
 This product is licensed under the Apache License, Version 2.0
-(see the LICENSE file in this directory, or
+(see the LICENSE file in this repository, or
 http://www.apache.org/licenses/LICENSE-2.0).
 
 ----------------------------------------------------------------------
@@ -31,7 +35,7 @@ particular:
   DNSO (Dillweed Namespace Stewardship Office) authorization is not
   permitted.
 
-The canonical Dillweed Namespace is operated by the DNSO, and its
+The canonical Dillweed Namespace is maintained by the DNSO, and its
 trust root is verifiable against the DNSO public key published at:
 
     https://dillweed.com/dnso_public.pem
