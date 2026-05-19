@@ -27,6 +27,11 @@ package-lock.json.bak
 keys/*
 !keys/.gitkeep
 
+# Defensive: exclude private key material anywhere in the tree
+*_private.pem
+*-private.pem
+dnso_private.pem
+
 # Generated runtime data
 data/*
 !data/.gitkeep
@@ -68,3 +73,8 @@ exports/
 # Operational scratch
 tmp/
 scratch/
+
+# Backup directories — should live outside repo, exclude defensively
+Dillweed-Backups/
+*-Backups/
+*-backups/
