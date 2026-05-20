@@ -2893,6 +2893,14 @@ INST-008 extract-directory rename for a combined cosmetic release.
 
 ---
 
+### 2026-05-19 — Repository made public
+
+Repository visibility changed from private to public at
+https://github.com/Dillweed-Namespace/dillweed-namespace.
+No code or content changes; visibility setting only.
+
+---
+
 ## NOTES ON THIS FILE
 
 - If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
