@@ -2901,6 +2901,56 @@ No code or content changes; visibility setting only.
 
 ---
 
+2026-05-22 — Steward agent capabilities registered; Resolver switched to remote mode
+Operator: Richard McClelland
+Nine capability records registered for the Dillweed Protocol Steward Agent,
+establishing the first real consumer of the namespace. Full end-to-end trust
+chain verified: Registry signs → Resolver fetches from live Registry →
+DillClaw verifies Ed25519 signature → capability resolved with trust signals
+(sig_valid, sig_verified, dnso_verified).
+Capability records registered:
+review.spec.read           (allowed — read:specs)
+review.repo.read           (allowed — read:repo)
+review.website.fetch       (allowed — read:web)
+review.release.verify      (allowed — read:repo, read:release, read:web, verify:hashes)
+review.report.write        (allowed — write:report)
+review.issue.suggest       (allowed — suggest:issue)
+review.issue.open          (approval required — write:issue, requires:human_approval)
+review.patch.propose       (approval required — suggest:patch, requires:human_approval)
+ledger.update.propose      (approval required — suggest:ledger_update, requires:human_approval)
+Resolver configuration change:
+DillClaw Resolver switched from local file mode (reading static registry.json)
+to remote Registry mode (fetching from http://localhost:9475). Configuration
+applied via DILLCLAW_REGISTRY_BASE_URL in the launchd plist
+(~/Library/LaunchAgents/com.dillweed.resolver.plist). Health endpoint now
+reports "source": "remote" and "url": "http://localhost:9475".
+Naming convention corrected:
+Initial registration used redundant namespace prefix (dillweed.review.spec.read),
+producing the URI dillweed://dillweed.review.spec.read. Corrected to
+review.spec.read, resolving as dillweed://review.spec.read — consistent with
+the existing seed record pattern (research.market.intel.vendors resolves as
+dillweed://research.market.intel.vendors). The redundant-prefix record was
+revoked with reason "Redundant namespace prefix; replaced by review.spec.read".
+Registry validation findings:
+Two validation rules discovered during first registration attempt:
+
+"protocol" is a required field (added "rest" to all records)
+Endpoint scheme must be http or https per Registry Spec §7
+(changed local:// to http://localhost/)
+
+Stale records revoked:
+dillweed.review.spec.read           — redundant namespace prefix
+test.capability.register.1779048956 — install-testing artifact
+test.good.lu.1779049551             — install-testing artifact
+test.semver.beta.1779049551         — install-testing artifact
+Post-session state: 16 records in Registry (7 seed + 9 steward capabilities).
+Resolver in remote mode fetching from live Registry. All nine steward
+capabilities resolve through DillClaw with valid DNSO signatures.
+Agent code location: ~/Dillweed-Agent/ (separate from dillweed-namespace-repo;
+the agent is a consumer of the namespace infrastructure, not part of it).
+
+---
+
 ## NOTES ON THIS FILE
 
 - If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS

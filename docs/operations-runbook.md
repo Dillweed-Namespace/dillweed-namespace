@@ -64,6 +64,28 @@ The local reference deployment of the Dillweed stack consists of three services 
 
 All three plists are installed with mode 0600 (owner read/write only).
 
+### Resolver operating mode
+The DillClaw Resolver can operate in two modes:
+
+Local mode (default): reads from the static registry.json file bundled
+with the Resolver. No Registry connectivity required. Edits to registry.json
+are picked up on the next resolution without restart.
+Remote mode: fetches capability records from a live Registry instance via
+HTTP. Configured by setting DILLCLAW_REGISTRY_BASE_URL in the launchd plist's
+EnvironmentVariables block. The Resolver refreshes from the Registry every
+60 seconds (configurable via DILLCLAW_REGISTRY_REFRESH_MS) and enforces
+stale-while-revalidate per Resolver Spec §7.3.
+
+The current deployment runs in remote mode, pointed at the local Registry:
+DILLCLAW_REGISTRY_BASE_URL=http://localhost:9475
+To switch between modes, edit the Resolver's launchd plist, add or remove the
+DILLCLAW_REGISTRY_BASE_URL key, and restart the service:
+bashlaunchctl unload ~/Library/LaunchAgents/com.dillweed.resolver.plist
+launchctl load   ~/Library/LaunchAgents/com.dillweed.resolver.plist
+Verify the current mode:
+bashcurl -s http://localhost:9474/health | python3 -m json.tool
+The registry.source field reports "local" or "remote".
+
 ### macOS Keychain entries
 
 | Service | Keychain service | Keychain account |
@@ -963,6 +985,24 @@ Option B trust-root migration procedure (Section 6.7), Keychain token documentat
 (INST-010 closure), and tarball naming convention (INST-008 closure).
 ```
 
+```
+### 2026-05-22 — Resolver switched to remote mode; steward capabilities registered
+
+**Operator:** Richard McClelland
+**Procedure executed:** Resolver plist updated (Section 2), capability registration
+**Pre-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.5
+**Post-condition versions:** unchanged (configuration change only)
+**Anomalies encountered:** Resolver .env file not loaded by launchd; environment
+variable added directly to launchd plist EnvironmentVariables block instead.
+Two Registry validation rules discovered: "protocol" required field, endpoint
+scheme must be http/https per §7.
+**Notes:** DillClaw Resolver switched from local file mode to remote Registry
+mode (DILLCLAW_REGISTRY_BASE_URL=http://localhost:9475). Nine steward agent
+capability records registered. Four stale test records revoked. Full end-to-end
+trust chain verified: Registry signs, Resolver fetches, DillClaw verifies
+signature, capability resolves with dnso_verified trust signal. Post-session
+Registry contains 16 records (7 seed + 9 steward).
+```
 ---
 
 ## 11. Restore-Documentation Template
