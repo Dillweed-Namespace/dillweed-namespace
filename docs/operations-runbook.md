@@ -80,10 +80,14 @@ The current deployment runs in remote mode, pointed at the local Registry:
 DILLCLAW_REGISTRY_BASE_URL=http://localhost:9475
 To switch between modes, edit the Resolver's launchd plist, add or remove the
 DILLCLAW_REGISTRY_BASE_URL key, and restart the service:
-bashlaunchctl unload ~/Library/LaunchAgents/com.dillweed.resolver.plist
+```bash 
+launchctl unload ~/Library/LaunchAgents/com.dillweed.resolver.plist
 launchctl load   ~/Library/LaunchAgents/com.dillweed.resolver.plist
+```
 Verify the current mode:
-bashcurl -s http://localhost:9474/health | python3 -m json.tool
+```bash 
+curl -s http://localhost:9474/health | python3 -m json.tool
+```
 The registry.source field reports "local" or "remote".
 
 ### macOS Keychain entries
