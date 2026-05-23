@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Dillweed Anthill Observability Plane Specification v0.1.2 — Dillweed Namespace Project">
+  <meta property="og:description" content="Distributed signal aggregation, anomaly detection, and ecosystem health monitoring for the Dillweed Namespace. The observational layer above DillClaw and the Registry.">
+  <meta property="og:url" content="https://dillweed.com/anthill-spec.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>Dillweed Anthill Observability Plane Specification v0.1.2 — Dillweed Namespace Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:        #0d1b2a;
+      --ink:         #18202c;
+      --mid:         #445566;
+      --muted:       #6b7f94;
+      --rule:        #c9d8e8;
+      --white:       #ffffff;
+      --pale:        #f5f7fa;
+      --serif:       'Spectral', Georgia, serif;
+      --sans:        'IBM Plex Sans', system-ui, sans-serif;
+      --mono:        'IBM Plex Mono', 'Courier New', monospace;
+      --accent:      #1a5c3a;
+      --accent-lt:   #2e8b57;
+      --accent-pale: #eef7f2;
+      --accent-light:#a8d5bc;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+
+    .sidebar { position: fixed; top: 0; left: 0; width: 235px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--white); line-height: 1.25; }
+    .sb-sub { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--accent-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    main { margin-left: 235px; }
+
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(46,139,87,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(46,139,87,0.06) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -80px; right: -60px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(46,139,87,0.14) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 600; color: var(--white); line-height: 1.1; margin-bottom: 1.1rem; max-width: 620px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.5); max-width: 540px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-thesis { background: rgba(46,139,87,0.1); border: 1px solid rgba(46,139,87,0.3); border-radius: 6px; padding: 1rem 1.5rem; max-width: 600px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.9rem; font-style: italic; color: rgba(255,255,255,0.75); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    p a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(26,92,58,0.3); transition: border-color 0.15s; }
+    p a:hover { border-bottom-color: var(--accent); }
+
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--accent-lt); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+
+    ul.std { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.std li { padding: 0.4rem 0 0.4rem 1.25rem; position: relative; font-size: 0.9rem; color: var(--mid); line-height: 1.65; border-bottom: 1px solid var(--rule); }
+    ul.std li:last-child { border-bottom: none; }
+    ul.std li::before { content: ''; position: absolute; left: 0; top: 0.8rem; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-lt); opacity: 0.7; }
+    ul.std li strong { color: var(--navy); font-weight: 500; }
+
+    .callout { border-left: 3px solid var(--accent-lt); background: var(--accent-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: #0d3a20; font-size: 0.9rem; line-height: 1.7; }
+
+    .pull-quote { font-family: var(--serif); font-size: 1.1rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.6; }
+
+    .signal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.25rem 0 2rem; }
+    .signal-card { border: 1px solid var(--rule); border-top: 3px solid var(--accent-lt); border-radius: 4px; padding: 1rem 1.25rem; background: var(--pale); }
+    .signal-id { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; font-weight: 500; }
+    .signal-name { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: var(--navy); line-height: 1.3; margin-bottom: 0.4rem; }
+    .signal-desc { font-size: 0.82rem; color: var(--mid); line-height: 1.6; }
+
+    .layer-diagram { background: var(--navy); border-radius: 7px; padding: 1.75rem 2rem; margin: 1.5rem 0; }
+    .layer-diagram-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 1.25rem; }
+    .layer-row { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 0.75rem; border-radius: 4px; margin-bottom: 0.4rem; font-size: 0.82rem; }
+    .layer-row.anthill { background: rgba(46,139,87,0.18); border: 1px solid rgba(46,139,87,0.35); margin-top: 1rem; }
+    .layer-row.normal { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+    .layer-num { font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.3); width: 1.5rem; flex-shrink: 0; }
+    .layer-name { color: rgba(255,255,255,0.7); font-weight: 400; flex: 1; }
+    .layer-name.highlight { color: var(--accent-lt); font-weight: 500; }
+    .layer-role { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.28); }
+    .layer-arrow { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.18); text-align: center; padding: 0.1rem 0; }
+    .layer-plane-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(46,139,87,0.55); text-align: center; padding: 0.5rem 0 0.2rem; }
+
+    .stack-ref { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+    .stack-ref-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.75rem; }
+    .stack-ref a { display: flex; justify-content: space-between; align-items: baseline; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 0.82rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.15s; }
+    .stack-ref a:last-child { border-bottom: none; }
+    .stack-ref a:hover { color: rgba(255,255,255,0.85); }
+    .stack-ref a .doc-name { font-weight: 500; color: var(--accent-lt); }
+    .stack-ref a .doc-role { font-family: var(--mono); font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+
+    footer { margin-left: 235px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .signal-grid { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.5s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.13s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.21s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.29s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.37s; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">Dillweed Anthill&#8482; Observability Plane</div>
+    <span class="sb-version">v0.1.2</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#s1">1. Purpose</a>
+    <a href="#s2">2. Architectural Position</a>
+    <a href="#s3">3. The Observability Imperative</a>
+    <a href="#s4">4. Signal Taxonomy</a>
+    <a href="#s5">5. Aggregation &amp; Detection</a>
+    <a href="#s6">6. DNSO Integration</a>
+    <a href="#s7">7. Response Protocols</a>
+    <a href="#s8">8. Implementation Notes</a>
+    <a href="#s9">9. Contact</a>
+    <a href="#appendix-a">Appendix A: Future Work</a>
+
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Dillweed Anthill&#8482; Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Namespace Project · Dillweed Anthill&#8482; Observability Plane · Founding Phase</div>
+      <h1 class="cover-title">Dillweed Anthill&#8482; Observability Plane Specification</h1>
+      <p class="cover-tagline">Distributed signal aggregation, anomaly detection, and ecosystem health monitoring for the Dillweed Namespace. The observational layer above DillClaw and the Registry.</p>
+      <div class="cover-thesis">
+        <p>A namespace governance commitment is only as credible as the steward's ability to observe what is happening within the namespace. Anthill provides the DNSO with the instrumentation necessary to fulfill its operational obligations — not through centralized surveillance, but through distributed signal aggregation that mirrors the stigmergic coordination of its namesake.</p>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.2</span></div>
+        <div class="cover-meta-item"><span class="label">Issued</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Initial Release</span></div>
+        <div class="cover-meta-item"><span class="label">Phase</span><span class="value">Founding</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Domain</span><span class="value">dillweed.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Purpose of This Document</h1></div>
+      <p>Dillweed Anthill&#8482; is the Dillweed Namespace stack's cross-cutting observability plane for neutral infrastructure monitoring. This document specifies the Anthill Observability Plane — the cross-cutting observability document of the Dillweed stack. Anthill defines the signal taxonomy, aggregation behavior, anomaly detection thresholds, and response protocols that enable the Dillweed Namespace Stewardship Office (DNSO) to monitor the health, integrity, and fairness of the namespace ecosystem in operational deployment.</p>
+      <p>The existing specification documents describe what the namespace is, how capabilities are resolved and registered, how governance authority is structured, and how the DNSO conducts its operations. Those documents describe obligations without specifying the tooling that fulfills them. Anthill closes that gap. It is the instrumentation layer that makes DNSO stewardship operationally credible rather than aspirationally documented.</p>
+      <div class="callout">
+        <div class="callout-label">Design Principle</div>
+        <p>Anthill does not perform centralized surveillance. It aggregates weak signals distributed across resolver nodes, registry operations, and trust tier transitions into a coherent ecosystem picture — analogous to the stigmergic coordination of an ant colony, where no single agent holds complete knowledge and emergent behavior arises from distributed local signals.</p>
+      </div>
+
+      <h2 class="sub-title">Forthcoming Architectural Decisions</h2>
+      <p>This specification is a v0.1.x line and is candid about its open questions. Several substantive architectural decisions remain to be resolved beyond the current revision, not merely refinements of drafting. These include: the cross-specification hook interfaces by which Registry and Resolver implementations emit signals to the aggregation layer (Anthill §3 and §5; Registry Specification Appendix A.5; DillClaw Resolver Specification Appendix A.7); the syntactic-versus-semantic distinction within ANT-DN signal payloads (Appendix A.5); the heartbeat-and-detection mechanism by which signal absence becomes itself an observable (Appendix A.6); the reporter-incentive architecture that resolves the principal-agent tension between faithful reporting and self-incrimination (Appendix A.7); the data-minimization model for relying-party signal submission in tension with the no-centralized-surveillance posture stated above (Appendix A.8); and whether to adopt the Registry-as-reference-monitor framing as the spec's organizing principle for signal evidentiary architecture (Appendix A.10), a framing decision with consequences for §3, §4, §5, §6, §11, and the priority of cross-specification hook design. The appendix entries name the design space; they do not commit to specific resolutions. As described in the Appendix A introduction, these revisions are expected to land as separable changes rather than as a single coordinated release, sequenced according to design readiness and operational conditions, with attribution to public-review contributors who surfaced the relevant tensions.</p>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here. Most of this document is narrative and architectural; the normative content concentrates in §4 (signal metadata), §5 (aggregation immutability), §6 (stewardship cadences), and §8 (implementation behavior).</p>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Architectural Position in the Stack</h1></div>
+      <p>Anthill occupies the observational plane across the Dillweed stack — it does not modify capability records, perform resolution, or make trust tier assignments. It observes, aggregates, and alerts. All authoritative operations remain with the Registry and DNSO signing authority as specified in the Registry Specification and DNSO Operations Charter.</p>
+
+      <div class="layer-diagram">
+        <div class="layer-diagram-label">Dillweed Stack — Anthill as Orthogonal Observability Plane</div>
+        <div class="layer-row normal">
+          <span class="layer-num">L1</span>
+          <span class="layer-name">Human Gateway Layer</span>
+          <span class="layer-role">platforms · identity · policy</span>
+        </div>
+        <div class="layer-arrow">↓</div>
+        <div class="layer-row normal">
+          <span class="layer-num">L2</span>
+          <span class="layer-name">Dillweed Namespace Layer</span>
+          <span class="layer-role">naming · trust tiers · governance</span>
+        </div>
+        <div class="layer-arrow">↓</div>
+        <div class="layer-row normal">
+          <span class="layer-num">L3</span>
+          <span class="layer-name">DillClaw Resolver Layer</span>
+          <span class="layer-role">resolution · trust scoring · caching</span>
+        </div>
+        <div class="layer-arrow">↓</div>
+        <div class="layer-row normal">
+          <span class="layer-num">L4</span>
+          <span class="layer-name">Capability Layer</span>
+          <span class="layer-role">tools · agents · data sources</span>
+        </div>
+        <div class="layer-arrow">↓</div>
+        <div class="layer-row normal">
+          <span class="layer-num">L5</span>
+          <span class="layer-name">Registry Layer</span>
+          <span class="layer-role">canonical records · Ed25519 signing · revocation</span>
+        </div>
+        <div class="layer-plane-label">— observed by —</div>
+        <div class="layer-row anthill">
+          <span class="layer-num">∥</span>
+          <span class="layer-name highlight">Anthill Observability Plane</span>
+          <span class="layer-role">telemetry · aggregation · anomaly detection · DNSO alerting</span>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Architectural Note</div>
+        <p>Anthill is not a vertical dependency layer in the L1&ndash;L5 stack. It is an orthogonal observability plane that spans Registry operations, resolver behavior, governance processes, and relying-party reporting simultaneously — analogous to a distributed tracing or metrics plane that observes a service stack horizontally rather than sitting beneath it vertically. The L1&ndash;L5 numbering in this document matches the stack convention used in the Namespace Standard, DillClaw Resolver Specification, and Registry Specification. Anthill is deliberately given no layer number: it is a plane, not a layer.</p>
+      </div>
+
+      <p>The DNSO Operations Charter mandates that the DNSO monitor for capability abuse, trust tier integrity violations, and ecosystem concentration risk. Anthill is the specification of how those monitoring obligations are fulfilled. Where the Operations Charter describes the <em>what</em>, Anthill describes the <em>how</em>. Governance authority — who sets policy, who can exercise revocation, how decisions are accountable — is specified in the <a href="/governance.html">Governance Framework</a>; operational procedure for exercising that authority is specified in the <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>. Neither document is a layer of the technical stack; they are the governance instruments that direct DNSO behavior within it.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">The Observability Imperative</h1></div>
+
+      <div class="callout">
+        <div class="callout-label">Status Note — Category Scope</div>
+        <p>A review of existing AI agent observability specifications conducted in preparation for this document — including OpenTelemetry GenAI Semantic Conventions (2025), the CSA Agentic Trust Framework (2026), the Microsoft Agent Governance Toolkit, and the agent-observability offerings of LangSmith, Arize, and comparable vendors — found no prior published work addressing observability at the coordination layer described in §4. The Dillweed Anthill Observability Plane may therefore be the first published technical specification focused on neutral namespace infrastructure observability for multi-party AI capability coordination. Counterexamples are welcomed and will inform future revisions; contact details are in §9.</p>
+      </div>
+
+      <p>A governance framework that promises to detect abuse but specifies no mechanism for detection is not a governance framework — it is an aspiration. The Dillweed Namespace Project makes specific governance commitments that require operational visibility to fulfill:</p>
+      <ul class="std">
+        <li>Trust tier integrity must be maintained across the full namespace lifecycle</li>
+        <li>Revocation events must propagate correctly and completely across all resolver nodes</li>
+        <li>No single capability provider should achieve ecosystem-level concentration that compromises namespace neutrality</li>
+        <li>Resolver nodes must operate within their governance mandate and not serve fabricated or stale records</li>
+        <li>Deceptive resolution attempts — agents attempting to circumvent attestation requirements — must be detectable</li>
+      </ul>
+      <p>None of these obligations can be honored through document review alone. They require continuous observational infrastructure with defined signal types, aggregation behavior, and response thresholds. Anthill specifies that infrastructure.</p>
+      <h2 class="sub-title">Signal Origin Model</h2>
+      <p>Anthill v0.1.2 defines three classes of signal origin: resolver nodes, registry operations, and DNSO-internal processes. A fourth origin class — <strong>relying-party reporting</strong> — is recognized as a planned future capability and is addressed in Appendix A. In a mature zero-trust agent ecosystem, relying parties themselves are an important observational source: they encounter trust failures, stale revocation evidence, unexpected resolver behavior, and attestation mismatches that operator-side monitoring may not surface. Incorporating authenticated relying-party signal submission would transform Anthill from an operator-observable system into a genuinely ecosystem-observable system.</p>
+      <div class="callout">
+        <div class="callout-label">Standards Parallel</div>
+        <p>DNSSEC has certificate transparency logs and monitoring frameworks. X.509 PKI has Certificate Transparency (RFC 6962) providing append-only public logs of issued certificates. The Dillweed namespace Anthill layer places the stack in the same category of operationally serious infrastructure — governance commitments backed by observable, auditable monitoring behavior.</p>
+      </div>
+
+      <h2 class="sub-title">The Missing Observability Layer</h2>
+      <p>As of April 2026, a substantial body of AI agent observability work exists at the application layer — what agents say, how they reason, which tools they invoke. Based on the review summarized in the Status Note above, no prior published specification addresses observability at the coordination layer — the infrastructure agents use to discover and invoke capabilities across organizational boundaries. Anthill fills that gap.</p>
+
+      <div style="overflow-x:auto; margin:1.4rem 0;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+          <thead>
+            <tr>
+              <th style="background:var(--navy);color:var(--white);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 0.9rem;text-align:left;width:18%;">Layer</th>
+              <th style="background:var(--navy);color:var(--white);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 0.9rem;text-align:left;width:22%;">Focus</th>
+              <th style="background:var(--navy);color:var(--white);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 0.9rem;text-align:left;width:35%;">Existing Specifications (2026)</th>
+              <th style="background:var(--navy);color:var(--white);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 0.9rem;text-align:left;width:25%;">Dillweed Coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:0.8rem;color:var(--mid);">L7 · Application</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);">What agents say and do — reasoning traces, tool calls, output quality, latency</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);">OpenTelemetry GenAI Semantic Conventions; LangSmith; Arize; Microsoft Agent Governance Toolkit; CSA Agentic Trust Framework</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);color:var(--mid);font-style:italic;">Out of scope — addressed by existing specifications</td>
+            </tr>
+            <tr style="background:var(--accent-pale);">
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:0.8rem;color:var(--accent);">L4 · Coordination</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);font-weight:600;">How agents discover and invoke capabilities across organizational boundaries — namespace integrity, trust tier correctness, revocation propagation, concentration neutrality</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);color:var(--accent);font-weight:600;">None identified in the April 2026 review</td>
+              <td style="padding:0.6rem 0.9rem;border-bottom:1px solid var(--rule);font-family:var(--serif);color:var(--accent);font-weight:600;">Dillweed Anthill Observability Plane — six signal classes spanning all coordination-layer failure modes</td>
+            </tr>
+            <tr>
+              <td style="padding:0.6rem 0.9rem;font-family:var(--mono);font-size:0.8rem;color:var(--mid);">L3 · Network</td>
+              <td style="padding:0.6rem 0.9rem;font-family:var(--serif);">How data moves — packet routing, connection integrity, network performance</td>
+              <td style="padding:0.6rem 0.9rem;font-family:var(--serif);">OpenTelemetry network metrics; VPC flow logs; standard infrastructure monitoring</td>
+              <td style="padding:0.6rem 0.9rem;font-family:var(--serif);color:var(--mid);font-style:italic;">Out of scope — addressed by existing specifications</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Category Definition</div>
+        <p>Every existing AI agent observability specification reviewed addresses the application layer — monitoring agent behavior within deployments. Anthill addresses a categorically different question: is the neutral coordination infrastructure itself behaving with integrity? This distinction — <em>operator-observable</em> versus <em>infrastructure-observable</em> — defines a new observability category that Anthill aims to address.</p>
+      </div>
+
+      <h2 class="sub-title">Field Observation: Pre-Deployment Key Fetch Activity</h2>
+      <p>On May 3, 2026, the DNSO public key (<code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dnso_public.pem</code>) was published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">https://dillweed.com/dnso_public.pem</code> for the first time, establishing the anchor for DNSO signature verification across the namespace stack. Within hours of publication, server access logs recorded multiple automated fetches of the public key by external systems — including at least one AI system crawler operating under a recognized user agent — ahead of any public announcement or documentation update pointing to the endpoint.</p>
+      <p>This observation is significant for two reasons. First, it confirms that once a DNSO signing key URL is published, external systems will begin attempting signature verification autonomously and without coordination — validating the operational reality that the Anthill ANT-TC monitoring class is designed to address. Second, it establishes that the gap between key publication and key fetch can be measured in hours rather than days, making the key lifecycle monitoring described in §4 an immediate operational concern rather than a future one. The Anthill aggregation layer is designed to make this class of activity continuously visible to the DNSO rather than discoverable only through manual log review.</p>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Signal Taxonomy</h1></div>
+      <p>Anthill defines six primary signal classes. Each class corresponds to a distinct category of namespace ecosystem behavior that the DNSO is obligated to monitor. Signals are collected at resolver nodes and registry operations, transmitted to the Anthill aggregation layer, and evaluated against defined thresholds.</p>
+
+      <div class="signal-grid">
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 1 · ANT-TC</div>
+          <div class="signal-name">Trust Tier Drift</div>
+          <div class="signal-desc">Monitors gradual or incremental accumulation of attestations that approach or exceed a capability's declared trust tier without a corresponding formal tier elevation request. Detects capabilities that are effectively operating at a higher trust level than their registered designation.</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 2 · ANT-RC</div>
+          <div class="signal-name">Revocation Cascade</div>
+          <div class="signal-desc">Tracks the downstream effects of a revocation event across the resolver network. Measures propagation completeness, propagation latency, and any resolver nodes that continue to serve a revoked capability record beyond the grace period specified in the Registry Specification.</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 3 · ANT-DN</div>
+          <div class="signal-name">Deceptive Namespace Path Activity</div>
+          <div class="signal-desc">Identifies resolution attempts that probe namespace paths in patterns consistent with circumventing attestation requirements — including systematic probing of unregistered capability identifiers, impersonation of registered paths, or resolution requests that bypass the standard DillClaw trust verification chain.</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 4 · ANT-RA</div>
+          <div class="signal-name">Resolver Abuse</div>
+          <div class="signal-desc">Monitors DillClaw resolver nodes for behavior outside their governance mandate — including serving capability records not present in the canonical Registry, cache poisoning indicators, anomalous resolution latency patterns, and systematic misrepresentation of trust tier scores.</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 5 · ANT-WF</div>
+          <div class="signal-name">Wildcard Fanout Anomalies</div>
+          <div class="signal-desc">Detects unusual resolution patterns consistent with automated capability harvesting — including high-frequency resolution of wildcard-adjacent namespace paths, systematic enumeration of registered capabilities, and resolution volume patterns that suggest machine-driven discovery rather than legitimate agent invocation.</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-id">Signal Class 6 · ANT-EC</div>
+          <div class="signal-name">Ecosystem Concentration Risk</div>
+          <div class="signal-desc">Measures the distribution of capability invocations across registered providers. Identifies when a disproportionate share of agent activity routes through a single capability provider or organizational group, creating systemic fragility and potential neutrality risk in the namespace ecosystem.</div>
+        </div>
+      </div>
+
+      <h2 class="sub-title">Signal Metadata Requirements</h2>
+      <p>Each signal instance MUST carry the following metadata fields to support aggregation and audit:</p>
+      <ul class="props">
+        <li><strong>signal_class</strong> — one of ANT-TC, ANT-RC, ANT-DN, ANT-RA, ANT-WF, ANT-EC</li>
+        <li><strong>signal_timestamp</strong> — RFC 3339 date-time in UTC with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">Z</code> offset and second precision (<code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">YYYY-MM-DDTHH:MM:SSZ</code>). Non-UTC offsets and fractional seconds MUST NOT be used. This matches the timestamp convention used across the Dillweed stack (see <a href="/registry-spec.html">Registry Specification v0.1</a> §3.1).</li>
+        <li><strong>signal_nonce</strong> — cryptographically random 128-bit value generated fresh for each signal instance; prevents signed signal replay attacks by ensuring no two signal submissions share an identical nonce</li>
+        <li><strong>node_sequence</strong> — monotonically increasing integer maintained per originating node; the aggregation layer MUST reject any signal whose node_sequence value does not exceed the last accepted sequence number for that node, preventing replay of previously accepted signals</li>
+        <li><strong>originating_node</strong> — resolver node identifier or REGISTRY for registry-origin signals</li>
+        <li><strong>capability_ref</strong> — the capability identifier under observation, if applicable</li>
+        <li><strong>severity</strong> — one of INFORMATIONAL, ADVISORY, WARNING, CRITICAL</li>
+        <li><strong>signal_payload</strong> — class-specific structured data as defined in the per-class schema</li>
+        <li><strong>node_signature</strong> — Ed25519 signature over the canonical serialization of all preceding fields using the originating node's registered key; the signature MUST cover signal_nonce and node_sequence to ensure authenticity of replay protection fields</li>
+      </ul>
+
+      <h2 class="sub-title">Replay and Collision Handling</h2>
+      <p>If the aggregation layer receives a signal whose <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_nonce</code> matches a previously accepted signal from the same <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">originating_node</code>, the signal MUST be rejected as a replay attempt. The aggregation layer MUST additionally generate a CRITICAL-severity ANT-RA (Resolver Abuse) signal naming the offending node. Nonce collisions at 128-bit random generation are statistically negligible in the absence of a broken RNG, implementation bug, or deliberate replay; a collision therefore indicates one of those conditions and warrants escalation regardless of cause.</p>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Aggregation and Anomaly Detection</h1></div>
+      <p>Anthill aggregation operates on a rolling time window basis. Signals from distributed resolver nodes are collected at the DNSO aggregation endpoint, deduplicated by node identifier and timestamp, and evaluated against defined thresholds. No resolver node has visibility into the aggregate signal picture — each node reports its local observations independently, and emergent anomaly patterns are identified only at the aggregation layer.</p>
+
+      <h2 class="sub-title">Aggregation Windows</h2>
+      <p>Three aggregation windows are defined for different signal classes:</p>
+      <ul class="props">
+        <li><strong>Immediate window (60 seconds)</strong> — ANT-DN and ANT-RA signals, which may indicate active abuse requiring rapid response</li>
+        <li><strong>Short window (1 hour)</strong> — ANT-RC signals, which require time to assess propagation completeness across the resolver network</li>
+        <li><strong>Extended window (24 hours)</strong> — ANT-TC, ANT-WF, and ANT-EC signals, which represent gradual ecosystem trends rather than acute events</li>
+      </ul>
+
+      <h2 class="sub-title">Threshold Escalation Model</h2>
+      <p>Each signal class defines severity thresholds that trigger escalation from INFORMATIONAL through CRITICAL. Threshold values are operational parameters maintained by the DNSO and subject to adjustment as the namespace ecosystem matures. This specification defines the escalation structure; the DNSO Operations Charter governs response obligations at each severity level.</p>
+      <ul class="std">
+        <li><strong>INFORMATIONAL</strong> — logged to the immutable operational log; no immediate action required; visible to Participant Council in periodic reporting</li>
+        <li><strong>ADVISORY</strong> — logged and queued for DNSO review within 72 hours; no immediate action required but pattern monitoring is elevated</li>
+        <li><strong>WARNING</strong> — logged and escalated to DNSO steward within 24 hours; response protocol initiated; affected parties notified if applicable</li>
+        <li><strong>CRITICAL</strong> — logged and escalated to DNSO steward immediately; emergency revocation or suspension authority may be invoked per Operations Charter §6.3</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-label">Immutability Requirement</div>
+        <p>All Anthill signal records, aggregation results, threshold breach events, and DNSO response actions MUST be written to the immutable operational log defined in the DNSO Operations Charter §9.1. No signal record may be deleted, overwritten, or suppressed after initial write. This immutability requirement is foundational to the auditability of DNSO stewardship behavior.</p>
+      </div>
+
+      <h2 class="sub-title">Cross-Signal Correlation</h2>
+      <p>The aggregation layer performs cross-signal correlation to identify compound anomaly patterns that do not individually exceed threshold but together indicate coordinated or systematic abuse. A resolver node simultaneously generating ANT-DN and ANT-WF signals, for example, warrants escalation even if neither signal individually reaches WARNING severity. Cross-signal correlation rules are maintained by the DNSO and versioned as operational parameters.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">DNSO Stewardship Integration</h1></div>
+      <p>Anthill is not an autonomous enforcement system. It is an observational instrument that provides the DNSO with the visibility necessary to exercise its stewardship obligations as defined in the Governance Framework and DNSO Operations Charter. All enforcement actions — revocation, suspension, trust tier revision, resolver node decertification — remain with the DNSO and follow the procedures specified in those documents.</p>
+
+      <h2 class="sub-title">Stewardship Visibility Obligations</h2>
+      <p>The DNSO steward is obligated to review Anthill aggregation outputs at the following cadences:</p>
+      <ul class="props">
+        <li><strong>Continuous</strong> — automated alerting for CRITICAL severity events; steward MUST acknowledge within 4 hours</li>
+        <li><strong>Daily</strong> — review of WARNING severity events generated in the prior 24-hour period</li>
+        <li><strong>Weekly</strong> — review of extended-window aggregation outputs for ANT-TC, ANT-WF, and ANT-EC signals; ecosystem health summary prepared for Participant Council visibility</li>
+        <li><strong>Monthly</strong> — full ecosystem health report submitted to Participant Council, including threshold breach counts by class, response actions taken, and any parameter adjustments made</li>
+      </ul>
+
+      <h2 class="sub-title">Participant Council Transparency</h2>
+      <p>Anthill aggregate health data — at the ecosystem level, not at the individual signal level — is reported to the Participant Council as part of the DNSO's transparency obligations under the Governance Framework. Individual signal records containing identifying information about specific resolver nodes or capability providers are not disclosed to the Participant Council absent a formal governance proceeding.</p>
+
+      <h2 class="sub-title">Neutrality Monitoring</h2>
+      <p>The ANT-EC (Ecosystem Concentration Risk) signal class has specific relevance to the DNSO's neutrality obligations. The founding thesis of the Dillweed Namespace is that no single participant should achieve effective control over capability discovery. Anthill's concentration risk monitoring operationalizes this commitment — providing early warning when usage patterns approach concentration levels that would compromise the namespace's value as neutral infrastructure.</p>
+      <div class="callout">
+        <div class="callout-label">Concentration Threshold Principle</div>
+        <p>The specific concentration thresholds that trigger ANT-EC escalation are operational parameters, not normative values in this specification. The DNSO is responsible for setting and periodically reviewing these thresholds in consultation with the Participant Council. The principle — that no single provider or organizational group should achieve ecosystem-dominant share of capability invocations without triggering DNSO review — is normative. Concentration alerts are governance review signals, not anti-success controls. High invocation volume achieved through legitimate adoption and superior capability quality is not a violation; it is a condition that warrants monitoring to ensure the namespace remains structurally accessible to new entrants and that concentration does not become a de facto governance mechanism.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Signal Response Protocols</h1></div>
+      <p>Each signal class has defined response protocol pathways that the DNSO follows when threshold escalation occurs. Response protocols are not automated — they are structured decision frameworks that the DNSO steward applies in evaluating the appropriate action given the signal context.</p>
+
+      <h2 class="sub-title">ANT-TC Response: Trust Tier Drift</h2>
+      <p>Upon WARNING escalation, the DNSO initiates a trust tier audit for the affected capability. The audit evaluates whether the capability's operational attestation profile is consistent with its registered trust tier. If drift is confirmed, the DNSO may issue a formal notice to the capability registrant requiring either a trust tier elevation request or a reduction in operational scope. Unresolved drift at CRITICAL severity may result in trust tier revision through the Registry's administrative authority.</p>
+
+      <h2 class="sub-title">ANT-RC Response: Revocation Cascade</h2>
+      <p>Revocation cascade failures — resolver nodes continuing to serve revoked capability records — trigger direct contact with the affected node operator. Node operators have 24 hours to resolve propagation failures upon WARNING escalation. Persistent propagation failure at CRITICAL severity may result in resolver node decertification per the DNSO Operations Charter.</p>
+
+      <h2 class="sub-title">ANT-DN Response: Deceptive Namespace Path Activity</h2>
+      <p>Deceptive namespace path activity at WARNING severity triggers an investigation into the originating resolution requests. If the activity originates from a registered agent deployment, the DNSO notifies the relevant implementer organization. Activity that cannot be attributed to a registered participant is logged and monitored for pattern escalation. CRITICAL severity deceptive path activity may be referred to appropriate external parties depending on the nature and context of the activity.</p>
+
+      <h2 class="sub-title">ANT-RA Response: Resolver Abuse</h2>
+      <p>Resolver abuse represents a direct violation of a node operator's governance obligations. WARNING escalation triggers immediate contact with the node operator and a 48-hour remediation window. Unresolved abuse at CRITICAL severity results in resolver node suspension pending investigation and, upon confirmation, decertification. The DNSO may additionally notify implementers relying on the affected node to redirect resolution traffic during the suspension period.</p>
+
+      <h2 class="sub-title">ANT-WF Response: Wildcard Fanout Anomalies</h2>
+      <p>Wildcard fanout anomalies are evaluated in context — some high-frequency resolution patterns represent legitimate agent behavior at scale. DNSO investigation at WARNING severity focuses on distinguishing legitimate high-volume resolution from systematic capability enumeration. If enumeration is confirmed, the DNSO may implement rate limiting recommendations for the relevant resolver nodes and notify the Participant Council of the pattern.</p>
+
+      <h2 class="sub-title">ANT-EC Response: Ecosystem Concentration Risk</h2>
+      <p>Ecosystem concentration risk does not trigger punitive action against any individual participant — high invocation volume is a consequence of market adoption, not a violation. The DNSO's response is analytical and communicative: issuing an ecosystem health advisory to the Participant Council, initiating outreach to encourage adoption diversity, and reviewing whether namespace structure or resolver behavior is inadvertently creating concentration pressure that could be mitigated through governance adjustment.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Implementation Notes</h1></div>
+      <p>This version of the Anthill specification defines the conceptual architecture, signal taxonomy, aggregation model, and response protocol framework. A Node.js reference implementation of the Anthill aggregation layer is now operational in local deployment, consistent with the DillClaw Resolver and Registry reference implementations also operating in local deployment. Future packaging for distribution is tracked in Appendix A.</p>
+
+      <h2 class="sub-title">Resolver Node Instrumentation</h2>
+      <p>DillClaw resolver nodes that participate in Anthill reporting require instrumentation additions to the reference implementation. The Anthill aggregation endpoint accepts signal submissions over HTTPS using Ed25519 signatures generated by the submitting node's registered key. Resolver node key registration follows the procedure defined in the DNSO Operations Charter.</p>
+
+      <h2 class="sub-title">Registry-Origin Signals</h2>
+      <p>Certain signal classes — particularly ANT-TC (Trust Tier Drift) and ANT-EC (Ecosystem Concentration Risk) — are most accurately generated from Registry-side analysis rather than resolver observation. The Registry reference implementation will include hooks for generating these signals directly from registration and attestation activity, signed with the DNSO's canonical Ed25519 key.</p>
+
+      <h2 class="sub-title">Privacy and Data Minimization</h2>
+      <p>Anthill signals MUST carry the minimum identifying information necessary to support the relevant analysis. Signal payloads MUST NOT include agent identity information, end-user data, or content of capability invocations. The observational scope of Anthill is limited to namespace infrastructure behavior — resolution patterns, trust tier transitions, revocation propagation — and does not extend to the content of agent operations conducted through the namespace.</p>
+
+      <h2 class="sub-title">Timestamp Integrity: Known Limitation</h2>
+      <p>The current specification relies on two timestamp sources: <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_timestamp</code>, which is supplied by the submitting node, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">received_at</code>, which is recorded by the aggregation layer at ingestion using its local system clock. Neither value is cryptographically bound to an external time authority. This creates a class of evidentiary limitation that implementers and relying parties should understand.</p>
+      <p>A submitting node may supply an arbitrary <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_timestamp</code> value — backdated, forward-dated, or imprecise — without detection. The nonce and node_sequence replay-protection mechanisms specified in §4 prevent duplicate submission and out-of-order replay, but they do not validate temporal accuracy of the timestamp field itself. Similarly, if the system clock of the aggregation host is manipulated, <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">received_at</code> values recorded during the manipulation window will reflect the manipulated time. This does not corrupt the database structure or the nonce integrity of other records; it introduces only timestamp inaccuracy for signals received during that window.</p>
+
+      <div class="callout">
+        <div class="callout-label">Empirical Note — May 2026</div>
+        <p>During reference implementation testing, system clock manipulation on the aggregation host was verified to produce no service crash, no database corruption, and no nonce integrity failure. The service continued operating correctly throughout the manipulation window. No signals were received during the test window, so no records with anomalous timestamps were produced. This observation confirms that the current design provides operational resilience against clock manipulation but does not provide evidentiary protection — the immutable log faithfully preserves whatever timestamps were written, whether accurate or not.</p>
+      </div>
+
+      <p>The practical consequence is that the current v0.1.1 implementation satisfies the immutability requirement — records are written once and never mutated — but does not satisfy the stronger admissibility standard that Jeremy Bouedo identified in the context of this specification's public review: a neutral observer whose evidence must survive challenge before a regulator six months after the fact. An append-only log with manipulated timestamps is still append-only; it simply cannot prove what it claims about time ordering without external corroboration. For deployments where timestamp admissibility matters, RFC 3161 trusted timestamping is the appropriate upgrade path. See Appendix A.4.</p>
+
+      <h2 class="sub-title">Versioning and Parameter Management</h2>
+      <p>Anthill operational parameters — aggregation windows, escalation thresholds, cross-signal correlation rules — are versioned separately from this specification document. Parameter versioning follows the Stack Family convention. This specification document version (v0.1.2) defines the normative framework within which operational parameters are applied; parameter values are maintained by the DNSO and published in the operational log. Parameter publication format is addressed in Appendix A.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Contact and Further Information</h1></div>
+      <p>Inquiries regarding the Anthill Observability Specification, implementation participation, or DNSO monitoring obligations may be directed through <a href="https://dillweed.com">dillweed.com</a>.</p>
+
+      <div class="stack-ref">
+        <div class="stack-ref-label">Dillweed Specification Stack — Complete</div>
+        <a href="/namespace-standard.html"><span class="doc-name">Namespace Standard v0.4</span><span class="doc-role">naming model · trust tier definitions · authority boundaries</span></a>
+        <a href="/dillclaw-spec.html"><span class="doc-name">DillClaw Resolver Spec v0.1</span><span class="doc-role">resolution protocol · trust scoring · API contract</span></a>
+        <a href="/registry-spec.html"><span class="doc-name">Registry Specification v0.1</span><span class="doc-role">data model · signing authority · revocation semantics</span></a>
+        <a href="/governance.html"><span class="doc-name">Governance Framework v1.0</span><span class="doc-role">authority structure · succession · neutrality preservation</span></a>
+        <a href="/dnso-operations-charter.html"><span class="doc-name">DNSO Operations Charter v1.0</span><span class="doc-role">operating procedures · attestation · service posture</span></a>
+        <a href="/anthill-spec.html"><span class="doc-name">Anthill Observability Spec v0.1.2</span><span class="doc-role">signal taxonomy · anomaly detection · DNSO instrumentation · this document</span></a>
+        <a href="/standards-overview.html"><span class="doc-name">Standards Overview</span><span class="doc-role">integrated standards-facing reference</span></a>
+        <a href="/continuity-protocol.html"><span class="doc-name">Continuity Protocol GSP-01 v1.0</span><span class="doc-role">succession · key custody · stewardship continuity</span></a>
+      </div>
+
+      <div class="pull-quote">
+        A namespace governance commitment is only as credible<br>
+        as the steward's ability to observe what is happening within it.
+      </div>
+    </section>
+
+    <!-- Appendix A — Future Work (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Future Work (Non-Normative)</h1></div>
+
+      <p>This appendix records items intended for a future revision of the Anthill Observability Plane Specification. It is non-normative: nothing in this appendix imposes conformance requirements on implementations of v0.1.2. It is included to disclose the anticipated direction of the specification so that implementers can make informed decisions about extensibility and ecosystem participants can plan for forthcoming changes.</p>
+
+      <p>The items in this appendix are not committed to a single coordinated release. The DNSO will sequence these revisions as separable changes, with each landing when its design work has matured and operational conditions warrant. This phased posture, suggested in public review of v0.1.2, reflects how working specifications typically evolve: by separable design decisions rather than monolithic versioning.</p>
+
+      <h2 class="sub-title">A.1 Relying-Party Signal Origin</h2>
+      <p>The current specification defines three classes of signal origin: resolver nodes, registry operations, and DNSO-internal processes (§3). A future revision is expected to introduce a fourth origin class — <strong>relying-party reporting</strong> — allowing authenticated downstream consumers of the namespace to submit signals when they encounter trust failures, stale revocation evidence, unexpected resolver behavior, or attestation mismatches. This is among the primary subsequent development paths for the specification.</p>
+      <p>Introducing relying-party signal origin creates tension with the §8 Privacy and Data Minimization commitment: a relying party reporting a trust failure may reasonably wish to identify which agent encountered the failure, which begins to touch agent identity. A future revision is expected to resolve this tension by defining a constrained identity disclosure model in which relying parties identify themselves and the affected resolver node but do not disclose end-user or agent identity except under specific governance conditions. This change will affect §3 (signal origin model), §4 (signal metadata), and §8 (privacy).</p>
+
+      <h2 class="sub-title">A.2 Reference Implementation</h2>
+      <p>A packaged Node.js reference implementation of the Anthill aggregation layer is planned, consistent with the reference implementations published for the DillClaw Resolver and the Dillweed Registry. The reference implementation will include: the HTTPS aggregation endpoint with Ed25519 signature validation; the nonce and node_sequence replay-protection logic specified in §4; the three aggregation windows specified in §5; a minimal threshold escalation engine; and an append-only log satisfying the immutability requirement in §5. Resolver-side instrumentation hooks and Registry-origin signal hooks described in §8 will ship as separate modules integrated into the existing reference implementations.</p>
+
+      <h2 class="sub-title">A.3 Operational Parameter Publication Format</h2>
+      <p>Anthill operational parameters — threshold values per signal class, aggregation window tuning, cross-signal correlation rules — are versioned separately from this specification (§8). The exact publication format for operational parameters is not specified in v0.1.2. A future revision is expected to define: a machine-readable parameter schema (expected to be JSON with an accompanying JSON Schema validation document); a DNSO-signed parameter manifest that resolvers can fetch and validate; and a change-notification mechanism so that resolver operators can discover parameter revisions without polling. This change will affect §8.</p>
+
+      <h2 class="sub-title">A.4 External Timestamp Anchoring (RFC 3161)</h2>
+      <p>The v0.1.1 reference implementation records two timestamp values per signal — <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_timestamp</code> (supplied by the submitting node) and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">received_at</code> (recorded by the aggregation host at ingestion). Neither is cryptographically bound to an external time authority. As documented in §8, this satisfies the immutability requirement but not the stronger admissibility standard — a manipulated system clock produces incorrect <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">received_at</code> values that the immutable log faithfully preserves without any indication of manipulation.</p>
+      <p>A future revision is expected to address this through RFC 3161 trusted timestamping at the aggregation layer. Under this approach, upon accepting a valid signal, the aggregation endpoint computes a hash of the canonical signal record and submits it to a trusted timestamping authority (TSA) operating under RFC 3161. The TSA returns a signed timestamp token — a cryptographic assertion by the TSA that the submitted hash existed at a stated time. This token is stored alongside the signal record and is independently verifiable by any party with access to the TSA's public certificate chain, without requiring trust in the aggregation host's system clock.</p>
+      <p>This upgrade path does not require changes to the signal submission protocol or the nonce and sequence replay-protection mechanisms. It adds a post-ingestion step at the aggregation layer only. The resulting signal record would include a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">tsa_timestamp_token</code> field containing the RFC 3161 token in base64 encoding, and a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">tsa_url</code> field identifying the TSA used. Records ingested before this capability was enabled would have null values in these fields, providing a clear demarcation between pre- and post-anchored signal history.</p>
+      <p>The practical consequence, as Jeremy Bouedo observed in public review of this specification, is that the distinction between a neutral observer that <em>exists</em> and one whose evidence <em>survives challenge</em> is resolved at the timestamp layer. Nonce and sequence integrity prove that no signal was replayed. RFC 3161 timestamps prove that a signal existed at a stated time independently of the aggregation host's clock. Together they constitute an admissible record — one a regulator or auditor can evaluate without requiring trust in the DNSO's own infrastructure.</p>
+
+      <h2 class="sub-title">A.5 ANT-DN Failure-Class Distinction</h2>
+      <p>The current ANT-DN signal class (§3) treats deceptive namespace path activity as a single category, framed primarily in adversarial terms — systematic probing of unregistered identifiers, impersonation of registered paths, bypass of the standard trust verification chain. In practice, the wire-level traffic produced by an adversary probing for unregistered paths is indistinguishable from the traffic produced by an agent built on a language model that hallucinates capability paths it expects to exist. Both produce well-formed queries against capability identifiers that do not resolve. Without a payload-level distinction, ANT-DN aggregation conflates integration immaturity with adversarial intent, and the response posture defined in §11 cannot differentiate operator-actionable signals (a deployed agent producing many semantic misses, indicating a model that needs better grounding) from security-actionable signals (a coordinated probing campaign, indicating an attempted attack).</p>
+      <p>A future revision is expected to add a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">lookup_failure_class</code> field to the ANT-DN signal payload schema with two enumerated values: <strong>syntactic</strong> for parse errors, malformed identifiers, length violations, or other failures detectable before any registry lookup is attempted; and <strong>semantic</strong> for well-formed queries against capability identifiers that have no matching record. Aggregation logic at the DNSO would then evaluate syntactic-heavy and semantic-heavy patterns against distinct thresholds, with syntactic-heavy patterns producing operator-coordination guidance to the affected agent operator and semantic-heavy patterns producing the security-oriented response described in §11. The signal class name and description would also be revised to acknowledge the broadened scope: ANT-DN surfaces both adversarial probing and integration anomalies, and the response protocol in §11 would gain a corresponding integration-anomaly path. This change will affect §3, §6.1, and §11.</p>
+
+      <h2 class="sub-title">A.6 Signal-Absence Detection</h2>
+      <p>The current signal taxonomy (§3) defines six classes of <em>positive</em> observation — events the resolver and registry layers report when something noteworthy happens. The taxonomy does not address the converse case in which a node previously emitting signals goes silent. From the aggregation layer's perspective, a compromised resolver whose signal-generation code has been disabled, a network partition that isolates a node from the aggregation endpoint, and a node operating normally but with no anomalies to report are presently indistinguishable: all produce the same quieter feed. In a distributed observability plane intended to detect coordinated abuse of the namespace, the absence of expected signals is itself a load-bearing observable — particularly under threat models in which an attacker's first move is to silence the monitor.</p>
+      <p>A future revision is expected to address this through a heartbeat-and-detection pair. Each node generating Anthill signals would emit a periodic INFORMATIONAL signal (provisionally named <strong>ANT-HB</strong>, Heartbeat) at a defined interval, attesting continued operation, current signal-generation code version, and active signing key identifier. The aggregation layer would maintain expected-heartbeat tracking per registered node and would generate a derived anomaly signal (provisionally named <strong>ANT-NU</strong>, Node Unavailability) when expected heartbeats fail to arrive within tolerance. Heartbeat interval and missed-heartbeat thresholds would be DNSO-maintained operational parameters versioned per Appendix A.3. The interaction with the no-centralized-surveillance posture stated in §1 requires careful design: heartbeats convey only liveness and version state, not behavioral telemetry, and the aggregation layer's expected-set is derived from public node enrollment rather than from inferred activity. This change will affect §3, §4, §5, §8, and §11, and may warrant promotion of the heartbeat-and-detection pair to a §3 signal-class entry rather than treatment as an Appendix A future-work item alone, depending on the design path selected.</p>
+
+      <h2 class="sub-title">A.7 Reporter-Incentive Alignment</h2>
+      <p>The current Anthill design assumes that resolver nodes are reliable reporters of their own behavior. Several signal classes — most directly ANT-RA, but indirectly ANT-DN, ANT-WF, ANT-RC, and ANT-EC — require nodes to emit signals that may become evidence in subsequent governance review of those same nodes. This creates a principal-agent tension: an operator who reports faithfully exposes themselves to audit attention, while an operator who suppresses noisy reporting reduces that exposure. Over time, the population of "compliant" reporters becomes the population that has not yet had a serious incident, while operators who have had incidents have learned to report less. The current specification offers no mechanism that resolves this tension; it relies on operator goodwill and on the broader incentives of namespace participation.</p>
+      <p>A future revision is expected to address this through one or both of the following architectural directions. <strong>Reporter-reputation registers</strong> — a separate operator-level register, distinct from capability-level trust scores, that reflects observability-reporting fidelity and surfaces in operator-facing contexts (DNSO partnership decisions, mirror operator selection, trustee eligibility) rather than in caller-facing trust scores. The cleanest design preserves the layering boundary: trust tiers continue to express capability authenticity, while operator stewardship reputation runs alongside on its own surface. External corroboration is a tool available within this direction: signals that can be cross-validated against Registry-side records, peer-resolver observations, or relying-party reports carry stronger evidentiary weight than signals that stand alone, and a reputation register can reflect that distinction without committing to a specific reward or penalty schedule. <strong>Verifiable signal-completeness attestation</strong> — a complementary cryptographic mechanism in which each node periodically signs and publishes a Merkle root over the signals it generated in a window, such that suppression becomes retrospectively detectable when other observers (relying parties, peer resolvers, audit reviewers) report signals that should have been included but were not. This shifts a portion of the problem from incentive design to verifiable-completeness design, which is more aligned with the rest of the Dillweed stack's reliance on signed records and append-only logs. Reputation registers and completeness attestation address different temporal scales — reputation surfaces patterns that emerge over operational windows of weeks or months, while completeness attestation provides per-event cryptographic evidence within a single window. The two are architecturally complementary across the time dimension rather than alternatives within the same time scale. Either or both directions may be selected; the design choice will balance mechanism complexity against attack surface. This change will affect §4, §5, §8, and §11, and is one of the substantive architectural decisions to be resolved in subsequent revisions of this specification.</p>
+
+      <p>A reputation-register design must also address the bootstrap problem for new operators. When the first non-DNSO-operated resolver node comes online, it has no reputation history, and the principled answer to "what initial value does it receive" is not obvious. A zero-reputation seed creates a chicken-and-egg barrier in which the only way to earn standing is to operate, but operating requires standing. A full-reputation seed creates Sybil exposure in which an adversary can spin up fresh nodes for short-horizon misbehavior and discard them before reputation degrades meaningfully. The architectural shape of a workable answer is likely to derive newcomer seed values from primitives the stack already provides — most plausibly the Registry's own attestation tier for the operator's identity record, such that an operator entering at the Registry's <em>verified</em> tier seeds at a different reputation than one entering at the <em>experimental</em> tier, with reputation maturation tracked over operational time. This couples Anthill operator reputation to Registry attestation rather than treating them as independent surfaces, and it makes the bootstrap problem a cross-specification design point rather than an Anthill-internal one.</p>
+
+      <h2 class="sub-title">A.8 Relying-Party Data Minimization</h2>
+      <p>Appendix A.1 anticipates a fourth origin class for signals — relying-party reporting — in which agents and other namespace consumers submit observations of trust failures, stale revocation evidence, unexpected resolver behavior, and attestation mismatches that operator-side monitoring may not surface. A diagnostic-quality relying-party signal must carry enough detail for a DNSO investigator to determine why a trust verification failed: the queried capability identifier, the resolver node consulted, the trust signals received and the relying party's evaluation, the failure mode encountered, and the timestamp. Several of these fields are sensitive from the relying party's perspective. They reveal the relying party's invocation patterns, network topology, operational policy, and definition of acceptable behavior. The aggregate of such reports submitted to a central log is, from the relying party's perspective, indistinguishable from surveillance — directly in tension with the no-centralized-surveillance posture stated in §1.</p>
+      <p>A future revision is expected to address this tension explicitly, recognizing that no clean global resolution is available — the design choice will likely be made per signal class rather than uniformly. Three architectural directions are under consideration. <strong>Pseudonymized payload with relying-party-held de-pseudonymization key</strong> — relying parties report under a stable pseudonym signed by their own key, with the binding to operator identity held privately by the relying party. The DNSO observes patterns of failure across the ecosystem but cannot identify individual relying parties without voluntary de-pseudonymization. <strong>Tiered detail with relying-party-controlled disclosure</strong> — initial signals carry only the minimum information necessary to detect the failure category; the DNSO acknowledges receipt and may request additional detail through a structured back-channel, with the relying party deciding whether to provide it. Analogous to the way RFC 9162 Certificate Transparency proves an event occurred without requiring identification of the reporter. <strong>Aggregated submission via trusted intermediaries</strong> — relying parties submit to operator-level or industry-level aggregators that collapse multiple raw signals into a single anonymized population signal before submitting to Anthill. This loses individual-incident granularity but preserves population-level signal. Different signal types likely warrant different mechanisms: population-health signals plausibly via aggregation; specific-resolver-misbehavior signals plausibly via pseudonymization with per-incident de-pseudonymization. This change will affect §1, §2, §3, §4, and §11, and is one of the substantive architectural decisions to be resolved in subsequent revisions of this specification.</p>
+
+      <h2 class="sub-title">A.9 Implementation Onboarding Documentation</h2>
+      <p>This specification is a normative architecture and signal-taxonomy document. It does not host implementation-level guidance — sample configuration files, environment-variable schemas, quickstart command sequences, integration test fixtures, or operator-facing runbooks for deploying a conformant Anthill participant node. As the Node.js reference implementation matures and as external operators begin configuring resolver nodes that emit Anthill signals, that material will become important to ecosystem participation but does not belong inside this specification: configuration shapes evolve faster than specifications, and mixing the two would commit the spec to a maintenance burden inconsistent with its standards-facing role.</p>
+      <p>A separate implementation guide, developer portal, or operator handbook is the appropriate venue for this material and is anticipated as a future deliverable of the DNSO. The spec text will reference such documentation when it exists, but will not absorb it. This appendix entry exists to make the gap explicit so that reviewers and prospective implementers can locate it as an intentional boundary of scope rather than an oversight.</p>
+
+      <h2 class="sub-title">A.10 Registry as Reference Monitor for Signal Verification</h2>
+      <p>The current specification (§3) defines six signal classes as architectural peers, all flowing into the aggregation layer with equal evidentiary status. This framing is correct at the wire level but obscures a deeper structural pattern: the six classes do not all originate at the same architectural layer, and their evidentiary weight depends on whether the originating layer is the authoritative source of the underlying truth claim. ANT-EC (Ecosystem Concentration Risk), ANT-RC (Revocation Cascade), and ANT-TC (Trust Tier Drift) are <strong>Registry-native</strong> in the sense that the Registry holds the authoritative state against which the claim is made — namespace-wide capability distribution, revocation log state, attestation tier transitions. Resolver-side observations of these phenomena are partial and local; the Registry sees the whole. ANT-RA (Resolver Abuse), ANT-DN (Deceptive Namespace Path Activity), and ANT-WF (Well-Formedness) are <strong>resolver-native with Registry verification</strong>: the resolver observes the field event, but the claim that the event is anomalous is verifiable only by comparison against canonical Registry state.</p>
+      <p>If this pattern is accepted as the spec's organizing principle for evidentiary architecture, the Registry occupies the position of reference monitor for signal verification — the authoritative source against which other layers' claims become confirmable, contradictable, or shown to be inconsistent with canonical state. This has three consequences worth surfacing. First, signal-class metadata in a future revision could explicitly document each class's <strong>corroboration model</strong>: origin layer, corroboration layer, and the canonical state the claim is verifiable against. Second, the aggregation layer's threshold calculation (§6) and response posture (§11) could weight signals by corroboration depth — a standalone resolver-side claim carries some evidentiary weight; the same claim corroborated by Registry-side divergence detection carries substantially more. Third, this framing partially strengthens the response to the principal-agent tension named in A.7: a resolver emitting <em>false</em> claims about its own behavior is detectable through Registry-side verification against canonical state, narrowing the surface for fraudulent reporting independently of operator goodwill.</p>
+      <p>This recognition is not a new mechanism — the six signal classes already function evidentially in this way in any deployment. It is a framing decision about whether the specification should make the pattern explicit and organize subsequent revisions around it. The question is appropriate to resolve deliberately in a subsequent revision: adopting the reference-monitor framing would elevate the cross-specification hook interfaces tracked in Registry Specification Appendix A.5 from a peripheral coordination concern to a foundational evidentiary mechanism, and would justify the design effort that the hook interfaces require. Declining the framing would leave the six signal classes architecturally peer-level and the Registry-side hooks as one coordination concern among many. This change will affect §3, §4, §5, §6, §11, and the cross-specification coordination scope of A.5 in the Registry Specification.</p>
+      <p>The reference-monitor framing in this entry does not subsume the mechanisms named in A.6 (Signal-Absence Detection) or A.7 (Reporter-Incentive Alignment). The three appendix items address distinct failure modes and are architecturally complementary rather than alternatives. <strong>A.6 detects node absence</strong> — the case where a node has stopped emitting any signals and the aggregation layer must distinguish silence from quietude. Reference-monitor verification has no purchase on signals that were never sent; the Registry can observe that no signals are arriving, but doing so is itself a heartbeat-detection mechanism in different clothing, and the Registry's own observations of resolver query traffic are ambiguous between a silenced node and a node operating from cache (DNSO Operations Charter §8.3). <strong>A.10 detects false claims</strong> — the case where a node emits signals that diverge from canonical state. <strong>A.7 detects suppression</strong> — the case where a node emits some signals while withholding others, which neither heartbeat nor canonical-state verification can identify because the suppressed signals are syntactically absent from the stream and the emitted signals are individually consistent with canonical state. An attacker capable of evading all three mechanisms must simultaneously maintain heartbeat flow, keep emitted claims canonically consistent, and produce coherent Merkle-root completeness attestations over windowed signal sets — a substantially harder attack surface than evading any single mechanism. A.10 enriches A.6 (the Registry can verify heartbeat content against the operator's canonical attestation record) and enriches A.7 (completeness attestations can be Registry-corroborated against expected signal patterns), but it does not replace either.</p>
+
+      <h2 class="sub-title">A.11 Node Key Registration and Signature Verification</h2>
+      <p>The Signal Metadata Requirements in §4 mandate that each signal carry a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">node_signature</code> — an Ed25519 signature over the canonical serialization of all preceding metadata fields, generated using the originating node's registered key. The §4 text states explicitly that the signature MUST cover <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_nonce</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">node_sequence</code> to ensure authenticity of the replay-protection fields. The "Resolver Node Instrumentation" subsection of §8 further notes that resolver node key registration follows the procedure defined in the DNSO Operations Charter.</p>
+      <p>The current Anthill specification does not itself define the node-key registration procedure, the format of the registered-key store, or the verification semantics the aggregation layer applies when a signal arrives with a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">node_signature</code> field. These properties are referenced as existing elsewhere (the Operations Charter), but the dependent specification — Operations Charter §-tbd — has not yet been drafted with the level of detail needed for an implementation to verify signatures end-to-end. The v0.1.x reference implementation accepts the <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">node_signature</code> field, stores its value, but does not verify cryptographically. This is a known gap between spec language and implementation behavior; both sides are awaiting the registration procedure to land.</p>
+      <p>A future revision is expected to address this through coordinated work across three documents. The Operations Charter would define the node-registration procedure: how a resolver node submits its public key to the DNSO, what attestation accompanies the submission, how registrations are revoked or rotated, and where the resulting registered-key store is published or accessed. The Anthill specification would then incorporate verification semantics in §4: when a signal arrives, the aggregation layer fetches the originating node's registered key, verifies the signature over the canonical metadata serialization, and rejects the signal with a documented error code if verification fails. The DillClaw Resolver Specification would describe the node-side instrumentation: how a resolver loads its registered key at startup, how it constructs the canonical serialization, and how it handles key rotation in coordination with the Operations Charter procedure.</p>
+      <p>Until that coordinated revision lands, the replay-protection mechanisms specified in §4 (<code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">signal_nonce</code> uniqueness and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">node_sequence</code> monotonicity) function at the protocol level but do not provide cryptographic authenticity guarantees — a node that knows another node's identifier and current sequence number can submit signals impersonating that node, and the aggregation layer cannot detect the impersonation. This is an architectural gap, not an implementation defect; it cannot be closed by changes to the Anthill reference implementation alone. This change will affect §4, §8, the Operations Charter, and the DillClaw Resolver Specification. It is the largest single deferred work item identified in the v0.1.2 conformance review.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:var(--mono);font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:var(--serif);font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The Dillweed Anthill™ Observability Plane is the governance telemetry layer — providing coordination-level visibility across the namespace infrastructure that all other stack components rely on.</div>
+    <div style="font-family:var(--mono);font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:var(--mono);font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#5fc78f;font-weight:500;">Anthill Observability ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">Dillweed Anthill&#8482; Observability Plane Specification</div>
+  <div class="fm">v0.1.2 · May 2026 · Stack Family 2026.04 · dillweed.com</div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.35); letter-spacing:0.06em; margin-top:0.6rem; display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:center;">
+    <span>Published: April 14, 2026</span>
+    <span>Last Material Revision: May 5, 2026</span>
+    <span>Status: Founding Phase v0.1.2</span>
+    <span>Source Authority: Dillweed Namespace Stack</span>
+  </div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.08em; text-transform:none; margin-top:0.25rem;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Dillweed Anthill™ is a trademark of Richard McClelland. Implementations may reference and interoperate with this specification. The Dillweed Anthill™ mark and official specification text remain under the stewardship of the Dillweed Namespace Stack.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

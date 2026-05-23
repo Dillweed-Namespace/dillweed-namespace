@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Governance Framework v1.1.3 — Dillweed Namespace Project">
+  <meta property="og:description" content="Who holds authority, how neutrality is preserved over time, and how the Dillweed Namespace evolves toward multi-stakeholder governance.">
+  <meta property="og:url" content="https://dillweed.com/governance.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>Governance Framework v1.1.3 — Dillweed Namespace Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:        #0d1b2a;
+      --ink:         #18202c;
+      --mid:         #445566;
+      --muted:       #6b7f94;
+      --rule:        #c9d8e8;
+      --white:       #ffffff;
+      --pale:        #f5f7fa;
+      --serif:       'Spectral', Georgia, serif;
+      --sans:        'IBM Plex Sans', system-ui, sans-serif;
+      --mono:        'IBM Plex Mono', 'Courier New', monospace;
+      --accent:      #7a5c1e;
+      --accent-lt:   #b8860b;
+      --accent-pale: #faf4e8;
+      --accent-light:#e8d5a8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+
+    .sidebar { position: fixed; top: 0; left: 0; width: 235px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--white); line-height: 1.25; }
+    .sb-sub { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--accent-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    main { margin-left: 235px; }
+
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(184,134,11,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,11,0.06) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -80px; right: -60px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(184,134,11,0.14) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 600; color: var(--white); line-height: 1.1; margin-bottom: 1.1rem; max-width: 620px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.5); max-width: 540px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-thesis { background: rgba(184,134,11,0.1); border: 1px solid rgba(184,134,11,0.3); border-radius: 6px; padding: 1rem 1.5rem; max-width: 600px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.9rem; font-style: italic; color: rgba(255,255,255,0.75); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    p a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(122,92,30,0.3); transition: border-color 0.15s; }
+    p a:hover { border-bottom-color: var(--accent); }
+
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--accent-lt); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+
+    ul.std { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.std li { padding: 0.4rem 0 0.4rem 1.25rem; position: relative; font-size: 0.9rem; color: var(--mid); line-height: 1.65; border-bottom: 1px solid var(--rule); }
+    ul.std li:last-child { border-bottom: none; }
+    ul.std li::before { content: ''; position: absolute; left: 0; top: 0.8rem; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-lt); opacity: 0.7; }
+    ul.std li strong { color: var(--navy); font-weight: 500; }
+
+    .callout { border-left: 3px solid var(--accent-lt); background: var(--accent-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: #4a3010; font-size: 0.9rem; line-height: 1.7; }
+
+    .pull-quote { font-family: var(--serif); font-size: 1.1rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.6; }
+
+    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0 2rem; }
+    .tier-card { border: 1px solid var(--rule); border-top: 3px solid var(--accent-lt); border-radius: 4px; padding: 1rem 1.25rem; background: var(--pale); }
+    .tier-num { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; font-weight: 500; }
+    .tier-name { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: var(--navy); line-height: 1.3; }
+
+    .stack-ref { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+    .stack-ref-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.75rem; }
+    .stack-ref a { display: flex; justify-content: space-between; align-items: baseline; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 0.82rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.15s; }
+    .stack-ref a:last-child { border-bottom: none; }
+    .stack-ref a:hover { color: rgba(255,255,255,0.85); }
+    .stack-ref a .doc-name { font-weight: 500; color: var(--accent-lt); }
+    .stack-ref a .doc-role { font-family: var(--mono); font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+
+    footer { margin-left: 235px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .tier-grid { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.5s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.13s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.21s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.29s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.37s; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">Governance Framework</div>
+    <span class="sb-version">v1.1.3</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#s1">1. Purpose</a>
+    <a href="#s2">2. Background &amp; Founding Asset</a>
+    <a href="#s3">3. The Neutrality Thesis</a>
+    <a href="#s4">4. Current Governance</a>
+    <a href="#s5">5. Governance Evolution</a>
+    <a href="#s6">6. Asset Protection</a>
+    <a href="#s7">7. Partner Engagement</a>
+    <a href="#s8">8. Contact</a>
+    <a href="#appendix-a">Appendix A: Future Work</a>
+    <a href="#appendix-b">Appendix B: Revision History</a>
+
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Anthill Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Namespace Project · Governance Framework · Founding Phase</div>
+      <h1 class="cover-title">Governance Framework</h1>
+      <p class="cover-tagline">Authority structure, neutrality preservation, and the intended evolution of the Dillweed Namespace toward multi-stakeholder governance.</p>
+      <div class="cover-thesis">
+        <p>A namespace operated by a major platform participant would face an unavoidable neutrality challenge. This framework is designed to institutionalize the neutrality that makes the namespace valuable — across time, independent of any single moment of stewardship.</p>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">1.1.3</span></div>
+        <div class="cover-meta-item"><span class="label">Issued</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Canonical Release</span></div>
+        <div class="cover-meta-item"><span class="label">Phase</span><span class="value">Founding</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Domain</span><span class="value">dillweed.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Purpose of This Document</h1></div>
+      <p>This document describes the governance philosophy, current structure, and intended evolution of the Dillweed Namespace Project — a neutral, independently operated capability coordination namespace for AI agent systems. It is provided to inform prospective institutional partners, implementers, and contributors of the project's governance posture and founding stewardship principles.</p>
+
+      <p>In summary: founding provenance anchors neutrality now; multi-stakeholder governance earns legitimacy later; asset protections prevent platform capture during the transition. This framework defines how that progression is institutionalized.</p>
+
+      <div class="callout">
+        <div class="callout-label">Revision Note — v1.1.3 (May 2026)</div>
+        <p>This revision integrates substantive feedback received on v1.1.2 across multiple rounds of review. <strong>Tone, framing, and taxonomy:</strong> the §01 cover thesis, §03 neutrality discussion, §03 platform-participants sentence, and §06 Asset Protection callout are all rewritten from advocacy to analytical formulation, aligning with parallel work on the Standards-Facing Overview and About page. The §02 specification stack taxonomy is restructured to align with the Standards Overview's "five core specifications, one cross-cutting document, one governance support protocol" framing while preserving the GSP-as-distinct-category structure that has architectural meaning beyond the Standards Overview's flatter grouping. The §02 cross-reference to the DNSO Operations Charter is normalized to major.minor granularity, and a §02 explanatory note is added disclosing that cross-document version references in this and other Dillweed specifications are shown at major.minor granularity by deliberate convention. Detailed revision history for prior versions has been moved to Appendix B.</p>
+        <p><strong>Governance mechanics and status disclosure:</strong> the §5.1 founding-steward continuity seat language is reframed from "permanent in all governance structures" to a structural protection bounded by need; the residual "permanent seat" reference in §5.2 is harmonized via cross-reference to §5.1. The §5.6 amendment-concurrence requirement gains explicit scope-bounding language clarifying that it operates as asset-protection and neutrality-preservation logic rather than personal control. The §5.7 conflict-resolution precedence is extended to address GSP-01's role in succession, key custody, and continuity matters. A three-clause synthesis statement is added to §01 capturing the framework's institutional posture. A new Governance Status callout is added at §04 disclosing that multi-stakeholder bodies described in §04 and §05 are intended transition structures and are not yet constituted. No substantive governance authorities or neutrality commitments are altered by this revision; the changes refine institutional posture and clarify already-existing protections.</p>
+      </div>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here. Most of this framework is descriptive prose about governance philosophy and institutional intent; normative language is used sparingly in the asset-protection principles (§6), the amendment process (§5.6), and the conflict-resolution precedence order (§5.7).</p>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Background and Founding Asset</h1></div>
+      <p>Dillweed.com has been under continuous single-owner operation since 1997 — a 28-year provenance that establishes the domain as one of the longest-held independent namespace assets on the internet. This continuity of stewardship is foundational to the project's credibility and neutrality thesis.</p>
+      <p>The Dillweed Namespace Project encompasses five core governance-and-resolution specifications, one cross-cutting observability document, a standards-facing overview, one governance support protocol for continuity, and three deployable reference implementations.</p>
+
+      <p><em>Cross-document version references in this and other Dillweed specifications are shown at major.minor granularity (e.g., v0.4 rather than v0.4.1) by deliberate convention, to keep architectural cross-references stable across patch releases. Exact current versions of each document are tracked in the Standards Overview's maturity table.</em></p>
+
+      <h2 class="sub-title">Core Specifications</h2>
+      <ul class="std">
+        <li><strong>Dillweed Namespace Standard (v0.4)</strong> — the core capability coordination namespace specification</li>
+        <li><strong>DillClaw Resolver Specification (v0.1)</strong> — resolver protocol and reference implementation (Node.js, port 7474)</li>
+        <li><strong>Dillweed Registry Specification (v0.1)</strong> — registry protocol and reference implementation (Node.js, port 7475, Ed25519 cryptographic signing)</li>
+        <li><strong>Governance Framework (v1.1.3)</strong> — authority structure, neutrality preservation, and governance evolution</li>
+        <li><strong>DNSO Operations Charter (v1.0)</strong> — operational procedures, attestation, key management, and service posture</li>
+      </ul>
+
+      <h2 class="sub-title">Cross-Cutting Document</h2>
+      <ul class="std">
+        <li><strong>Dillweed Anthill Observability Plane Specification (v0.1)</strong> — distributed signal aggregation, anomaly detection, and ecosystem health monitoring for the DNSO; reference implementation (Node.js)</li>
+      </ul>
+
+      <h2 class="sub-title">Standards-Facing Overview</h2>
+      <ul class="std">
+        <li><strong>Standards Overview</strong> — integrated standards-facing reference to the specification stack</li>
+      </ul>
+
+      <h2 class="sub-title">Governance Support Protocols</h2>
+      <ul class="std">
+        <li><strong>DNSO Continuity and Stewardship Transition Protocol (GSP-01 v1.0)</strong> — succession mechanics, key custody transfer, and governance continuity procedures for the DNSO</li>
+      </ul>
+
+      <p>Supporting domain assets include dillweed.ai, dill.ai, dillclaw.ai, dillclaw.com, dillforge.ai, dillforge.com, and approximately 200 defensively registered related domains. Trademark coverage spans Classes 35, 41, and 42 in the United States.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">The Neutrality Thesis</h1></div>
+      <p>The central strategic premise of the Dillweed Namespace Project is that a capability coordination namespace for AI agents derives its value precisely from its neutrality.</p>
+      <div class="callout">
+        <div class="callout-label">Core Premise</div>
+        <p>A namespace operated by a major platform participant would face an unavoidable neutrality challenge — a namespace controlled by Google, Microsoft, Meta, Anthropic, or Amazon would face the structural problem that the operator simultaneously occupies two roles: provider of competing services and arbiter of discovery and trust policy among them. The coordination function the namespace is designed to provide depends on those roles being structurally separable.</p>
+      </div>
+      <p>This creates a structural opportunity for an independently held, long-provenance namespace to serve as the neutral coordination layer that platform participants would struggle to provide credibly for themselves. The governance framework described in this document is designed to institutionalize that neutrality across time, independent of any single moment of stewardship.</p>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Current Governance Structure — Founding Phase</h1></div>
+
+      <div class="callout">
+        <div class="callout-label">Governance Status</div>
+        <p>The project is in founding-phase governance. The Technical Steering Committee, Participant Council, and other multi-stakeholder bodies described in this document and in §05 are intended transition structures and are not yet constituted. Sections describing those bodies represent governance design rather than current operational state.</p>
+      </div>
+
+      <h2 class="sub-title">4.1 Founding Steward</h2>
+      <p>The project is currently governed by its founding steward, who has held the anchor domain asset since 1997 and developed the specification stack. During the founding phase, the founding steward retains full authority over:</p>
+      <ul class="props">
+        <li>Specification evolution and versioning (subject to the amendment process described in §5.6)</li>
+        <li>Domain and trademark asset management</li>
+        <li>Partnership and institutional engagement decisions</li>
+        <li>Reference implementation development and release</li>
+      </ul>
+
+      <h2 class="sub-title">4.2 Founding Phase Duration</h2>
+      <p>The founding phase is expected to conclude when one or more of the following conditions are met:</p>
+      <ul class="props">
+        <li>A significant institutional partner or implementer has adopted the standard</li>
+        <li>Multiple independent implementations exist</li>
+        <li>Sufficient community interest exists to constitute a multi-stakeholder governance body</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Intended Governance Evolution</h1></div>
+      <p>As multi-party adoption develops, the project intends to formalize a multi-stakeholder governance model consistent with durable internet standards practice. The intended structure comprises three governance tiers, supported by explicit amendment and disclosure procedures.</p>
+
+      <div class="tier-grid">
+        <div class="tier-card">
+          <div class="tier-num">Tier 1</div>
+          <div class="tier-name">Founding Steward Continuity Role</div>
+        </div>
+        <div class="tier-card">
+          <div class="tier-num">Tier 2</div>
+          <div class="tier-name">Technical Steering Committee</div>
+        </div>
+        <div class="tier-card">
+          <div class="tier-num">Tier 3</div>
+          <div class="tier-name">Participant Council</div>
+        </div>
+      </div>
+
+      <h2 class="sub-title">5.1 Founding Steward Continuity Role</h2>
+      <p>The founding steward retains a continuity seat in governance structures for matters affecting the structural neutrality of the namespace and the integrity of the founding asset base. The seat exists as a structural protection rather than a personal privilege: its function is to preserve the provenance-anchored neutrality argument that underlies the namespace's value, and it persists as long as that structural property remains at risk from governance evolution that could compromise it. This structure mirrors continuity roles commonly preserved in durable internet governance models, with the explicit understanding that the seat may evolve or be retired as multi-stakeholder governance matures and institutionalizes neutrality protections through other mechanisms.</p>
+      <p>In matters involving direct commercial arrangements that materially affect the founding asset base, the Technical Steering Committee may, by majority vote, request that the founding steward abstain from non-technical decisions in that specific matter. This conflict-of-interest provision is designed to strengthen institutional credibility without compromising continuity of stewardship.</p>
+
+      <h2 class="sub-title">5.2 Technical Steering Committee</h2>
+      <p>A Technical Steering Committee (TSC) — initially three to five members, always an odd number — will govern specification evolution. Membership is earned through demonstrated technical contribution to the specification or reference implementations. The TSC operates by consensus, with the founding steward holding the continuity seat described in §5.1. In the event of a tied vote, the founding steward's position prevails.</p>
+      <p>Where the founding steward has abstained from a specific matter pursuant to §5.1, the tie-break provision does not apply to that matter. In such cases, the TSC MUST reach a decision through majority of its remaining voting members, or defer the decision to a subsequent session. This constraint ensures that the abstention requested under §5.1 cannot be reversed in effect by tie-break operation, preserving the integrity of the conflict-of-interest mechanism.</p>
+
+      <h2 class="sub-title">5.3 Participant Council</h2>
+      <p>Organizations that have adopted and implemented the Dillweed Namespace Standard in production systems will be eligible for representation on a Participant Council. The Participant Council holds the following defined authorities:</p>
+      <ul class="props">
+        <li>May initiate formal review requests for proposed specification changes, which the TSC is obligated to consider within 30 calendar days of receipt</li>
+        <li>May issue public implementation recommendations and compatibility guidance</li>
+        <li>Provides advisory input on governance evolution and foundation structure decisions</li>
+      </ul>
+      <p>The Participant Council does not hold authority over the core specification. No single participant organization may hold a controlling interest in the council's proceedings. The precise definition of "controlling interest" in a council setting — whether through vote share, committee chair concentration, agenda-setting authority, or other mechanisms — will be refined when the council is constituted in practice; see Appendix A.</p>
+
+      <h2 class="sub-title">5.4 Succession and Continuity</h2>
+      <p>The founding steward may designate a continuity trustee or controlled stewardship entity to preserve governance continuity in the event of incapacity or succession. Any such designation SHALL be documented and held by the Technical Steering Committee. The operational procedures for succession, key custody transfer, and transition of stewardship obligations are specified in the DNSO Continuity and Stewardship Transition Protocol (GSP-01). This provision preserves governance continuity beyond individual stewardship and reinforces the institutional durability implied by the project's 28-year provenance.</p>
+      <p>In extraordinary circumstances where the continuity seat is vacant and no prior designation exists, the TSC may appoint an interim continuity trustee by unanimous vote pending formal succession. This provision ensures that no governance vacuum arises from the absence of a prior designation.</p>
+
+      <h2 class="sub-title">5.5 Foundation Structure</h2>
+      <p>As multi-party adoption develops, the project intends to formalize foundation status — either as a 501(c)(6) trade association or under the stewardship of an established standards body such as the Linux Foundation. The specific legal structure is a matter for future decision and is tracked in Appendix A. Any such arrangement will be structured as a licensing and stewardship agreement rather than a transfer of domain or trademark assets.</p>
+
+      <h2 class="sub-title">5.6 Amendment Process and Transparency</h2>
+      <p>Amendments to this governance framework and any successor charter instruments require concurrence of the founding continuity seat and a majority of the Technical Steering Committee. This concurrence requirement is limited to governance-framework and asset-continuity amendments and is intended to prevent changes that would compromise the neutrality thesis or transfer effective control of the founding asset base. Proposed amendments MUST be circulated to the Participant Council for review no fewer than 30 days prior to adoption.</p>
+      <p>Major governance transitions, continuity designations, and framework amendments MUST be publicly disclosed in a timely manner, consistent with the project's commitment to transparency and auditability. The specific disclosure windows for governance-triggered events are specified in the DNSO Operations Charter §7. This disclosure principle applies equally to any successor charter instruments adopted in connection with foundation formation.</p>
+
+      <h2 class="sub-title">5.7 Document Authority and Conflict Resolution</h2>
+      <p>The Dillweed specification stack comprises seven documents with distinct authority domains, supplemented by governance support protocols. In the event of a conflict between this Governance Framework and any operational or technical specification, governance authority over institutional structure, succession, amendment rights, and continuity shall prevail, while technical semantics remain governed by the applicable specification document. The precedence order for conflict resolution is: Governance Framework, then Namespace Standard, then Registry Specification, then DillClaw Resolver Specification, then DNSO Operations Charter, then Dillweed Anthill Observability Plane Specification. For matters of stewardship succession, key custody transfer, or continuity transition, GSP-01 (Continuity Protocol) controls within the scope delegated to it by this Governance Framework.</p>
+      <p>The Standards Overview is a meta-document providing an integrated standards-facing reference to the specification stack and does not participate in normative conflict resolution. Governance Support Protocols — including the DNSO Continuity and Stewardship Transition Protocol (GSP-01) — sit alongside the specification stack and are interpreted consistent with, but do not supersede, the core specifications. Conflicts between documents SHOULD be logged as amendment candidates for the affected document rather than resolved through informal interpretation.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Asset Protection Principles</h1></div>
+      <p>The following principles govern the relationship between the founding asset base and any governance structure:</p>
+      <ul class="props">
+        <li>The domain assets (dillweed.com, dillclaw.com, dillweed.ai, dill.ai, and related domains) MUST NOT be transferred to any foundation, partner, or institutional entity outright.</li>
+        <li>The specifications MAY be licensed to a foundation or standards body for stewardship purposes under terms that preserve the founding steward's continuity role.</li>
+        <li>Trademark registrations (Classes 35, 41, 42) MUST be maintained by the founding steward or a wholly controlled entity.</li>
+        <li>Any institutional partnership agreement MUST explicitly acknowledge the neutrality thesis and prohibit any arrangement that would give a single platform participant effective control over the namespace.</li>
+      </ul>
+      <div class="callout">
+        <div class="callout-label">Asset Protection Principle</div>
+        <p>The domain assets are licensed, not transferred. No partnership, foundation formation, or institutional arrangement changes the founding steward's ownership of the underlying namespace infrastructure. This is a structural neutrality condition that a platform participant would struggle to replicate credibly.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Institutional Partner Engagement</h1></div>
+      <p>The project welcomes engagement from institutional partners in the following capacities:</p>
+      <ul class="props">
+        <li><strong>Implementer</strong> — organizations adopting the Dillweed Namespace Standard in their agent systems</li>
+        <li><strong>Technical contributor</strong> — organizations or individuals contributing to specification development</li>
+        <li><strong>Infrastructure partner</strong> — organizations providing hosting, resolver, or registry infrastructure</li>
+        <li><strong>Governance participant</strong> — organizations represented on the Participant Council upon qualifying adoption</li>
+      </ul>
+      <p>The project does not accept engagement that would compromise the neutrality thesis, including exclusive arrangements, controlling equity or governance positions for any single platform participant, or any structure that would effectively transfer control of the namespace to a commercial entity.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Contact and Further Information</h1></div>
+      <p>Inquiries regarding partnership, institutional engagement, or governance discussion may be directed through <a href="https://dillweed.com">dillweed.com</a>.</p>
+
+      <div class="stack-ref">
+        <div class="stack-ref-label">Dillweed Specification Stack</div>
+        <a href="/namespace-standard.html"><span class="doc-name">Namespace Standard v0.4</span><span class="doc-role">naming model · trust tier definitions · authority boundaries</span></a>
+        <a href="/dillclaw-spec.html"><span class="doc-name">DillClaw Resolver Spec v0.1</span><span class="doc-role">resolution protocol · trust scoring · API contract</span></a>
+        <a href="/registry-spec.html"><span class="doc-name">Registry Specification v0.1</span><span class="doc-role">data model · signing authority · revocation semantics</span></a>
+        <a href="/governance.html"><span class="doc-name">Governance Framework v1.1.3</span><span class="doc-role">authority structure · succession · this document</span></a>
+        <a href="/dnso-operations-charter.html"><span class="doc-name">DNSO Operations Charter v1.0</span><span class="doc-role">operating procedures · attestation · service posture</span></a>
+        <a href="/anthill-spec.html"><span class="doc-name">Anthill Observability Spec v0.1</span><span class="doc-role">signal taxonomy · anomaly detection · DNSO instrumentation</span></a>
+        <a href="/standards-overview.html"><span class="doc-name">Standards Overview</span><span class="doc-role">integrated standards-facing reference to the specification stack</span></a>
+        <a href="/continuity-protocol.html"><span class="doc-name">Continuity Protocol (GSP-01) v1.0</span><span class="doc-role">succession mechanics · key custody transfer · governance continuity</span></a>
+      </div>
+
+      <div class="pull-quote">
+        The legitimacy of any coordination namespace<br>
+        must be earned through adoption, not granted through declaration.
+      </div>
+    </section>
+
+    <!-- Appendix A — Future Work (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Future Work (Non-Normative)</h1></div>
+
+      <p>This appendix records items intended for a future revision of the Governance Framework. It is non-normative: nothing in this appendix imposes conformance requirements on current implementations or institutional participants. It is included to disclose the anticipated direction of the framework so that prospective partners, contributors, and stakeholders can plan for forthcoming refinements.</p>
+
+      <h2 class="sub-title">A.1 Foundation Structure Selection</h2>
+      <p>The current framework notes that foundation formation may proceed as a 501(c)(6) trade association or under the stewardship of an established standards body such as the Linux Foundation (§5.5). The specific legal structure is a future decision that depends on the scale, composition, and geographic distribution of institutional partners at the point of formation. A future revision of this framework is expected to record the chosen structure, the rationale for the choice, and the licensing and stewardship terms negotiated with the receiving entity. This change will affect §5.5 and §6.</p>
+
+      <h2 class="sub-title">A.2 Controlling Interest Definition for the Participant Council</h2>
+      <p>The current framework prohibits any single participant organization from holding a controlling interest in the Participant Council's proceedings (§5.3) but does not define "controlling interest" precisely. This is deliberate: the appropriate definition depends on the size, composition, and working practices of the council once constituted. A future revision is expected to refine this provision with specific limits on voting share, committee chair concentration, agenda-setting authority, and any proxy or bloc-voting arrangements. This change will affect §5.3.</p>
+
+      <h2 class="sub-title">A.3 Machine-Readable Governance Instruments</h2>
+      <p>The governance instruments described in this framework are currently expressed in natural-language prose across this document, the DNSO Operations Charter, and the Continuity Protocol. A future revision is expected to publish machine-readable governance instruments — signed policy documents, amendment rules expressed as executable validation logic, and disclosure obligations expressed as testable predicates — so that the rules governing the namespace are enforceable by code rather than solely by document interpretation. This is aligned with the corresponding future-work item in the Namespace Standard Appendix A.3 and will affect §5.6 and §5.7.</p>
+
+      <h2 class="sub-title">A.4 Governance Observability Integration</h2>
+      <p>The Anthill Observability Plane (v0.1) specifies a signal taxonomy and aggregation model oriented toward namespace ecosystem monitoring. A future revision is expected to extend Anthill's signal classes to cover governance events — TSC vote records, Participant Council review outcomes, amendment progressions, and continuity designations — so that governance activity benefits from the same observability and auditability discipline that the technical infrastructure does. This change will affect §5.6 and the Anthill Observability Plane specification.</p>
+    </section>
+
+    <!-- Appendix B — Revision History (non-normative) -->
+    <section class="section" id="appendix-b">
+      <div class="section-header"><span class="sec-num">APPENDIX B</span><h1 class="sec-title">Revision History (Non-Normative)</h1></div>
+      <p>This appendix records the revision history of the Governance Framework prior to v1.1.3. Detailed notes for the current revision are at the top of this document. The entries below are preserved as institutional record of the document's evolution.</p>
+
+      <h2 class="sub-title">B.1 v1.1.2 (May 2026)</h2>
+      <p>Corrected the §02 project inventory framing sentence to reflect the current document count and the addition of a third deployable reference implementation (Anthill Observability Plane); added a reference-implementation note to the Anthill specification bullet for parallelism with DillClaw and Registry; normalized the DNSO Operations Charter cross-reference to major.minor granularity for consistency with other cross-document references in the §02 list; made the Appendix A.2 controlling-interest deferral timeless rather than pinned to a specific revision; applied a stack-wide system-flow navigation panel style update at the document footer. No substantive governance provisions, authority structures, or neutrality commitments were altered.</p>
+
+      <h2 class="sub-title">B.2 v1.1.1 (April 2026)</h2>
+      <p>Aligned the specification stack inventory with the v0.1 Registry Specification version; aligned the domain-asset portfolio reference with the Namespace Standard v0.4; added RFC 2119 conformance terminology; clarified the interaction between the §5.1 abstention mechanism and the §5.2 tie-break mechanism; introduced Appendix A for future work; corrected a structural footer defect carried forward from v1.1.</p>
+
+      <h2 class="sub-title">B.3 v1.1 (April 2026)</h2>
+      <p>Updated the specification stack inventory to reflect the two specifications added in April 2026 (the Dillweed Anthill Observability Plane Specification v0.1 and the Standards Overview), and the first Governance Support Protocol (GSP-01 DNSO Continuity and Stewardship Transition Protocol v1.0). Extended the conflict-resolution precedence order in §5.7 correspondingly.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The Governance Framework defines the authority structure, neutrality preservation doctrine, and participant council model that gives the Dillweed Namespace its institutional legitimacy.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#6ea8fe;font-weight:500;">Governance ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">Dillweed Governance Framework</div>
+  <div class="fm">v1.1.3 · May 2026 · Stack Family 2026.04 · dillweed.com</div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.08em; text-transform:none; margin-top:0.25rem;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

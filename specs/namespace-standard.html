@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Dillweed Namespace Standard v0.4.3 — Dillweed Namespace Project">
+  <meta property="og:description" content="A governed coordination layer for agentic AI systems. Namespace structure, capability records, trust tiers, resolution model, and governance.">
+  <meta property="og:url" content="https://dillweed.com/namespace-standard.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>Dillweed Namespace Standard v0.4.3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0d1b2a;
+      --blue:        #1a3a5c;
+      --accent:      #2468a2;
+      --accent-lt:   #3d89c8;
+      --pale:        #f0f5fb;
+      --light-blue:  #dceaf7;
+      --ink:         #18202c;
+      --mid:         #445566;
+      --muted:       #6b7f94;
+      --rule:        #c9d8e8;
+      --white:       #ffffff;
+      --serif:       'Spectral', Georgia, serif;
+      --sans:        'IBM Plex Sans', system-ui, sans-serif;
+      --mono:        'IBM Plex Mono', 'Courier New', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+    .sidebar { position: fixed; top: 0; left: 0; width: 230px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--white); line-height: 1.2; }
+    .sb-sub { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--accent-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+    main { margin-left: 230px; }
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(36,104,162,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(36,104,162,0.07) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -100px; right: -80px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(36,104,162,0.22) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight: 600; color: var(--white); line-height: 1.08; margin-bottom: 1.25rem; max-width: 640px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.55); max-width: 560px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-problem { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1.25rem 1.5rem; max-width: 620px; margin-bottom: 1.5rem; }
+    .cover-problem p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.7; margin: 0 0 0.6rem; }
+    .cover-problem p:last-child { margin-bottom: 0; }
+    .cover-problem strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+    .cover-thesis { background: rgba(36,104,162,0.2); border: 1px solid rgba(36,104,162,0.45); border-radius: 6px; padding: 1rem 1.5rem; max-width: 620px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.92rem; font-style: italic; color: rgba(255,255,255,0.78); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    .callout { border-left: 3px solid var(--accent); background: var(--light-blue); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: var(--blue); font-size: 0.88rem; }
+    .callout p + p { margin-top: 0.5rem; }
+    .callout p strong { color: var(--navy); }
+    .pull-quote { font-family: var(--serif); font-size: 1.2rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.55; }
+    .code-block { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1rem 0 1.25rem; overflow-x: auto; }
+    .code-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.6rem; }
+    .code-block code { font-family: var(--mono); font-size: 0.82rem; line-height: 1.65; white-space: pre; display: block; }
+    .c-uri   { color: #7dd3fc; }
+    .c-key   { color: #86efac; }
+    .c-str   { color: #f9a8d4; }
+    .c-muted { color: rgba(255,255,255,0.35); }
+    .c-white { color: rgba(255,255,255,0.85); }
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--accent); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+    .tbl-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 7px; border: 1px solid var(--rule); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--pale); }
+    tbody td { padding: 0.75rem 1rem; color: var(--mid); line-height: 1.6; vertical-align: top; }
+    tbody td:first-child { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); white-space: nowrap; font-weight: 500; }
+    .steps { margin: 1.25rem 0; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.1rem; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.65rem; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .step-body p { margin: 0; font-size: 0.875rem; }
+    .scenario { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.5rem 0; }
+    .scenario-header { background: var(--navy); padding: 0.85rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .scenario-header .s-badge { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-lt); }
+    .scenario-header .s-title { font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.8); }
+    .scenario-body { padding: 0; }
+    .scenario-step { display: flex; gap: 0; border-bottom: 1px solid var(--rule); }
+    .scenario-step:last-child { border-bottom: none; }
+    .ss-num { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.5); background: var(--blue); padding: 0.85rem 1rem; display: flex; align-items: flex-start; flex-shrink: 0; min-width: 48px; justify-content: center; padding-top: 1rem; }
+    .ss-content { padding: 0.85rem 1.25rem; flex: 1; }
+    .ss-content h4 { font-size: 0.82rem; font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .ss-content p { margin: 0; font-size: 0.85rem; line-height: 1.65; }
+    .ss-content code { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); background: var(--light-blue); padding: 0.1rem 0.35rem; border-radius: 3px; }
+    .trust-tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1.25rem 0; }
+    .tier { border: 1px solid var(--rule); border-radius: 7px; padding: 1rem 1.25rem; background: var(--pale); transition: border-color 0.15s; }
+    .tier:hover { border-color: var(--accent); }
+    .tier-badge { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 3px; margin-bottom: 0.5rem; font-weight: 500; }
+    .tier-t1 .tier-badge { background: #fef3c7; color: #92400e; }
+    .tier-t2 .tier-badge { background: #dbeafe; color: #1e40af; }
+    .tier-t3 .tier-badge { background: #d1fae5; color: #065f46; }
+    .tier-t4 .tier-badge { background: #ede9fe; color: #5b21b6; }
+    .tier h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.3rem; }
+    .tier p { margin: 0; font-size: 0.825rem; line-height: 1.55; }
+    .stack { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.5rem 0; }
+    .stack-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); }
+    .stack-row:last-child { border-bottom: none; }
+    .stack-row.hl { background: linear-gradient(90deg, var(--light-blue), var(--pale)); border-left: 3px solid var(--accent); }
+    .stack-num { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); padding: 1rem 1rem 1rem 1.25rem; display: flex; align-items: center; flex-shrink: 0; min-width: 50px; }
+    .stack-row.hl .stack-num { color: var(--accent); }
+    .stack-content { padding: 1rem 1.25rem 1rem 0; flex: 1; }
+    .stack-content h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .stack-content p { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .stack-arrow { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--rule); background: var(--pale); padding: 0.2rem; border-bottom: 1px solid var(--rule); }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .compare-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+    .compare-head { background: var(--navy); padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .compare-body { padding: 1rem; background: var(--pale); }
+    .compare-body p { margin: 0 0 0.6rem; font-size: 0.85rem; font-style: italic; color: var(--navy); font-family: var(--serif); }
+    .compare-body ul { list-style: none; padding: 0; }
+    .compare-body ul li { font-size: 0.825rem; color: var(--mid); padding: 0.2rem 0 0.2rem 1rem; position: relative; }
+    .compare-body ul li::before { content: '·'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+    .milestones { margin: 1rem 0; }
+    .milestone { display: flex; gap: 1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
+    .milestone:last-child { border-bottom: none; }
+    .ms-icon { width: 32px; height: 32px; border: 2px solid var(--rule); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); font-size: 0.6rem; color: var(--muted); }
+    .ms-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .ms-body p { margin: 0; font-size: 0.85rem; }
+    .prov-grid { display: grid; grid-template-columns: auto 1fr; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; margin: 1.25rem 0; }
+    .prov-key { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); padding: 0.65rem 1rem; border-bottom: 1px solid var(--rule); border-right: 1px solid var(--rule); white-space: nowrap; background: var(--pale); }
+    .prov-val { font-size: 0.85rem; color: var(--mid); padding: 0.65rem 1rem; border-bottom: 1px solid var(--rule); line-height: 1.5; }
+    .prov-grid > *:nth-last-child(-n+2) { border-bottom: none; }
+    footer { margin-left: 230px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.55); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .trust-tiers, .compare { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.55s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.14s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.22s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.30s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.38s; }
+    .cover-inner > *:nth-child(6) { animation-delay: 0.46s; }
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace</div>
+    <div class="sb-sub">Standard Proposal</div>
+    <span class="sb-version">v0.4.3</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#abstract">Abstract</a>
+    <a href="#s1">1. The Coordination Problem</a>
+    <a href="#s2">2. Registry vs. Namespace</a>
+    <a href="#s3">3. Namespace Structure</a>
+    <a href="#s3" style="padding-left:2.2rem;font-size:0.72rem;opacity:0.7;">3.4 URI Scheme: dllwd://</a>
+    <a href="#s4">4. Capability Records</a>
+    <a href="#s5">5. Resolution Model</a>
+    <a href="#s6">6. A Worked Example</a>
+    <a href="#s7">7. Trust Model</a>
+    <a href="#s8">8. Governance</a>
+    <a href="#s9">9. Stack Positioning</a>
+    <a href="#s10">10. Why Not Blockchain?</a>
+    <a href="#s11">11. What Must Be Demonstrated</a>
+    <a href="#s12">12. Asset Provenance</a>
+    <a href="#s13">13. Conclusion</a>
+    <a href="#appendix-a">Appendix A: Future Work</a>
+
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Anthill Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <header class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Namespace Standard &nbsp;·&nbsp; Draft for Comment</div>
+      <h1 class="cover-title">Dillweed Namespace Standard <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Draft Proposal)</span></h1>
+      <p class="cover-tagline">A Governed Coordination Layer for Agentic AI Systems</p>
+
+      <div class="cover-problem">
+        <p>Agents can call tools. What they lack is a stable way to <strong>discover, evaluate, and select</strong> the right capability across time. Agentic AI systems face a coordination problem that protocols alone cannot solve — they can connect to tools, but cannot reliably find, trust, and use them across providers, at scale.</p>
+        <p>The question is not whether agents can call tools. It is whether they can do so through a naming and trust layer <strong>stable enough to survive scale, substitution, and time.</strong></p>
+      </div>
+
+      <div class="cover-thesis">
+        <p>A registry answers <em>"what exists?"</em> &nbsp; A namespace answers <em>"what should be used?"</em> &nbsp; As agentic systems scale, this distinction becomes the difference between a directory and infrastructure. The Dillweed coordination layer is one proposed answer to that problem — offered as a standard model with a specific governance implementation.</p>
+      </div>
+
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.4.3</span></div>
+        <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Issued by</span><span class="value">Dillweed Namespace Stewardship Office</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Draft for Comment</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-body">
+
+    <section class="section" id="abstract">
+      <div class="section-header"><h1 class="sec-title">Abstract</h1></div>
+
+      <p>Agentic AI systems are proliferating faster than the infrastructure needed to coordinate them. Protocols like MCP and A2A solve the connection problem. They do not solve the coordination problem: how agents discover capabilities reliably, how names remain stable across provider changes, how trust accumulates over time rather than being re-established at every boundary.</p>
+
+      <p>This document describes an abstract namespace model for addressing that gap, and proposes the Dillweed Namespace as a concrete implementation of that model. The two are presented together but are conceptually distinct: the model describes what a governed coordination namespace must do; the Dillweed implementation describes one specific instantiation with defined governance, provenance, and stewardship.</p>
+
+      <p>Other implementations of the model are possible and may emerge. This document aims to define the model well enough that any implementation — including this one — can be evaluated on its merits. If this layer is not established deliberately, it will emerge implicitly — fragmented across platforms, inconsistent across agents, and unstable over time.</p>
+
+      <div class="callout">
+        <div class="callout-label">What This Document Proposes</div>
+        <p>A namespace structure and URI syntax for naming capabilities durably. A resolution protocol for mapping names to invocable endpoints. A governance model for maintaining continuity and trust over time. A layered trust framework designed for accumulation, not just point-in-time verification.</p>
+      </div>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119" style="color:var(--accent);">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174" style="color:var(--accent);">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here. Most of this document is narrative rather than normative; the naming rules in §3.3, the Capability Record schema in §4.1, and the governance constraints in §8 are the primary normative sections.</p>
+
+      <div class="callout">
+        <div class="callout-label">Revision 0.4.3 (May 2026)</div>
+        <p>§3.3 Naming Rules: the uniqueness bullet was rephrased to make explicit that uniqueness applies to the <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">(name, version)</code> pair among non-revoked records, and that a revoked pair may be re-registered with the prior record retained in the registration log. No normative behavior changed; the rule is unchanged from what is already enforced by conformant Registry implementations and stated in Registry Specification §3.3.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">What This Is Not</div>
+        <p>The Dillweed Namespace is not an agent runtime, model provider, application framework, marketplace, or replacement for DNS, PKI, or identity infrastructure. It is a proposed coordination layer for naming, trust accumulation, resolution, governance, and continuity across agentic capability ecosystems.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">The Coordination Problem</h1></div>
+
+      <p>Modern AI systems can connect. They cannot reliably <strong>find, trust, and use</strong> each other. The gap is not protocol — it is coordination. Today's ecosystem provides APIs, agent frameworks, and interoperability protocols. What it lacks is a stable way to name capabilities, discover them in context, evaluate trust, and select them reliably across systems and over time.</p>
+
+      <p>Without a coordination layer, large-scale agentic deployments face predictable failure modes:</p>
+
+      <ul class="props">
+        <li>Capability discovery is ad hoc and non-transferable across systems</li>
+        <li>Names and identifiers are unstable, breaking agent workflows when services change</li>
+        <li>Trust must be re-established at every integration point with no accumulated history</li>
+        <li>Invocation target selection is embedded in individual agents rather than resolved from shared structure</li>
+      </ul>
+
+      <p>A governed coordination namespace addresses all four failure modes simultaneously — by providing stable names, durable identity, accumulated trust, and shared resolution structure.</p>
+
+      <h2 class="sub-title">Why Existing Approaches Fall Short</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Approach</th><th>What It Solves</th><th>What It Leaves Open</th></tr></thead>
+          <tbody>
+            <tr><td>MCP</td><td>Standardizes agent-to-tool connections</td><td>Naming, invocation target selection, long-term identity</td></tr>
+            <tr><td>A2A</td><td>Enables inter-agent communication</td><td>Stable namespace, resolution layer</td></tr>
+            <tr><td>MCP Registries</td><td>Discovery of available services</td><td>Governance, continuity, trust accumulation</td></tr>
+            <tr><td>AgentDNS / ANS</td><td>DNS-like resolution proposals</td><td>Governed namespace, stewardship model</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Registry vs. Namespace</h1></div>
+
+      <div class="compare">
+        <div class="compare-card">
+          <div class="compare-head">A registry answers</div>
+          <div class="compare-body">
+            <p>"What exists?"</p>
+            <ul>
+              <li>Stores entries</li>
+              <li>Records what is registered</li>
+              <li>Answers lookup queries</li>
+              <li>Optimized for enumeration</li>
+            </ul>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-head">A namespace answers</div>
+          <div class="compare-body">
+            <p>"What should be used?"</p>
+            <ul>
+              <li>Organizes meaning</li>
+              <li>Accumulates trust over time</li>
+              <li>Enables contextual selection</li>
+              <li>Optimized for resolution</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <p>A registry stores entries. A namespace organizes meaning, accumulates trust, and enables action. This distinction becomes critical at the scale agentic systems are approaching — and it is the distinction this document is built around.</p>
+
+      <div class="callout">
+        <div class="callout-label">Key Distinction</div>
+        <p>The key function of a coordination namespace is not storage. It is answering: <strong>"Given this context, what should happen next?"</strong></p>
+      </div>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">Namespace Structure and Syntax</h1></div>
+
+      <h2 class="sub-title">3.1 Design Principles</h2>
+      <p>A viable coordination namespace must satisfy five structural properties. These are properties of the model, not specific to any implementation:</p>
+      <ul class="props">
+        <li><strong>Memorability</strong> — Usable by humans and agents without lookup overhead</li>
+        <li><strong>Distinctness</strong> — Low ambiguity across linguistic and technical contexts</li>
+        <li><strong>Extensibility</strong> — Accommodates many categories, subcategories, and capability types</li>
+        <li><strong>Durable Control</strong> — Long-term stewardship by a single accountable party</li>
+        <li><strong>Semantic Openness</strong> — Not locked to a single product, trend, or technology generation</li>
+      </ul>
+
+      <h2 class="sub-title">3.2 URI Format</h2>
+      <p>The Dillweed Namespace uses a URI scheme that signals addressable resolution intent rather than simple labeling. Two scheme forms are defined: the full form <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed://</code> for human-readable contexts, and the canonical short form <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code> for machine, protocol, and infrastructure contexts. Both forms are semantically equivalent and governed by the same naming rules.</p>
+      <div class="code-block">
+        <div class="code-label">Syntax — full form</div>
+        <code><span class="c-uri">dillweed://</span><span class="c-key">&lt;domain&gt;</span><span class="c-white">.</span><span class="c-key">&lt;category&gt;</span><span class="c-white">.</span><span class="c-key">&lt;function&gt;</span></code>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Syntax — canonical short form</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-key">&lt;domain&gt;</span><span class="c-white">.</span><span class="c-key">&lt;category&gt;</span><span class="c-white">.</span><span class="c-key">&lt;function&gt;</span></code>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Example — vendor comparison capability</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.intel.vendors</span></code>
+      </div>
+
+      <h2 class="sub-title">3.3 Naming Rules</h2>
+      <p>Namespace paths are normative. The following rules define what constitutes a valid Dillweed namespace path; they are binding on registries, resolvers, and any other implementation in the stack.</p>
+      <ul class="props">
+        <li>A namespace path MUST contain at least two dot-separated components. Periods are the only permitted component separator.</li>
+        <li>Each component MUST consist of lowercase ASCII letters (a–z), digits (0–9), and hyphens (U+002D).</li>
+        <li>Each component MUST be between 2 and 64 characters inclusive.</li>
+        <li>A component MUST NOT begin or end with a hyphen.</li>
+        <li>The root schemes <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed://</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code> are reserved and governed solely by the DNSO.</li>
+        <li>The combination of <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">name</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">version</code> MUST be globally unique among non-revoked capability records. A revoked <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">(name, version)</code> MAY be re-registered; the revoked record remains in the registration log for auditability. Implementations enforce this uniqueness rule at registration time and return an appropriate error when a duplicate is submitted.</li>
+        <li>Version suffixes may be appended using a colon: <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://tools.search.web-retrieval:v2</code>.</li>
+      </ul>
+      <p>Internationalized namespace components are reserved for a future revision and are expected to follow IDNA 2008 (RFC 5891) punycode conventions. See Appendix A.</p>
+
+      <h2 class="sub-title">3.4 URI Scheme Identifier</h2>
+      <p>The canonical short-form URI scheme for the Dillweed Namespace is <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code>. This scheme is the preferred form for use in machine-readable contexts, protocol headers, resolver queries, registry records, and infrastructure configuration. The full form <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed://</code> is the preferred form for human-facing documentation, standards submissions, and public communications where the source mark should be legible without prior context.</p>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code> scheme identifier is grounded in the domain registration <strong>dllwd.com</strong>, held by the founding steward under continuous ownership, which provides an independent prior art anchor for the scheme name. Both scheme forms resolve through the same DillClaw™ resolver infrastructure and produce identical resolution results. Implementations MUST treat the two forms as semantically equivalent.</p>
+      <div class="callout">
+        <div class="callout-label">Usage Convention</div>
+        <p>Use <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code> in code, configuration, resolver queries, capability records, and API references. Use <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed://</code> in standards documents, white papers, and human-readable explanations. Either form is acceptable in specifications; the canonical short form is preferred where brevity aids clarity.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Capability Records</h1></div>
+
+      <p>Each namespace entry resolves to a <strong>Capability Record (CR)</strong> — a structured document that defines what a capability is, how it behaves, and how it can be used. The CR is the atomic unit of the resolution system. The schema summarized here is governed in full by the <a href="https://dillweed.com/registry-spec.html" style="color:var(--accent);">Registry Specification v0.1</a>; this section defines the fields that are essential to the namespace model.</p>
+
+      <h2 class="sub-title">4.1 Record Schema</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>name</td><td>Fully qualified Dillweed namespace path, conforming to §3.3</td></tr>
+            <tr><td>description</td><td>Human-readable summary of the capability's purpose</td></tr>
+            <tr><td>endpoint</td><td>Base URI or connection string for invocation</td></tr>
+            <tr><td>protocol</td><td>Invocation protocol: mcp, rest, grpc, a2a, or custom</td></tr>
+            <tr><td>input_schema</td><td>URI or inline JSON Schema for accepted inputs</td></tr>
+            <tr><td>output_schema</td><td>URI or inline JSON Schema for returned outputs</td></tr>
+            <tr><td>trust_tier</td><td>Trust classification: experimental, trusted, verified, or canonical (see §7.1)</td></tr>
+            <tr><td>permissions</td><td>Enumerated allowed actions for consuming agents</td></tr>
+            <tr><td>version</td><td>Semver string for the capability implementation</td></tr>
+            <tr><td>signature</td><td>Ed25519 DNSO signature (format <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dnso_v1_&lt;base64url&gt;</code>). See Registry Specification §5.</td></tr>
+            <tr><td>last_updated</td><td>RFC 3339 date-time in UTC with second precision (<code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">YYYY-MM-DDTHH:MM:SSZ</code>). Non-UTC offsets and fractional seconds MUST NOT be used.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">4.2 Example Capability Record</h2>
+      <div class="code-block">
+        <div class="code-label">JSON — Capability Record</div>
+        <code><span class="c-muted">{</span>
+  <span class="c-key">"name"</span><span class="c-white">:         </span><span class="c-str">"research.market.intel.vendors"</span><span class="c-muted">,</span>
+  <span class="c-key">"description"</span><span class="c-white">:  </span><span class="c-str">"Vendor comparison and analysis capability"</span><span class="c-muted">,</span>
+  <span class="c-key">"endpoint"</span><span class="c-white">:     </span><span class="c-str">"https://api.marketintel.ai/vendors"</span><span class="c-muted">,</span>
+  <span class="c-key">"protocol"</span><span class="c-white">:     </span><span class="c-str">"rest"</span><span class="c-muted">,</span>
+  <span class="c-key">"input_schema"</span><span class="c-white">: </span><span class="c-muted">{},</span>
+  <span class="c-key">"output_schema"</span><span class="c-white">:</span><span class="c-muted">{},</span>
+  <span class="c-key">"trust_tier"</span><span class="c-white">:   </span><span class="c-str">"verified"</span><span class="c-muted">,</span>
+  <span class="c-key">"permissions"</span><span class="c-white">:  </span><span class="c-muted">[</span><span class="c-str">"query"</span><span class="c-muted">, </span><span class="c-str">"summarize"</span><span class="c-muted">, </span><span class="c-str">"export"</span><span class="c-muted">],</span>
+  <span class="c-key">"version"</span><span class="c-white">:      </span><span class="c-str">"1.2.0"</span><span class="c-muted">,</span>
+  <span class="c-key">"signature"</span><span class="c-white">:    </span><span class="c-str">"dnso_v1_WZ8oHbterECAL0P_D1Rtq..."</span><span class="c-muted">,</span>
+  <span class="c-key">"last_updated"</span><span class="c-white">: </span><span class="c-str">"2026-03-20T14:22:05Z"</span>
+<span class="c-muted">}</span></code>
+      </div>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Resolution Model</h1></div>
+
+      <p>The namespace becomes operational through resolution. A resolver takes an agent's intent, queries the namespace, applies trust and policy filters, and returns an invocable capability. In the Dillweed stack, the resolution layer is implemented by DillClaw, operating directly against the Dillweed Namespace. The resolution protocol, trust-scoring algorithm, and API contract are specified in full in the <a href="https://dillweed.com/dillclaw-spec.html" style="color:var(--accent);">DillClaw Resolver Specification v0.1</a>; this section describes the resolution model at the level needed to understand the namespace design.</p>
+
+      <h2 class="sub-title">5.1 Resolution Flow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Parse</h4><p>Validate the namespace URI against the syntax rules in §3.3. Reject malformed paths before any network request.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Registry Lookup</h4><p>Query the authoritative Dillweed Registry for candidate Capability Records matching the path.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Trust Filter</h4><p>Apply the caller's trust policy. Reject entries below the required trust tier. Callers may require verified status or apply custom logic.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Contextual Selection</h4><p>If multiple candidates remain, select the best-fit capability based on context, version preference, and required permissions.</p></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><h4>Invoke</h4><p>The calling agent invokes the capability directly using the endpoint and protocol returned in the Capability Record. The resolver does not sit in the invocation path unless a separate implementation explicitly chooses to proxy.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">5.2 Interoperability</h2>
+      <p>The resolution protocol is intentionally protocol-agnostic at the invocation layer. A resolver may return endpoints for MCP servers, REST APIs, A2A-compatible agents, or custom protocols. The namespace remains viable across protocol generations without becoming obsolete as underlying standards evolve.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">A Worked Example</h1></div>
+
+      <p>To make the resolution model concrete, consider a procurement agent tasked with vendor due diligence. It needs to find, evaluate, and invoke a capability it has never called before — through a namespace it can trust without knowing the underlying provider in advance.</p>
+
+      <div class="scenario">
+        <div class="scenario-header">
+          <span class="s-badge">Scenario</span>
+          <span class="s-title">Procurement agent performing vendor due diligence</span>
+        </div>
+        <div class="scenario-body">
+          <div class="scenario-step">
+            <div class="ss-num">1</div>
+            <div class="ss-content">
+              <h4>The agent expresses intent</h4>
+              <p>A procurement agent is asked to compare shortlisted software vendors. It does not have a hardcoded tool for this. Instead, it queries the resolver: <em>"I need a vendor comparison capability with at least verified trust, query and export permissions."</em></p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">2</div>
+            <div class="ss-content">
+              <h4>The resolver queries the namespace</h4>
+              <p>DillClaw searches the Dillweed Registry for entries matching <code>dillweed://research.market.*.vendors</code> with <code>trust_tier: verified</code> and <code>permissions</code> including <code>query</code> and <code>export</code>.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">3</div>
+            <div class="ss-content">
+              <h4>Candidates are returned and filtered</h4>
+              <p>Three entries match. One is <code>experimental</code> — rejected by the agent's trust policy. One is <code>trusted</code> but lacks export permission. One is <code>verified</code> with full permissions and a 14-month usage history. That entry is selected.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">4</div>
+            <div class="ss-content">
+              <h4>The Capability Record is resolved</h4>
+              <p>The resolver returns the full CR for <code>dillweed://research.market.intel.vendors</code> — including the endpoint, schema, version, and DNSO signature. The agent validates the signature and confirms the schema matches its expected input format.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">5</div>
+            <div class="ss-content">
+              <h4>The capability is invoked and the result returned</h4>
+              <p>The agent calls the endpoint with its vendor list. The capability returns a structured comparison report. The agent notes the namespace path in its audit log — so the same capability can be retrieved reliably in future sessions, regardless of which server currently serves it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>This scenario illustrates why the namespace matters in practice. The agent never needed to know the underlying provider. It needed a stable name, a trust signal it could rely on, and a resolution layer that could answer <em>"given what I need, what should I use?"</em> — not just <em>"what exists?"</em></p>
+
+      <div class="callout">
+        <div class="callout-label">Why This Matters at Scale</div>
+        <p>Multiply this interaction across thousands of agents, dozens of capability categories, and years of provider turnover. Without a stable namespace and trust layer, every agent must maintain its own capability map — which fragments, drifts, and breaks at every provider change. With one, the map is shared, governed, and stable.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Trust Model</h1></div>
+
+      <p>Trust is layered, not binary. It is not inferred from existence alone — it is accumulated through validation, usage, stewardship, and policy over time. This is what separates a namespace from a registry.</p>
+
+      <h2 class="sub-title">7.1 Trust Tiers</h2>
+      <p>The four trust tiers are presented below in order from lowest to highest trust. Promotion criteria and governance semantics for each tier are specified in the <a href="https://dillweed.com/registry-spec.html" style="color:var(--accent);">Registry Specification §9</a>.</p>
+      <div class="trust-tiers">
+        <div class="tier tier-t1"><span class="tier-badge">Tier 1</span><h4>Experimental</h4><p>Limited validation or early-stage capability. Default starting tier for new registrations. Use with explicit acknowledgment of provisional status.</p></div>
+        <div class="tier tier-t2"><span class="tier-badge">Tier 2</span><h4>Trusted</h4><p>Demonstrated reliability and usage history. Endpoint tested and found stable over a meaningful period. Promoted from experimental through track record.</p></div>
+        <div class="tier tier-t3"><span class="tier-badge">Tier 3</span><h4>Verified</h4><p>Identity confirmed, endpoint tested, DNSO review complete. Suitable for production use by agents without explicit trust override.</p></div>
+        <div class="tier tier-t4"><span class="tier-badge">Tier 4</span><h4>Canonical</h4><p>DNSO-designated preferred implementation for its category. Assigned sparingly and only by the DNSO for reference implementations.</p></div>
+      </div>
+
+      <h2 class="sub-title">7.2 Trust Accumulation</h2>
+      <ul class="props">
+        <li>Capabilities that maintain valid registrations, stable endpoints, and consistent schemas over time accrue a usage history visible to resolvers</li>
+        <li>Resolvers may expose this history to consuming agents as a contextual trust signal</li>
+        <li>The DNSO may promote capabilities across tiers based on demonstrated reliability</li>
+        <li>Revocation is immediate and namespace-wide: a suspended registration is untrusted across all resolvers simultaneously</li>
+      </ul>
+
+      <h2 class="sub-title">7.3 Namespace-Anchored Identity</h2>
+      <p>Within the Dillweed Namespace, identity is anchored to the URI path rather than to any specific credential or endpoint. A capability's identity <em>is</em> its namespace path — trust accumulated against that path persists across endpoint changes as long as the steward maintains the registration. This is the property that makes long-term trust accumulation meaningful.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Governance</h1></div>
+
+      <p>This section describes two distinct things: first, the abstract governance model that any coordination namespace requires; second, the specific stewardship arrangement proposed for the Dillweed implementation. These are separable. The model could in principle be implemented by a different operator; the Dillweed implementation is one instantiation with specific, documented continuity properties. The operational details of DNSO governance are specified in the <a href="https://dillweed.com/governance.html" style="color:var(--accent);">Governance Framework</a> and the <a href="https://dillweed.com/dnso-operations-charter.html" style="color:var(--accent);">DNSO Operations Charter</a>.</p>
+
+      <h2 class="sub-title">8.1 The Abstract Governance Model</h2>
+      <p>A durable coordination namespace requires governance that provides four properties regardless of who operates it:</p>
+      <ul class="props">
+        <li><strong>Continuity</strong> — The namespace MUST outlive any single product cycle, company, or technology generation</li>
+        <li><strong>Accountability</strong> — Decisions about naming, registration, and trust MUST be traceable and contestable</li>
+        <li><strong>Consistency</strong> — Rules MUST be applied uniformly; preferential treatment undermines the trust layer</li>
+        <li><strong>Openness</strong> — Any qualified party SHOULD be able to register; the namespace is not a closed ecosystem</li>
+      </ul>
+
+      <h2 class="sub-title">8.2 The Dillweed Stewardship Arrangement</h2>
+      <p>The Dillweed implementation of this model is governed by the <strong>Dillweed Namespace Stewardship Office (DNSO)</strong>. The DNSO's purpose is continuity assurance — ensuring the namespace persists, remains trustworthy, and remains accessible across time — not control for its own sake.</p>
+
+      <p>The DNSO's current stewardship rests on 28 years of single-owner domain provenance, registered trademark protection across three classes, and a domain portfolio of approximately 200 assets. These are structural continuity properties, not claims of authority. They exist to answer a simple question any serious adopter will ask: <em>will this namespace still exist and mean the same thing in ten years?</em></p>
+
+      <p>Stewardship is explicitly designed to transfer. Governance instruments are being structured so that the namespace can outlive any individual steward — similar to how a trust or foundation holds assets for beneficiaries beyond the founder's tenure. The DNSO role is that of a long-term custodian, not a gatekeeper. The long-term continuity mechanism is specified in the <a href="https://dillweed.com/continuity-protocol.html" style="color:var(--accent);">Continuity Protocol</a>.</p>
+
+      <div class="callout">
+        <div class="callout-label">On the Question of Legitimacy</div>
+        <p>A coordination namespace derives legitimacy from adoption, not declaration. The Dillweed Namespace does not claim authority by assertion. It offers a well-structured model, documented continuity, and transparent governance — and invites adoption on those terms. The community grants legitimacy; this document only makes the case for why it is worth granting.</p>
+      </div>
+
+      <h2 class="sub-title">8.3 Governance Constraints</h2>
+      <ul class="props">
+        <li>All namespace decisions MUST be logged and reviewable</li>
+        <li>Registration criteria MUST be published and applied consistently</li>
+        <li>Revocation actions MUST include documented justification</li>
+        <li>Dispute resolution mechanisms MUST be defined and accessible</li>
+        <li>Stewardship may expand over time without breaking continuity of existing registrations</li>
+      </ul>
+
+      <h2 class="sub-title">8.4 Registration Requirements</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Requirement</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Identity verification</td><td>Verifiable contact information and organizational affiliation where applicable</td></tr>
+            <tr><td>Capability Record</td><td>Complete CR as defined in §4.1 submitted at registration time</td></tr>
+            <tr><td>Schema validation</td><td>Referenced schema must be accessible and valid at time of registration</td></tr>
+            <tr><td>Stewardship commitment</td><td>Registrant commits to endpoint maintenance and notifying the DNSO of material changes</td></tr>
+            <tr><td>Use compliance</td><td>Capability must comply with the acceptable use policy published by the DNSO</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Stack Positioning</h1></div>
+
+      <p>The Dillweed Namespace operates as the middle layer in the emerging agentic AI stack — between human-scale distribution systems and capability-level implementations. Each layer serves a distinct role; none can substitute for another.</p>
+
+      <div class="stack">
+        <div class="stack-row">
+          <div class="stack-num">L1</div>
+          <div class="stack-content"><h4>Human Gateway Layer</h4><p>Access, identity, governance at platform scale. Examples: Meta, Google, Apple, Microsoft, Salesforce. The Dillweed Namespace is designed as a neutral coordination root no single platform controls — valuable to all of them for exactly that reason.</p></div>
+        </div>
+        <div class="stack-arrow">↓</div>
+        <div class="stack-row hl">
+          <div class="stack-num">L2</div>
+          <div class="stack-content">
+            <h4>Dillweed Namespace Layer &nbsp;<span style="font-family:var(--mono);font-size:0.65rem;color:var(--accent);font-weight:500">← this document</span></h4>
+            <p>Structure, continuity, meaning, and trust for agentic coordination.</p>
+          </div>
+        </div>
+        <div class="stack-arrow">↓</div>
+        <div class="stack-row">
+          <div class="stack-num">L3</div>
+          <div class="stack-content"><h4>DillClaw Resolver Layer</h4><p>DillClaw is a resolver layer handling discovery, registry lookup, trust evaluation, candidate ranking, and invocation target selection against the Dillweed Namespace. Specified in the <a href="https://dillweed.com/dillclaw-spec.html" style="color:var(--accent);">DillClaw Resolver Specification v0.1</a>.</p></div>
+        </div>
+        <div class="stack-arrow">↓</div>
+        <div class="stack-row">
+          <div class="stack-num">L4</div>
+          <div class="stack-content"><h4>Capability Layer</h4><p>Tools, agents, data sources, and services registered within the namespace and invocable through the resolver.</p></div>
+        </div>
+        <div class="stack-arrow">↕</div>
+        <div class="stack-row">
+          <div class="stack-num">L5</div>
+          <div class="stack-content"><h4>Anthill Observability Plane</h4><p>An orthogonal governance telemetry layer spanning L2–L4. Anthill ingests neutral coordination signals from resolvers and registry operations, providing the DNSO with a verifiable, append-only record of namespace ecosystem health. It does not gate resolution or invocation; it observes them. Specified in the <a href="https://dillweed.com/anthill-spec.html" style="color:var(--accent);">Anthill Observability Plane Specification v0.1</a>.</p></div>
+        </div>
+      </div>
+
+      <p>This reflects a classical infrastructure pattern: the most durable layers are those that are neutral, independent, and provide coordination that competing parties can adopt without ceding ground to each other. The value of neutrality compounds over time. The observability plane (L5) is shown as orthogonal because it monitors the operational layers without participating in them — a structural prerequisite for credible governance, not an optional add-on.</p>
+
+      <div class="callout">
+        <div class="callout-label">The Full Stack</div>
+        <p>Three additional specifications address sub-concerns the diagram above does not expand. The <a href="https://dillweed.com/registry-spec.html" style="color:var(--accent);">Registry Specification</a> defines the authoritative persistence layer that backs the namespace. The <a href="https://dillweed.com/governance.html" style="color:var(--accent);">Governance Framework</a> and the <a href="https://dillweed.com/dnso-operations-charter.html" style="color:var(--accent);">DNSO Operations Charter</a> operationalize the governance model in §8. The <a href="https://dillweed.com/continuity-protocol.html" style="color:var(--accent);">Continuity Protocol</a> defines the long-term stewardship transfer mechanism.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s10">
+      <div class="section-header"><span class="sec-num">§ 10</span><h1 class="sec-title">Why Not Blockchain?</h1></div>
+
+      <p>Blockchain systems are optimized for <strong>registration</strong>. They answer who owns something, what exists, and what changed. They do not solve real-time capability selection, contextual trust evaluation, low-latency resolution, or coordinated invocation.</p>
+
+      <div class="compare">
+        <div class="compare-card">
+          <div class="compare-head">Blockchain is good at</div>
+          <div class="compare-body"><ul><li>Immutable ownership records</li><li>Decentralized registration</li><li>Tamper-evident history</li><li>Trustless consensus</li></ul></div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-head">Blockchain does not solve</div>
+          <div class="compare-body"><ul><li>Real-time capability selection</li><li>Contextual trust evaluation</li><li>Low-latency resolution</li><li>Coordinated invocation</li></ul></div>
+        </div>
+      </div>
+
+      <p>In an agentic ecosystem, the scarce resource is not record-keeping. It is <strong>resolution</strong>. The Dillweed Namespace is designed for resolution, not registration — and the governance model is designed for continuity, not decentralization for its own sake.</p>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header"><span class="sec-num">§ 11</span><h1 class="sec-title">What Must Be Demonstrated</h1></div>
+
+      <p>This document is a proposal, not a settled standard. The Dillweed Namespace becomes meaningful infrastructure through demonstrated adoption, not through assertion. Without these milestones it remains conceptual. With them, it becomes operational.</p>
+
+      <div class="callout">
+        <div class="callout-label">Implementation Status — May 2026</div>
+        <p>A complete reference implementation of the namespace stack — Registry, DillClaw Resolver, and Anthill Observability Plane — is operating on local infrastructure, with each service passing the conformance test suite for its corresponding specification under <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">launchd</code> auto-start. The DNSO Ed25519 public key is published at <a href="https://dillweed.com/dnso_public.pem" style="color:var(--accent);">dillweed.com/dnso_public.pem</a>. All currently published capability records in the registry are signed against this key and verifiable by any party. Public deployment of the registry endpoint is the next milestone.</p>
+      </div>
+
+      <div class="milestones">
+        <div class="milestone"><div class="ms-icon">01</div><div class="ms-body"><h4>Public Registry Endpoint &nbsp;<span style="font-family:var(--mono);font-size:0.6rem;color:var(--accent);font-weight:500;letter-spacing:0.08em;">IN PROGRESS</span></h4><p>A publicly accessible registry returning Capability Records for registered namespace entries. Currently operating on local infrastructure with full API surface; public endpoint deployment pending.</p></div></div>
+        <div class="milestone"><div class="ms-icon">02</div><div class="ms-body"><h4>End-to-End Resolution Workflow &nbsp;<span style="font-family:var(--mono);font-size:0.6rem;color:#1a5c3a;font-weight:500;letter-spacing:0.08em;">ACHIEVED</span></h4><p>At least one complete resolution flow — from namespace URI to invoked capability — implemented and documented publicly. The reference implementation demonstrates this flow end to end through the DillClaw Resolver against the Registry, with full trace capture.</p></div></div>
+        <div class="milestone"><div class="ms-icon">03</div><div class="ms-body"><h4>Protocol Interoperability &nbsp;<span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);font-weight:500;letter-spacing:0.08em;">PENDING</span></h4><p>A documented integration with at least one of MCP, A2A, or a major platform gateway layer.</p></div></div>
+        <div class="milestone"><div class="ms-icon">04</div><div class="ms-body"><h4>Developer Adoption &nbsp;<span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);font-weight:500;letter-spacing:0.08em;">PENDING</span></h4><p>Real developer usage: at least one external capability registered and actively maintained within the namespace.</p></div></div>
+        <div class="milestone"><div class="ms-icon">05</div><div class="ms-body"><h4>Trust Accumulation in Practice &nbsp;<span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);font-weight:500;letter-spacing:0.08em;">PENDING</span></h4><p>At least one capability demonstrating a track record of stable registration and elevated trust tier classification.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="s12">
+      <div class="section-header"><span class="sec-num">§ 12</span><h1 class="sec-title">Asset Provenance</h1></div>
+
+      <p>The Dillweed implementation is anchored in a controlled asset portfolio with documented long-term provenance. This provenance supports the governance model's continuity claim — it demonstrates the kind of durable, single-steward control that a coordination root requires to be taken seriously as infrastructure.</p>
+
+      <div class="prov-grid">
+        <div class="prov-key">dillweed.com</div><div class="prov-val">Primary domain. Single-owner provenance of 28 years.</div>
+        <div class="prov-key">dillweed.ai</div><div class="prov-val">Primary AI-specific domain variant.</div>
+        <div class="prov-key">dill.ai</div><div class="prov-val">Short-form variant for high-frequency reference contexts.</div>
+        <div class="prov-key">DillClaw.ai</div><div class="prov-val">Resolver brand domain for the DillClaw layer.</div>
+        <div class="prov-key">DillForge.ai</div><div class="prov-val">Development tooling brand domain.</div>
+        <div class="prov-key">~200 registrations</div><div class="prov-val">Defensive portfolio covering variant spellings, extensions, and related terms.</div>
+        <div class="prov-key">TM 35 / 41 / 42</div><div class="prov-val">Trademark coverage across retail/advertising, education/technology, and scientific/software services.</div>
+      </div>
+    </section>
+
+    <section class="section" id="s13">
+      <div class="section-header"><span class="sec-num">§ 13</span><h1 class="sec-title">Conclusion</h1></div>
+
+      <p>The AI ecosystem is expanding rapidly. The limiting factor is no longer access to capability. It is the ability to find the right capability, trust it, and use it correctly — through infrastructure stable enough to survive scale, substitution, and time.</p>
+
+      <p>The namespace model described in this document proposes one structure for meeting that requirement. The Dillweed implementation proposes one instantiation of that model, with specific continuity properties that make it a credible long-term coordination root.</p>
+
+      <p>The legitimacy of any coordination namespace — including this one — must be earned through adoption, not granted through declaration. This document aims to make the case clearly enough that adoption is worth considering. The rest is demonstrated, not argued.</p>
+
+      <div class="pull-quote">
+        Wrappers are replaceable.<br>
+        Coordination roots, if they emerge, are not.
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Contact &amp; Registration Inquiries</div>
+        <p>For capability registration, stewardship partnership, or technical integration inquiries, contact the Dillweed Namespace Stewardship Office via dillweed.com.</p>
+      </div>
+    </section>
+
+    <!-- Appendix A — Future Work (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Future Work (Non-Normative)</h1></div>
+
+      <p>This appendix records items intended for a future revision of the Dillweed Namespace Standard. It is non-normative: nothing in this appendix imposes conformance requirements on implementations. It is included to disclose the anticipated direction of the specification so that implementers can make informed decisions about extensibility and ecosystem participants can plan for forthcoming changes.</p>
+
+      <h2 class="sub-title">A.1 Internationalized Namespace Components</h2>
+      <p>The current specification restricts namespace components to lowercase ASCII letters, digits, and hyphens to guarantee unambiguous byte-level comparison and stable canonical JSON signing. A future revision is expected to extend the component rule to accept internationalized names encoded per IDNA 2008 (RFC 5891) punycode, with a clear normalization rule that prevents the same logical name from producing distinct signed records. This change will affect §3.3 and the downstream Registry and DillClaw specifications.</p>
+
+      <h2 class="sub-title">A.2 Machine-Readable Governance Instruments</h2>
+      <p>The governance instruments described in §8 are currently expressed in natural-language prose across this document, the Governance Framework, and the DNSO Operations Charter. A future revision is expected to publish machine-readable governance instruments — signed policy documents, registration rules expressed as executable validation logic, and promotion criteria expressed as testable predicates — so that the rules governing the namespace are enforceable by code, not merely stated in documents. This change will affect §8.3 and the Governance Framework.</p>
+
+      <h2 class="sub-title">A.3 Structured Registration APIs and Automated Stewardship</h2>
+      <p>The current specification describes registration (§8.4) as a process requiring DNSO review for identity verification and stewardship commitment. A future revision is expected to introduce tiered automation: a self-service registration path for <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">experimental</code> tier capabilities with automated validation; a review-mediated path for <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">trusted</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> tier promotions; and a fully manual path for <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> tier assignment. This change will affect §8.4 and the Registry Specification.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The Namespace Standard is the foundational document — defining the naming model, trust tier hierarchy, capability identity structure, and semantic conventions that all other stack components implement and depend on.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <span style="color:#6ea8fe;font-weight:500;">Namespace Standard ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">Dillweed Namespace Standard</div>
+  <div class="fm">v0.4.3 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; Draft for Comment &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm" style="width:100%; margin-top:0.5rem; opacity:0.7; text-transform:none; letter-spacing:0.05em;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion and research purposes. Commercial implementation, redistribution, or derivative works require written permission from the copyright holder.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

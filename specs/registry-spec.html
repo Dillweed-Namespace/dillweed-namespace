@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Dillweed Registry Specification v0.1.4 — Dillweed Namespace Project">
+<meta property="og:description" content="The authoritative data layer for the Dillweed Namespace. Capability records, cryptographic signing, trust tier governance, and revocation semantics.">
+<meta property="og:url" content="https://dillweed.com/registry-spec.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>Dillweed Registry Specification v0.1.4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0d1b2a;
+      --blue:        #1a3a5c;
+      --ink:         #18202c;
+      --mid:         #445566;
+      --muted:       #6b7f94;
+      --rule:        #c9d8e8;
+      --white:       #ffffff;
+      --pale:        #f4f3fb;
+      --serif:       'Spectral', Georgia, serif;
+      --sans:        'IBM Plex Sans', system-ui, sans-serif;
+      --mono:        'IBM Plex Mono', 'Courier New', monospace;
+      --rg-accent:   #4c3aaa;
+      --rg-lt:       #7b6dd4;
+      --rg-pale:     #f0eeff;
+      --rg-light:    #ddd8f8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+
+    .sidebar { position: fixed; top: 0; left: 0; width: 230px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--white); line-height: 1.2; }
+    .sb-sub { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--rg-accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--rg-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    main { margin-left: 230px; }
+
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(76,58,170,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(76,58,170,0.08) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -100px; right: -80px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(76,58,170,0.2) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rg-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight: 600; color: var(--white); line-height: 1.08; margin-bottom: 1.25rem; max-width: 640px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.55); max-width: 560px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-problem { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1.25rem 1.5rem; max-width: 620px; margin-bottom: 1.5rem; }
+    .cover-problem p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.7; margin: 0 0 0.6rem; }
+    .cover-problem p:last-child { margin-bottom: 0; }
+    .cover-problem strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+    .cover-thesis { background: rgba(76,58,170,0.18); border: 1px solid rgba(76,58,170,0.4); border-radius: 6px; padding: 1rem 1.5rem; max-width: 620px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.92rem; font-style: italic; color: rgba(255,255,255,0.78); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--rg-accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--rg-accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+
+    .callout { border-left: 3px solid var(--rg-accent); background: var(--rg-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--rg-accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: #2d1f7a; font-size: 0.88rem; }
+    .callout p + p { margin-top: 0.5rem; }
+    .callout p strong { color: var(--navy); }
+
+    .pull-quote { font-family: var(--serif); font-size: 1.2rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.55; }
+
+    .code-block { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1rem 0 1.25rem; overflow-x: auto; }
+    .code-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.6rem; }
+    .code-block code { font-family: var(--mono); font-size: 0.82rem; line-height: 1.65; white-space: pre; display: block; }
+    .c-key   { color: #86efac; }
+    .c-str   { color: #f9a8d4; }
+    .c-muted { color: rgba(255,255,255,0.35); }
+    .c-white { color: rgba(255,255,255,0.85); }
+    .c-comment { color: rgba(255,255,255,0.22); font-style: italic; }
+
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--rg-accent); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+
+    .tbl-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 7px; border: 1px solid var(--rule); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--pale); }
+    tbody td { padding: 0.75rem 1rem; color: var(--mid); line-height: 1.6; vertical-align: top; }
+    tbody td:first-child { font-family: var(--mono); font-size: 0.78rem; color: var(--rg-accent); white-space: nowrap; font-weight: 500; }
+
+    .steps { margin: 1.25rem 0; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.1rem; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--rg-accent); color: white; font-family: var(--mono); font-size: 0.65rem; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .step-body p { margin: 0; font-size: 0.875rem; }
+
+    .arch { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.5rem 0; }
+    .arch-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); }
+    .arch-row:last-child { border-bottom: none; }
+    .arch-row.hl { background: linear-gradient(90deg, var(--rg-light), var(--rg-pale)); border-left: 3px solid var(--rg-accent); }
+    .arch-num { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); padding: 1rem 1rem 1rem 1.25rem; display: flex; align-items: center; flex-shrink: 0; min-width: 50px; }
+    .arch-row.hl .arch-num { color: var(--rg-accent); }
+    .arch-content { padding: 1rem 1.25rem 1rem 0; flex: 1; }
+    .arch-content h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .arch-content p { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .arch-arrow { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--rule); background: var(--pale); padding: 0.2rem; border-bottom: 1px solid var(--rule); }
+
+    .endpoint-group { margin: 1.5rem 0; }
+    .endpoint-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; margin-bottom: 1rem; }
+    .endpoint-header { background: var(--navy); padding: 0.7rem 1.25rem; display: flex; align-items: center; gap: 1rem; }
+    .method-badge { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; padding: 0.18rem 0.55rem; border-radius: 3px; flex-shrink: 0; }
+    .method-get  { background: #166534; color: #bbf7d0; }
+    .method-post { background: #1e40af; color: #bfdbfe; }
+    .endpoint-path { font-family: var(--mono); font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+    .endpoint-body { padding: 1rem 1.25rem; background: var(--pale); }
+    .endpoint-body p { margin: 0 0 0.75rem; font-size: 0.875rem; }
+    .endpoint-body p:last-child { margin-bottom: 0; }
+
+    .milestones { margin: 1rem 0; }
+    .milestone { display: flex; gap: 1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
+    .milestone:last-child { border-bottom: none; }
+    .ms-icon { width: 32px; height: 32px; border: 2px solid var(--rule); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); font-size: 0.6rem; color: var(--muted); }
+    .ms-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .ms-body p { margin: 0; font-size: 0.85rem; }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .compare-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+    .compare-head { background: var(--navy); padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .compare-body { padding: 1rem; background: var(--pale); }
+    .compare-body ul { list-style: none; padding: 0; }
+    .compare-body ul li { font-size: 0.825rem; color: var(--mid); padding: 0.3rem 0 0.3rem 1rem; position: relative; line-height: 1.5; }
+    .compare-body ul li::before { content: '·'; position: absolute; left: 0; color: var(--rg-accent); font-weight: 700; }
+
+    .schema-grid { display: grid; grid-template-columns: auto auto 1fr; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; margin: 1.25rem 0; }
+    .sg-field { font-family: var(--mono); font-size: 0.78rem; color: var(--rg-accent); padding: 0.6rem 1rem; border-bottom: 1px solid var(--rule); border-right: 1px solid var(--rule); background: var(--pale); white-space: nowrap; font-weight: 500; }
+    .sg-type  { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); padding: 0.6rem 1rem; border-bottom: 1px solid var(--rule); border-right: 1px solid var(--rule); background: var(--pale); white-space: nowrap; }
+    .sg-desc  { font-size: 0.84rem; color: var(--mid); padding: 0.6rem 1rem; border-bottom: 1px solid var(--rule); line-height: 1.55; }
+    .schema-grid > *:nth-last-child(-n+3) { border-bottom: none; }
+
+    footer { margin-left: 230px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.55); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .compare { grid-template-columns: 1fr; } .schema-grid { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.55s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.14s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.22s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.30s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.38s; }
+    .cover-inner > *:nth-child(6) { animation-delay: 0.46s; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">Registry Specification</div>
+    <span class="sb-version">v0.1.4</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#abstract">Abstract</a>
+    <a href="#s1">1. Role in the Stack</a>
+    <a href="#s2">2. Registry Architecture</a>
+    <a href="#s3">3. Capability Record Schema</a>
+    <a href="#s4">4. API Reference</a>
+    <a href="#s5">5. Signing Model</a>
+    <a href="#s6">6. Storage Model</a>
+    <a href="#s7">7. Registration Requirements</a>
+    <a href="#s8">8. Revocation Model</a>
+    <a href="#s9">9. Trust Tier Governance</a>
+    <a href="#s10">10. Integration with DillClaw</a>
+    <a href="#s11">11. Security Model</a>
+    <a href="#s12">12. What Must Be Demonstrated</a>
+    <a href="#s13">13. Relationship to the Stack</a>
+    <a href="#appendix-a">Appendix A: Future Work</a>
+
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Anthill Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <header class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Registry &nbsp;·&nbsp; Specification &nbsp;·&nbsp; Published Specification v0.1.4</div>
+      <h1 class="cover-title">Dillweed Registry <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
+      <p class="cover-tagline">The authoritative data layer for the Dillweed Namespace — storing, signing, and serving Capability Records.</p>
+
+      <div class="cover-problem">
+        <p>A namespace without a registry is a naming convention with nowhere to look things up. The Dillweed Registry is the authoritative source of truth for all Capability Records in the Dillweed Namespace — the layer that makes names resolvable, signatures verifiable, and governance enforceable.</p>
+        <p>If the namespace standard defines <strong>what can exist</strong>, and the DillClaw Resolver defines <strong>how names are found</strong>, the Registry defines <strong>what is actually registered, by whom, under what terms, and with what cryptographic proof.</strong></p>
+      </div>
+
+      <div class="cover-thesis">
+        <p>Without a registry, a namespace remains descriptive. Without a resolver, it remains inaccessible. The Registry is the authoritative substrate — the durable store that gives both the namespace and the resolver something real to operate against.</p>
+      </div>
+
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.4</span></div>
+        <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">NS Standard v0.4</a></span></div>
+        <div class="cover-meta-item"><span class="label">Resolver Ref</span><span class="value"><a href="https://dillweed.com/dillclaw-spec.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">DillClaw Spec v0.1</a></span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Published Specification</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-body">
+
+    <!-- ABSTRACT -->
+    <section class="section" id="abstract">
+      <div class="section-header"><h1 class="sec-title">Abstract</h1></div>
+
+      <p>The Dillweed Registry is the authoritative persistence layer for the Dillweed Namespace. It stores Capability Records — the structured documents that define what a registered capability is, how it behaves, and how it can be invoked. It signs each record cryptographically at registration time using the DNSO (Dillweed Namespace Stewardship Office) private key, making every record independently verifiable by any party holding the published DNSO public key. It exposes a governed HTTP API for registration, lookup, revocation, and trust tier management.</p>
+
+      <p>This document specifies the Registry's data model, API contract, signing protocol, storage requirements, registration rules, revocation semantics, and integration with the DillClaw Resolver layer. Implementations that conform to this specification are considered Dillweed Registry-compliant.</p>
+
+      <p>This is the third core infrastructure document in the Dillweed specification stack. It should be read alongside the <a href="https://dillweed.com/namespace-standard.html" style="color:var(--rg-accent);">Dillweed Namespace Standard v0.4</a> and the <a href="https://dillweed.com/dillclaw-spec.html" style="color:var(--rg-accent);">DillClaw Resolver Specification v0.1</a>. Those documents define the naming model and the resolution protocol respectively. This document defines the authoritative data store that makes both operational.</p>
+
+      <div class="callout">
+        <div class="callout-label">Scope of This Document</div>
+        <p>This document specifies the Dillweed Registry layer only. Namespace URI syntax, Capability Record schema interpretation, and trust tier definitions are governed by the Dillweed Namespace Standard. Resolution protocol and query semantics are governed by the DillClaw Resolver Specification. This document defines the authoritative store those systems depend on.</p>
+      </div>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119" style="color:var(--rg-accent);">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174" style="color:var(--rg-accent);">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here.</p>
+
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.4 (May 2026)</div>
+        <p>§04 API Reference: added the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">GET /log</code> endpoint, formalizing the protocol-level review path for the registration log already maintained per §06 Storage Model. This lifts the "logged and reviewable" property required by Namespace Standard §8.3 from an implicit operator-only capability (filesystem access to the SQLite database) to a public, protocol-level obligation. No changes to existing endpoints; conformant v0.1.3 implementations must add <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/log</code> to reach v0.1.4 conformance.</p>
+      </div>
+    </section>
+
+    <!-- S1 — CHANGE 1: Stack reordered so Registry is L5 (authoritative substrate) -->
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Role in the Stack</h1></div>
+
+      <p>The Dillweed Registry is the authoritative substrate of the agentic coordination stack. All other layers depend on it — without it, neither the namespace nor the resolver has authoritative data to operate against. Unlike the layers above it, the Registry does not participate in query resolution or invocation routing; it provides the durable, signed record of what exists.</p>
+
+      <div class="arch">
+        <div class="arch-row">
+          <div class="arch-num">L1</div>
+          <div class="arch-content"><h4>Human Gateway Layer</h4><p>Platform-scale access, identity, and policy. Examples: Meta, Google, Apple, Microsoft. These layers surface agent capabilities to end users and enterprise systems.</p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-num">L2</div>
+          <div class="arch-content"><h4>Dillweed Namespace Layer</h4><p>Stable naming, trust accumulation, and governance. Defined in the <a href="https://dillweed.com/namespace-standard.html" style="color:var(--rg-accent);">Dillweed Namespace Standard v0.4</a>.</p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-num">L3</div>
+          <div class="arch-content"><h4>DillClaw Resolver Layer</h4><p>Query parsing, trust evaluation, candidate ranking, and invocation routing. Defined in the <a href="https://dillweed.com/dillclaw-spec.html" style="color:var(--rg-accent);">DillClaw Resolver Specification v0.1</a>.</p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-num">L4</div>
+          <div class="arch-content"><h4>Capability Layer</h4><p>Individual tools, agents, APIs, and data sources. Their records live in the Registry; their endpoints are invoked directly by agents after resolution.</p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row hl">
+          <div class="arch-num">L5</div>
+          <div class="arch-content">
+            <h4>Dillweed Registry — Authoritative Substrate &nbsp;<span style="font-family:var(--mono);font-size:0.65rem;color:var(--rg-accent);font-weight:500">← this document</span></h4>
+            <p>Authoritative Capability Record storage, DNSO cryptographic signing, registration governance, and revocation. The durable data foundation all other layers read from. The Registry is not a vertical layer in the resolution chain — it is the substrate on which the chain rests.</p>
+          </div>
+        </div>
+      </div>
+
+      <p>The Registry's relationship to the resolver mirrors the relationship between a DNS zone file and a DNS resolver — the resolver handles queries, but the authoritative data lives in the zone. The Registry is the zone. Unlike DNS zone files, Registry records carry cryptographic signatures and structured trust metadata that resolvers evaluate beyond simple presence.</p>
+
+      <p>Registry operations produce observable lifecycle events — registration, promotion, revocation, mirror refresh, and key rotation — that may be emitted as Anthill signals for coordination-layer observability. The Registry does not depend on Anthill for its normative behavior; the relationship is one of optional emission rather than required coupling. The hook interface for this emission is tracked in Appendix A.5.</p>
+
+      <div class="callout">
+        <div class="callout-label">The Registry Contract</div>
+        <p>The Registry stores what has been registered, signs it to make it verifiable, and exposes it through a governed API. It does not resolve queries, evaluate trust in context, or route invocations — those responsibilities belong to the DillClaw Resolver. The Registry's contract is narrow: <strong>store it durably, sign it honestly, serve it accurately.</strong></p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">What This Is Not</div>
+        <p>The Registry is not a resolver, invocation router, agent runtime, or governance decision-maker. It stores signed Capability Records, preserves lifecycle history, exposes governed access, and provides verifiable substrate truth for the rest of the stack. Trust-tier attestation is recorded in the Registry but evaluated and applied at the resolution layer.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Reference Monitor Role</div>
+        <p>The Registry functions as the reference monitor for namespace existence: it does not decide contextual trust or route execution, but it determines whether a Capability Record exists, whether it is active or revoked, and whether its signed representation can be independently verified. Whether this role should extend to verification of signal claims emitted by other layers — the broader reference-monitor framing discussed in <a href="https://dillweed.com/anthill-spec.html" style="color:var(--rg-accent);">Anthill Specification Appendix A.10</a> — is a forward-pointing architectural decision and is not asserted by this revision.</p>
+      </div>
+    </section>
+
+    <!-- S2 -->
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Registry Architecture</h1></div>
+
+      <p>A conformant Dillweed Registry consists of four functional components. These may be deployed together as a single service or independently — the specification is agnostic to deployment topology provided the external API behavior is conformant.</p>
+
+      <h2 class="sub-title">2.1 Functional Components</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+          <tbody>
+            <tr><td>Record Store</td><td>Durable persistence for Capability Records, both active and revoked. Must support indexed lookup by name, version, and trust tier. Must survive process restart and system reboot without data loss.</td></tr>
+            <tr><td>Signing Authority</td><td>Holds the DNSO private key. Signs every Capability Record at registration time using Ed25519. Never exposes the private key through any API surface.</td></tr>
+            <tr><td>API Layer</td><td>HTTP service exposing lookup, list, register, revoke, promote, and verify endpoints. Documented in full in §4.</td></tr>
+            <tr><td>Registration Log</td><td>Append-only audit trail of all registry actions: registrations, revocations, and tier promotions. Must be queryable for governance review. Never modified or deleted.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">2.2 Deployment Modes</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Mode</th><th>Description</th><th>Typical Use</th></tr></thead>
+          <tbody>
+            <tr><td>Authoritative</td><td>The single source of truth for the Dillweed Namespace. Operated under DNSO authority when the canonical public namespace is deployed. All resolvers ultimately reference this instance.</td><td>Intended deployment: the canonical public registry at dillweed.com under DNSO authority</td></tr>
+            <tr><td>Local Development</td><td>A registry instance running on a local machine or LAN, seeded with test Capability Records. DillClaw resolvers can be pointed at it for development and testing.</td><td>Mac Mini, developer workstation</td></tr>
+            <tr><td>Mirror (read-only)</td><td>A read-only cache of the authoritative registry, synchronized periodically. Does not accept registrations. Improves resolver availability during registry downtime.</td><td>Regional availability, resilience</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The reference implementation described in this document is a local development mode registry. It is fully conformant with this specification and may be promoted to authoritative status by operating it at a stable public endpoint and publishing its DNSO public key at the canonical URL.</p>
+
+      <div class="callout">
+        <div class="callout-label">Mirror Freshness Requirements</div>
+        <p>Mirror registries carry additional conformance obligations beyond read-only operation. A conformant mirror MUST expose two fields in its <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/health</code> response: <strong><code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">authoritative_snapshot_timestamp</code></strong> — the RFC 3339 UTC date-time of the most recent synchronization from the authoritative registry (see §3.1 for format requirements) — and <strong><code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">authoritative_signature_hash</code></strong> — the lowercase hexadecimal SHA-256 digest of the exact UTF-8 bytes of the authoritative registry's most recent <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> response body as served over HTTP, computed without re-encoding or re-ordering. These fields allow resolvers to detect stale, split-brain, or tampered mirrors without trusting the mirror itself. Full mirror semantics are specified in §10.3.</p>
+      </div>
+    </section>
+
+    <!-- S3 -->
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">Capability Record Schema</h1></div>
+
+      <p>The Capability Record (CR) is the atomic unit of the registry. Every registered capability is represented by exactly one CR per version. The schema defined here is the canonical storage schema — a superset of the CR schema defined in the Dillweed Namespace Standard, which defines only the fields relevant to resolution.</p>
+
+      <h2 class="sub-title">3.1 Field Definitions</h2>
+      <div class="schema-grid">
+        <div class="sg-field">name</div>              <div class="sg-type">string · required</div>    <div class="sg-desc">Fully qualified Dillweed namespace path. Dot-separated, with at least two components. Each component MUST consist of lowercase ASCII letters (a–z), digits (0–9), and hyphens (U+002D); MUST be 2–64 characters long; and MUST NOT begin or end with a hyphen. Unique per version among active records. See §7 for the complete registration rule set. Internationalized namespace components are reserved for a future revision and are expected to follow IDNA 2008 (RFC 5891) punycode conventions.</div>
+        <div class="sg-field">description</div>       <div class="sg-type">string · required</div>    <div class="sg-desc">Human-readable summary of the capability's purpose and behavior. Used by resolvers to provide context to agents.</div>
+        <div class="sg-field">endpoint</div>          <div class="sg-type">string · required</div>    <div class="sg-desc">Base URL for capability invocation. Must be a valid URL at registration time.</div>
+        <div class="sg-field">protocol</div>          <div class="sg-type">string · required</div>    <div class="sg-desc">Invocation protocol: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">rest</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">mcp</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">a2a</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">grpc</code>, or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">custom</code>.</div>
+        <div class="sg-field">input_schema</div>      <div class="sg-type">object · optional</div>    <div class="sg-desc">JSON Schema describing accepted inputs. Included in the DNSO signature when present, ensuring tamper-evidence for executable behavior definitions.</div>
+        <div class="sg-field">output_schema</div>     <div class="sg-type">object · optional</div>    <div class="sg-desc">JSON Schema describing returned outputs. Included in the DNSO signature when present, ensuring tamper-evidence for executable behavior definitions.</div>
+        <div class="sg-field">trust_tier</div>        <div class="sg-type">string · required</div>    <div class="sg-desc">Trust classification: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">experimental</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trusted</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code>, or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code>. Assigned at registration; updated via the promote endpoint.</div>
+        <div class="sg-field">permissions</div>       <div class="sg-type">array · optional</div>     <div class="sg-desc">Enumerated allowed actions for consuming agents. Examples: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">query</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">summarize</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">export</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">execute</code>.</div>
+        <div class="sg-field">version</div>           <div class="sg-type">string · required</div>    <div class="sg-desc">Semver string for the capability implementation. Combined with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name</code>, forms the unique registry key.</div>
+        <div class="sg-field">signature</div>         <div class="sg-type">string · generated</div>   <div class="sg-desc">DNSO Ed25519 signature over canonical record fields. Generated by the registry at write time. Never supplied by the registrant — any submitted value is overwritten.</div>
+        <div class="sg-field">registration_date</div> <div class="sg-type">string · optional</div>    <div class="sg-desc">RFC 3339 full-date (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">YYYY-MM-DD</code>) of first registration. Used in trust score history calculation by resolvers. Defaults to the date of registration if not supplied.</div>
+        <div class="sg-field">last_updated</div>      <div class="sg-type">string · generated</div>   <div class="sg-desc">RFC 3339 date-time in UTC with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">Z</code> offset and second precision (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">YYYY-MM-DDTHH:MM:SSZ</code>). Set by the registry at write time. Included in the signed payload; non-UTC offsets and fractional seconds MUST NOT be used, to guarantee byte-identical canonical JSON across implementations.</div>
+        <div class="sg-field">tags</div>              <div class="sg-type">array · optional</div>     <div class="sg-desc">Free-form classification strings for filtering via <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list?tag=</code>. Not used in trust evaluation. Examples: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">search</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">finance</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">mcp</code>.</div>
+      </div>
+
+      <h2 class="sub-title">3.2 Example Capability Record</h2>
+      <div class="code-block">
+        <div class="code-label">JSON — full Capability Record as stored and served</div>
+        <code><span class="c-muted">{</span>
+  <span class="c-key">"name"</span><span class="c-white">:              </span><span class="c-str">"research.market.intel.vendors"</span><span class="c-muted">,</span>
+  <span class="c-key">"description"</span><span class="c-white">:       </span><span class="c-str">"Vendor comparison and analysis capability"</span><span class="c-muted">,</span>
+  <span class="c-key">"endpoint"</span><span class="c-white">:          </span><span class="c-str">"https://api.marketintel.example.com/vendors"</span><span class="c-muted">,</span>
+  <span class="c-key">"protocol"</span><span class="c-white">:          </span><span class="c-str">"rest"</span><span class="c-muted">,</span>
+  <span class="c-key">"input_schema"</span><span class="c-white">:      </span><span class="c-muted">{ ... },</span>   <span class="c-comment">// included in signature when present</span>
+  <span class="c-key">"output_schema"</span><span class="c-white">:     </span><span class="c-muted">{ ... },</span>   <span class="c-comment">// included in signature when present</span>
+  <span class="c-key">"trust_tier"</span><span class="c-white">:        </span><span class="c-str">"verified"</span><span class="c-muted">,</span>
+  <span class="c-key">"permissions"</span><span class="c-white">:       </span><span class="c-muted">[</span><span class="c-str">"query"</span><span class="c-muted">, </span><span class="c-str">"summarize"</span><span class="c-muted">, </span><span class="c-str">"export"</span><span class="c-muted">],</span>
+  <span class="c-key">"version"</span><span class="c-white">:           </span><span class="c-str">"1.2.0"</span><span class="c-muted">,</span>
+  <span class="c-key">"signature"</span><span class="c-white">:         </span><span class="c-str">"dnso_v1_WZ8oHbterECAL0P_D1Rtq..."</span><span class="c-muted">,   </span><span class="c-comment">// DNSO-generated at write time</span>
+  <span class="c-key">"registration_date"</span><span class="c-white">: </span><span class="c-str">"2024-09-15"</span><span class="c-muted">,</span>
+  <span class="c-key">"last_updated"</span><span class="c-white">:      </span><span class="c-str">"2026-03-27T14:22:05Z"</span><span class="c-muted">,</span>
+  <span class="c-key">"tags"</span><span class="c-white">:              </span><span class="c-muted">[</span><span class="c-str">"research"</span><span class="c-muted">, </span><span class="c-str">"procurement"</span><span class="c-muted">, </span><span class="c-str">"vendor"</span><span class="c-muted">]</span>
+<span class="c-muted">}</span></code>
+      </div>
+
+      <h2 class="sub-title">3.3 Uniqueness Constraint</h2>
+      <p>A <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name</code> + <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">version</code> pair must be unique among active (non-revoked) records. Attempting to register a duplicate returns <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">409 ALREADY_EXISTS</code>. A revoked record's name and version may be re-registered — revocation frees the slot for a corrected submission.</p>
+    </section>
+
+    <!-- S4 -->
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">API Reference</h1></div>
+
+      <p>The Registry exposes a minimal HTTP API. All endpoints accept and return <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">application/json</code> except <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/pubkey</code>, which returns PEM text. Write endpoints should be protected by a bearer token in production deployments via the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">REGISTRY_ADMIN_TOKEN</code> environment variable.</p>
+
+      <div class="endpoint-group">
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/health</span></div>
+          <div class="endpoint-body"><p>Returns registry health, total active record count, per-tier breakdown, signing algorithm, public key URL, and uptime. Required for all conformant implementations. The DillClaw Resolver uses this endpoint to confirm registry availability before relying on a live connection.</p></div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/pubkey</span></div>
+          <div class="endpoint-body"><p>Returns the DNSO Ed25519 public key in PEM format. The endpoint is provided for operational discovery and mirror compatibility. Canonical verification SHOULD use the DNSO-published public key URL <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">https://dillweed.com/dnso_public.pem</code> over TLS rather than a key served by the same registry instance whose records are being verified, since a compromised registry could serve forged records and a forged key together.</p></div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/lookup/&lt;name&gt;</span></div>
+          <div class="endpoint-body">
+            <p>Returns all active Capability Records for the given namespace path. An optional <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?version=</code> query parameter pins the result to a specific version. Path separators may be dots or forward slashes — both are accepted and normalized to dots internally.</p>
+            <div class="code-block">
+              <div class="code-label">Examples</div>
+              <code><span class="c-white">GET</span> <span class="c-muted">/lookup/research.market.intel.vendors</span>
+<span class="c-white">GET</span> <span class="c-muted">/lookup/tools.search.web-retrieval?version=3.1.0</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/list</span></div>
+          <div class="endpoint-body">
+            <p>Returns all active Capability Records with optional filtering. Supports <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tier=</code> (filter by trust tier), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tag=</code> (filter by tag), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?limit=</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?offset=</code> for pagination. Maximum 500 records per response. This is the primary endpoint used by DillClaw Resolvers to warm their local capability cache on startup and refresh it periodically.</p>
+            <div class="code-block">
+              <div class="code-label">Examples</div>
+              <code><span class="c-white">GET</span> <span class="c-muted">/list</span>
+<span class="c-white">GET</span> <span class="c-muted">/list?tier=verified</span>
+<span class="c-white">GET</span> <span class="c-muted">/list?tag=search&limit=20&offset=0</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/verify/&lt;name&gt;</span></div>
+          <div class="endpoint-body"><p>Verifies the DNSO cryptographic signature on a stored Capability Record. Returns <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">signature_valid: true/false</code>, the algorithm used, and the public key URL. A valid signature confirms the record was written by the DNSO and has not been altered at rest. Used by agents and auditors who want to verify records independently of the resolver's trust evaluation.</p></div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/log</span></div>
+          <div class="endpoint-body">
+            <p>Returns entries from the append-only registration log in ascending <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code> order (which is also chronological order, since <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code> is monotonically assigned). Public read: no authentication is required. The log contains only information that is public by nature — registrations are public artifacts, and revocations are public events with documented justification per §08 of this specification and §8.3 of the Namespace Standard.</p>
+            <p>Supports <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?limit=</code> (default 100, maximum 500), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?offset=</code> (default 0) for pagination consistent with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?name=</code> to filter to a specific capability name (returns entries for all versions), and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?action=</code> to filter by action type (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">register</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoke</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">promote</code>, or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">provisional_tier</code>).</p>
+            <p>The response includes an <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">entries</code> array, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">total_count</code> (matching the filter, before pagination), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">limit</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">offset</code>, and a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">has_more</code> boolean indicating whether further pages remain. Each entry carries <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">action</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">version</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">detail</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">caller</code>, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">created_at</code>.</p>
+            <p>Conformance: the endpoint MUST exist and be publicly readable. It MUST return entries in ascending <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code> order. It MUST NOT mutate the underlying log. It MAY support additional filter parameters beyond those listed above; unknown parameters MUST be ignored without error. Strict cursor-based pagination is a candidate for a future revision; until then, ordering by <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code> makes offset-based pagination safe against insertion drift, because <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">id</code> values are append-only and monotonic.</p>
+            <div class="code-block">
+              <div class="code-label">Examples</div>
+              <code><span class="c-white">GET</span> <span class="c-muted">/log</span>
+<span class="c-white">GET</span> <span class="c-muted">/log?action=revoke&amp;limit=50</span>
+<span class="c-white">GET</span> <span class="c-muted">/log?name=research.market.intel.vendors</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-post">POST</span><span class="endpoint-path">/register</span></div>
+          <div class="endpoint-body">
+            <p>Registers a new Capability Record. The registry validates the record, rejects malformed or duplicate submissions, generates the DNSO signature, stamps <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">last_updated</code>, logs the action, and persists the signed record. Returns the complete signed record. See §7 for required fields and validation rules.</p>
+            <div class="code-block">
+              <div class="code-label">Minimal registration request body</div>
+              <code><span class="c-muted">{</span>
+  <span class="c-key">"name"</span><span class="c-white">:        </span><span class="c-str">"tools.translation.text.en-es"</span><span class="c-muted">,</span>
+  <span class="c-key">"description"</span><span class="c-white">: </span><span class="c-str">"English to Spanish translation with confidence scores."</span><span class="c-muted">,</span>
+  <span class="c-key">"endpoint"</span><span class="c-white">:    </span><span class="c-str">"https://api.translate.example.com/en-es"</span><span class="c-muted">,</span>
+  <span class="c-key">"protocol"</span><span class="c-white">:    </span><span class="c-str">"rest"</span><span class="c-muted">,</span>
+  <span class="c-key">"trust_tier"</span><span class="c-white">:  </span><span class="c-str">"experimental"</span><span class="c-muted">,</span>
+  <span class="c-key">"version"</span><span class="c-white">:     </span><span class="c-str">"1.0.0"</span>
+<span class="c-muted">}</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-post">POST</span><span class="endpoint-path">/revoke</span></div>
+          <div class="endpoint-body"><p>Revokes a Capability Record. Revoked records disappear from all lookups and list results immediately. A <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">version</code> field scopes revocation to a single version; omitting it revokes all active versions. A <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">reason</code> field is required for audit log purposes. See §8 for full revocation semantics.</p></div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header"><span class="method-badge method-post">POST</span><span class="endpoint-path">/promote</span></div>
+          <div class="endpoint-body"><p>Updates the trust tier of an existing active record. Accepts <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">version</code>, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trust_tier</code>. The action is logged and the updated record returned. Supports both promotion (experimental → trusted) and demotion (verified → trusted) without record revocation.</p></div>
+        </div>
+
+      </div>
+
+      <h2 class="sub-title">4.1 Error Response Format</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>HTTP</th><th>Error Code</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>400</td><td>BAD_REQUEST</td><td>Malformed request body or invalid JSON.</td></tr>
+            <tr><td>401</td><td>UNAUTHORIZED</td><td>Write endpoint requires <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">Authorization: Bearer &lt;token&gt;</code>.</td></tr>
+            <tr><td>404</td><td>NOT_FOUND</td><td>No active record at the specified path or version.</td></tr>
+            <tr><td>409</td><td>ALREADY_EXISTS</td><td>A record with this <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name:version</code> is already active.</td></tr>
+            <tr><td>422</td><td>VALIDATION_FAILED</td><td>Record fields fail validation. Includes a structured <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">errors</code> array.</td></tr>
+            <tr><td>500</td><td>SERVER_FAULT</td><td>Internal registry error. Includes a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">detail</code> field for diagnostics.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- S5 — CHANGE 3: Signing model expanded to include input_schema and output_schema -->
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Signing Model</h1></div>
+
+      <p>Every Capability Record stored in the Registry carries a DNSO cryptographic signature. The signature is the mechanism that makes records authoritative — it allows any agent or resolver to verify independently that a record was written by the DNSO and has not been altered since registration.</p>
+
+      <h2 class="sub-title">5.1 Algorithm</h2>
+      <p>The Registry uses <strong>Ed25519</strong> (Edwards-curve Digital Signature Algorithm, RFC 8032) for all record signing. Ed25519 was chosen for its combination of strong security, compact signatures (~88 base64url characters), fast verification, and wide support across languages and runtimes including Node.js built-ins, Python, Go, Rust, and browser WebCrypto APIs.</p>
+
+      <h2 class="sub-title">5.2 Canonical JSON</h2>
+      <p>Signatures are computed over a deterministic canonical JSON representation of the record, not the full stored document. This ensures the signature is stable regardless of storage format, field ordering, or whitespace. The canonical JSON includes the fields below, with keys sorted alphabetically and no whitespace. <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">input_schema</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">output_schema</code> are included when present, as they define executable behavior and must be tamper-evident:</p>
+      <div class="code-block">
+        <div class="code-label">Fields included in signature — alphabetical order, no whitespace</div>
+        <code><span class="c-muted">{</span><span class="c-key">"description"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"endpoint"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"input_schema"</span><span class="c-white">:</span><span class="c-muted">{...},</span><span class="c-key">"last_updated"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"name"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"output_schema"</span><span class="c-white">:</span><span class="c-muted">{...},</span><span class="c-key">"permissions"</span><span class="c-white">:</span><span class="c-muted">[...],</span><span class="c-key">"protocol"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"trust_tier"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">,</span><span class="c-key">"version"</span><span class="c-white">:</span><span class="c-str">"..."</span><span class="c-muted">}</span></code>
+      </div>
+      <p>When <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">input_schema</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">output_schema</code> are absent, they are omitted from the canonical JSON entirely rather than represented as null. Implementations must handle both the present and absent cases consistently.</p>
+
+      <p><strong>Scope of canonicalization.</strong> The alphabetical-key-ordering and whitespace-stripping requirements apply <em>only to the top-level fields enumerated above</em>. Nested objects within <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">input_schema</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">output_schema</code> are signed in their stored JSON representation as-supplied by the registrant, without recursive key sorting. Signature stability for those fields depends on the registrant submitting them in a stable representation; the registry preserves the bytes-as-stored when constructing the canonical JSON. Implementations that re-serialize nested objects with different key ordering will produce divergent signatures. This scoping decision was added in the v0.1.4 errata after external review identified the ambiguity; it matches the behavior of the v0.2.x reference implementation.</p>
+
+      <p><strong>Planned migration to recursive canonicalization (v0.2 / v0.3, non-normative).</strong> The top-level-only canonicalization defined above is sufficient for a single-implementation reference deployment, but places fragile constraints on nested-object key-order preservation across serialize/parse/re-serialize cycles in non-Node implementations, alternative database backends, and independent third-party verifiers. A future revision (provisionally v0.2 or v0.3) is expected to adopt <a href="https://www.rfc-editor.org/rfc/rfc8785" target="_blank" rel="noopener" style="color:var(--rg-accent);text-decoration:none;border-bottom:1px solid var(--rg-accent)">RFC 8785 JSON Canonicalization Scheme (JCS)</a> or equivalent recursive canonicalization, applying alphabetical key ordering at every nesting depth and using a canonical number-serialization rule. This is a breaking change to the signing scheme: signatures generated under v0.1.x canonicalization will not verify under v0.2+ canonicalization without re-signing.</p>
+
+      <p>The migration is expected to use a <strong>dual-signature transition window</strong> analogous to the planned key-rotation overlap model in §5.6. During the transition window, the registry stores both a v0.1.x signature (over the top-level-canonical form) and a v0.2+ signature (over the recursive-canonical form), and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">GET /verify</code> accepts records whose v0.2+ signature OR v0.1.x signature validates. After the window closes, only v0.2+ signatures are accepted; remaining v0.1.x-only records that have not been re-signed transition to a distinct inactive state (provisionally <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">requires_resign</code>), separate from spec-defined revocation, until the DNSO either re-signs them under the v0.2+ profile or invokes the formal §08 revocation process. This distinction matters because revocation in this specification has specific governance meaning (audit-trail reason, DNSO authority, immutability of revoked rows per §8.1); conflating profile-cutover state with revocation would overload that governance vocabulary and create operational ambiguity. Specific window length and cutover sequencing are deferred to the v0.2 revision; this paragraph records the expected pattern, not a commitment to specific dates. Specialist cryptographic-protocol review is anticipated before v0.2 finalizes the JCS profile and dual-signature semantics.</p>
+
+      <h2 class="sub-title">5.3 Signature Format</h2>
+      <p>Signatures are serialized as a prefixed base64url string: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">dnso_v1_</code> followed by the base64url-encoded raw Ed25519 signature bytes (ieee-p1363 encoding). The version prefix enables future algorithm migration without breaking existing parsers.</p>
+
+      <h2 class="sub-title">5.4 Independent Verification Steps</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Fetch the DNSO public key</h4><p>Retrieve the Ed25519 public key in PEM format from <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">https://dillweed.com/dnso_public.pem</code> over TLS. Do not trust a key fetched from the registry's own <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/pubkey</code> endpoint as the sole source.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Reconstruct canonical JSON</h4><p>Build the canonical JSON from the record's signed fields (§5.2). Keys must be alphabetical, no whitespace, compact <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">JSON.stringify()</code> output. Include <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">input_schema</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">output_schema</code> only if present in the stored record.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Decode the signature</h4><p>Strip the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">dnso_v1_</code> prefix and base64url-decode the remaining string to raw bytes.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Verify</h4><p>Verify the decoded bytes against the canonical JSON payload using the DNSO public key and Ed25519. A successful verification confirms the record is authentic and has not been modified since signing.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">5.5 Keypair Custody</h2>
+      <p>The DNSO private key is the root of trust for the entire namespace. It must be stored at file mode <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">0600</code>, never committed to version control, never transmitted over any network interface, and backed up to at least two encrypted, physically separate media. If the private key is lost, all existing signatures become unverifiable and a keypair reset is required.</p>
+
+      <div class="callout">
+        <div class="callout-label">On Keypair Loss</div>
+        <p>A keypair reset is a registry reset event: a new keypair is generated, the public key is republished, and all active records must be re-signed. Resolvers that cached the old public key will need to refresh. The registration log survives intact as a historical record, but the trust chain from old signatures to the new key cannot be automatically reconstructed. Back up the private key with the same care as a certificate authority root.</p>
+      </div>
+
+      <h2 class="sub-title">5.6 Planned Key Rotation</h2>
+      <p>Routine DNSO key rotation — distinct from emergency keypair reset — SHOULD be performed periodically to limit the blast radius of undetected key compromise. During planned rotation, the prior public key MUST be preserved and served alongside the new key for a defined overlap window (RECOMMENDED minimum: 30 days). This permits staged resolver refresh: resolvers that have cached the old public key continue to verify existing records while they refresh to the new key at their next scheduled update cycle. Records signed under the prior key remain valid during the overlap window. At the close of the overlap window, all active records MUST be re-signed under the new key and the prior key retired. The overlap window start and end dates MUST be disclosed publicly and logged to the registration audit trail.</p>
+
+      <p>During an active overlap window, the prior public key MUST be retrievable via <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">GET /pubkey?previous=true</code>, which returns the prior key in the same PEM format as <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">GET /pubkey</code>. When no overlap is active, this endpoint MUST return <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">404 NOT_FOUND</code>. While an overlap is active, the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/health</code> response MUST include a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">key_rotation</code> object with the following fields:</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>overlap_active</td><td>boolean</td><td>Always <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">true</code> when the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">key_rotation</code> object is present. The absence of the object indicates no rotation is in progress.</td></tr>
+            <tr><td>rotation_started_at</td><td>string</td><td>RFC 3339 date-time in UTC (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">YYYY-MM-DDTHH:MM:SSZ</code>) marking the start of the overlap window.</td></tr>
+            <tr><td>rotation_ends_at</td><td>string</td><td>RFC 3339 date-time in UTC marking the scheduled end of the overlap window.</td></tr>
+            <tr><td>previous_key_url</td><td>string</td><td>Absolute URL at which the prior public key is being served during the overlap window.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- S6 — CHANGE 4: Added explicit re-registration sentence to §6.2 -->
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Storage Model</h1></div>
+
+      <p>The Registry uses a relational data model. The reference implementation uses SQLite with WAL (Write-Ahead Logging) journal mode, providing ACID guarantees, crash safety, and zero-configuration deployment. Alternative conformant implementations may use any storage system that satisfies the durability and query requirements.</p>
+
+      <h2 class="sub-title">6.1 Core Tables</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Table</th><th>Purpose</th><th>Key Constraints</th></tr></thead>
+          <tbody>
+            <tr><td>capabilities</td><td>Stores all Capability Records, active and revoked. The primary data table.</td><td>Unique index on <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">(name, version)</code> where <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoked=0</code>. Index on <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trust_tier</code> for filtered list queries.</td></tr>
+            <tr><td>registration_log</td><td>Append-only audit trail of all registry actions: register, revoke, promote. Every action is logged with the caller identity and a timestamp.</td><td>Append-only. No rows updated or deleted. Retained indefinitely.</td></tr>
+            <tr><td>meta</td><td>Registry-level key-value configuration: schema version, creation date, public key URL.</td><td>Read at startup. Updated only during schema migrations, never by the API.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">6.2 Soft-Delete Revocation</h2>
+      <p>Revoked records are not deleted — they are marked with a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoked=1</code> flag and a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoke_reason</code>. This preserves the audit trail: a revoked record demonstrates that a capability existed, was registered by a real party, and was retired for a documented reason. All API read responses filter on <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoked=0</code> unless explicitly querying history. When a revoked <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name:version</code> pair is re-registered, the implementation must insert a new row rather than mutating the existing revoked row — the revoked row is immutable and must remain in the audit log unchanged.</p>
+
+      <h2 class="sub-title">6.3 Durability Requirements</h2>
+      <ul class="props">
+        <li>Records must survive process restart and system reboot without loss</li>
+        <li>The registration log must be append-only — no rows may be deleted or modified</li>
+        <li>WAL journal mode (or equivalent) is required for SQLite deployments to prevent corruption on unclean shutdown</li>
+        <li>The DNSO keypair must be stored outside the database, in a file with mode 0600 or equivalent OS-level access control</li>
+        <li>A backup of both the database and the keypair must be maintained on a separate physical medium, verified at least monthly</li>
+      </ul>
+
+      <h2 class="sub-title">6.4 Schema Migration Philosophy</h2>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">meta.schema_version</code> field records the current schema revision of the registry database. Schema migrations must be forward-readable for at least one minor version — a registry running schema version N+1 must remain capable of serving records to a resolver or client built against schema version N without error. This requirement ensures that ecosystem participants can upgrade on independent schedules without coordination failures. Breaking schema changes require a major version increment and must be announced with a minimum 60-day advance notice period.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Registration Requirements</h1></div>
+
+      <p>The Registry enforces the following validation rules on all <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">POST /register</code> requests. A submission that fails any rule is rejected with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">422 VALIDATION_FAILED</code> and a structured <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">errors</code> array listing every failure simultaneously — callers receive all problems in a single response.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Validation Rule</th></tr></thead>
+          <tbody>
+            <tr><td>name</td><td>Required. Each dot-separated component MUST consist of lowercase ASCII letters (a–z), digits (0–9), and hyphens (U+002D), MUST be 2–64 characters long, and MUST NOT begin or end with a hyphen. The full name MUST contain at least two components. No wildcards. No uppercase letters. Internationalized names are reserved for a future revision and are expected to follow IDNA 2008 (RFC 5891) punycode conventions.</td></tr>
+            <tr><td>description</td><td>Required. Non-empty string.</td></tr>
+            <tr><td>endpoint</td><td>Required. Must parse as a valid URL. HTTP and HTTPS accepted; custom schemes rejected.</td></tr>
+            <tr><td>protocol</td><td>Required. Must be one of: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">rest</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">mcp</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">a2a</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">grpc</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">custom</code>.</td></tr>
+            <tr><td>trust_tier</td><td>Required. Must be one of: <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">experimental</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trusted</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code>. See note on self-assignment below.</td></tr>
+            <tr><td>version</td><td>Required. Semver-formatted string (e.g. <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">1.0.0</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">2.3.1-beta</code>). Combined with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name</code>, must be unique among active records.</td></tr>
+            <tr><td>permissions</td><td>Optional. If provided, must be an array of strings.</td></tr>
+            <tr><td>input_schema / output_schema</td><td>Optional. If provided, must be valid JSON objects. When present, both are included in the DNSO signature to ensure tamper-evidence of executable behavior.</td></tr>
+            <tr><td>tags</td><td>Optional. If provided, must be an array of strings.</td></tr>
+            <tr><td>signature</td><td>Must NOT be supplied by the registrant. Any submitted value is silently overwritten by the DNSO-generated signature. The registry is the sole signing authority.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">On Trust Tier Self-Assignment</div>
+        <p>Registrants MAY submit provisional tier declarations up to and including <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code>. These declarations are accepted by the registry as provisional claims, subject to resolver-side weighting penalties until DNSO attestation is established. A resolver encountering a self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code> record without a corresponding DNSO promotion audit entry SHOULD treat it as <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trusted</code> for scoring purposes. The DNSO retains the right to revoke any record whose declared tier is not substantiated, regardless of whether the signature is valid. A future revision is expected to require DNSO identity review before the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code> tiers are accepted as attested rather than provisional; see Appendix A.</p>
+      </div>
+    </section>
+
+    <!-- S8 -->
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Revocation Model</h1></div>
+
+      <p>Revocation removes a Capability Record from active resolution immediately and permanently, while preserving it in the database for audit purposes. It is the governance mechanism that makes the trust layer meaningful — a namespace that cannot revoke bad actors cannot be trusted.</p>
+
+      <h2 class="sub-title">8.1 Revocation Semantics</h2>
+      <ul class="props">
+        <li><strong>Immediate effect</strong> — A revoked record disappears from <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/lookup</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> at the moment of revocation. DillClaw Resolver caches may serve the record until their TTL expires; this is expected behavior, mirroring DNS TTL semantics.</li>
+        <li><strong>Reason required</strong> — All revocations must include a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">reason</code> string. This is logged to the audit trail and provides the accountability the governance model requires.</li>
+        <li><strong>Scoped or full</strong> — Revocation may target a single <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name:version</code> pair or all active versions of a capability by omitting the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">version</code> field.</li>
+        <li><strong>Slot freed</strong> — After revocation, the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name:version</code> pair may be re-registered. This allows a capability to be replaced with a corrected version under the same name without breaking the namespace path. Re-registration of a revoked name/version creates a new signed record and does not modify or erase the historical revoked record in the registration log; both records remain in the database for audit purposes.</li>
+        <li><strong>Audit retained</strong> — Revoked records remain in the database with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">revoked=1</code>, the revocation reason, and a timestamp. They are never deleted.</li>
+      </ul>
+
+      <h2 class="sub-title">8.2 Who May Revoke</h2>
+      <p>Any caller holding a valid admin token MAY revoke any record. The admin token is the sole access control mechanism and MUST be held exclusively by the DNSO steward. A future revision is expected to introduce a registrant identity model that permits registrants to revoke only their own records while reserving governance-level revocation to the DNSO; see Appendix A.</p>
+    </section>
+
+    <!-- S9 -->
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Trust Tier Governance</h1></div>
+
+      <p>Trust tiers are the Registry's current assessment of a capability's reliability and standing. They are assigned at registration and updated through the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/promote</code> endpoint as a capability earns or loses standing over time.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Tier</th><th>Meaning</th><th>Promotion Criteria</th></tr></thead>
+          <tbody>
+            <tr><td>experimental</td><td>Limited validation or early-stage capability. Use with explicit acknowledgment of provisional status. Default starting tier.</td><td>No criteria — default for new registrations.</td></tr>
+            <tr><td>trusted</td><td>Demonstrated reliability and usage history. Endpoint tested and found stable over a meaningful period.</td><td>Minimum 3 months continuous registration. Consistent endpoint liveness. No revocation history.</td></tr>
+            <tr><td>verified</td><td>Identity confirmed, endpoint tested, DNSO review complete. Suitable for production use by agents without explicit trust override.</td><td>DNSO identity verification of registrant. Schema validation passes. 6+ months active registration.</td></tr>
+            <tr><td>canonical</td><td>DNSO-designated preferred implementation for its category. Assigned sparingly and only by the DNSO.</td><td>DNSO determination only. Signals the reference implementation for a category.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Tier demotions — from a higher tier to a lower one — are permitted and logged. A capability that was <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> but has become unreliable may be demoted to <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">trusted</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">experimental</code> without revocation, preserving its registration history while accurately reflecting its current standing.</p>
+
+      <div class="callout">
+        <div class="callout-label">Governance Principle</div>
+        <p>Trust tiers derive legitimacy from the governance process that assigns them, not from the claim itself. A self-assigned <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> tier is a claim. A DNSO-reviewed <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> tier, backed by a signed record and an audit trail, is infrastructure.</p>
+      </div>
+    </section>
+
+    <!-- S10 -->
+    <section class="section" id="s10">
+      <div class="section-header"><span class="sec-num">§ 10</span><h1 class="sec-title">Integration with DillClaw</h1></div>
+
+      <p>The DillClaw Resolver connects to the Dillweed Registry as its authoritative data source. The integration is intentionally simple: the resolver polls <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> to warm its local cache and queries <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/lookup</code> on cache miss.</p>
+
+      <h2 class="sub-title">10.1 Connection Model</h2>
+      <ul class="props">
+        <li><strong>Cache warm on startup</strong> — On startup, a DillClaw Resolver configured with <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">DILLCLAW_REGISTRY_URL</code> calls <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> to load all active records into its in-process cache.</li>
+        <li><strong>Periodic refresh</strong> — The resolver re-fetches <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> every 60 seconds by default. Revocations and tier changes propagate within this window.</li>
+        <li><strong>Graceful fallback</strong> — If the registry is unreachable, the resolver continues from its stale cache, disclosing staleness to callers via <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">stale: true</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">cached_at</code> in the response.</li>
+        <li><strong>Signature pass-through</strong> — The resolver never modifies DNSO signatures. They are returned verbatim to calling agents for independent verification.</li>
+      </ul>
+
+      <h2 class="sub-title">10.2 Local Mac Mini Setup</h2>
+      <div class="code-block">
+        <div class="code-label">Running registry and resolver together on a Mac Mini</div>
+        <code><span class="c-comment"># Terminal 1 — start the registry on port 7475</span>
+<span class="c-white">cd dillweed-registry &amp;&amp; ./start.sh</span>
+
+<span class="c-comment"># Terminal 2 — start DillClaw pointing at the live registry</span>
+<span class="c-white">cd dillclaw-resolver</span>
+<span class="c-white">DILLCLAW_REGISTRY_URL</span><span class="c-muted">=</span><span class="c-str">http://localhost:7475</span> <span class="c-white">node server.js</span>
+
+<span class="c-comment"># Verify the full stack: namespace URI → registry → resolver → result</span>
+<span class="c-white">curl -s -X POST http://localhost:7474/resolve \</span>
+<span class="c-white">  -H "Content-Type: application/json" \</span>
+<span class="c-white">  -d '{"query":"dillweed://research.market.intel.vendors"}' | jq .</span></code>
+      </div>
+
+      <h2 class="sub-title">10.3 Mirror Registry Semantics</h2>
+      <p>Read-only mirror registries may be operated by third parties to improve availability and reduce latency for geographically distributed resolver deployments. Mirror registries must expose two additional fields in their <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/health</code> response to permit resolver freshness validation:</p>
+      <ul class="props">
+        <li><strong>authoritative_snapshot_timestamp</strong> — the ISO 8601 timestamp of the most recent full synchronization from the authoritative registry. Resolvers use this to detect staleness beyond their acceptable threshold.</li>
+        <li><strong>authoritative_signature_hash</strong> — a hash of the authoritative registry's most recent <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> response payload, as signed by the DNSO. Resolvers may compare this against a fresh fetch from the authoritative registry to confirm the mirror is not serving a divergent record set.</li>
+      </ul>
+      <p>A resolver that cannot confirm mirror freshness within its acceptable staleness window should fall back to the authoritative registry or disclose staleness to callers via the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">stale: true</code> flag. Mirror registries may not modify DNSO signatures and may not promote or revoke records — all writes are the exclusive authority of the authoritative DNSO registry.</p>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header"><span class="sec-num">§ 11</span><h1 class="sec-title">Security Model</h1></div>
+
+      <p>The Registry's security model has two scopes: protecting the registry itself from unauthorized writes, and protecting consumers of registry data from tampered or spoofed records.</p>
+
+      <h2 class="sub-title">11.1 Threat Model</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Threat</th><th>Mitigation</th></tr></thead>
+          <tbody>
+            <tr><td>Record tampering at rest</td><td>Ed25519 signatures over canonical JSON including input and output schemas. Any modification to signed fields invalidates the signature, detectable by any verifier.</td></tr>
+            <tr><td>Unauthorized registration</td><td>Bearer token on write endpoints. A future revision is expected to add registrant identity verification; see Appendix A.</td></tr>
+            <tr><td>Private key theft</td><td>Key stored at mode 0600, outside the database, never exposed via API. Physical security of the host is the final control.</td></tr>
+            <tr><td>Registry impersonation</td><td>Consumers should verify the DNSO public key via TLS-protected <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">dillweed.com/dnso_public.pem</code>, not solely from the registry's <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/pubkey</code> endpoint.</td></tr>
+            <tr><td>Revocation propagation delay</td><td>Revocations propagate within the resolver's cache refresh window (default 60s). Callers receiving stale responses are informed via the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">stale</code> flag.</td></tr>
+            <tr><td>SQL injection</td><td>All database queries use parameterized prepared statements compiled once at startup.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">11.2 What the Registry Does Not Secure</h2>
+      <ul class="props">
+        <li>The capability endpoint itself — authentication to the capability is the provider's responsibility</li>
+        <li>The content of capability responses — the registry makes no representation about what a capability returns</li>
+        <li>Network transit to the registry — TLS is strongly RECOMMENDED for production deployments but is not enforced by this specification</li>
+      </ul>
+
+      <h2 class="sub-title">11.3 Rate Limiting and Abuse Prevention</h2>
+      <p>Public read endpoints — <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/lookup</code>, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/verify</code> — SHOULD enforce per-IP rate controls to prevent registry scraping and availability degradation. The reference implementation does not itself enforce rate limits, as the primary deployment context is a controlled network. Production deployments serving public internet traffic SHOULD place the registry behind a reverse proxy (such as nginx or Caddy) configured with appropriate rate limiting rules. Write endpoints (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/register</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/revoke</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/promote</code>) are protected by bearer token authentication and SHOULD additionally be restricted by IP allowlist in production environments where the set of authorized callers is known and fixed.</p>
+    </section>
+
+    <section class="section" id="s12">
+      <div class="section-header"><span class="sec-num">§ 12</span><h1 class="sec-title">What Must Be Demonstrated</h1></div>
+
+      <p>This specification documents a system that exists as a deployable implementation and is being refined through operation. The following milestones define the transition from local development registry to authoritative public registry — the point at which this document describes operational infrastructure rather than a proposal.</p>
+
+      <div class="milestones">
+        <div class="milestone"><div class="ms-icon">01</div><div class="ms-body"><h4>Live Public Endpoint</h4><p>A publicly accessible registry at a stable URL (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">registry.dillweed.com</code> or equivalent), returning real Capability Records for at least five registered capabilities across at least three namespace categories.</p></div></div>
+        <div class="milestone"><div class="ms-icon">02</div><div class="ms-body"><h4>Published DNSO Public Key</h4><p>The DNSO Ed25519 public key published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">dillweed.com/dnso_public.pem</code> over HTTPS, enabling any party to independently verify record signatures without trusting the registry itself.</p></div></div>
+        <div class="milestone"><div class="ms-icon">03</div><div class="ms-body"><h4>Connected DillClaw Resolver</h4><p>A running DillClaw Resolver pointed at the live registry, demonstrating the complete end-to-end stack: namespace URI → registry lookup → trust evaluation → invocable endpoint returned to a calling agent.</p></div></div>
+        <div class="milestone"><div class="ms-icon">04</div><div class="ms-body"><h4>External Registration</h4><p>At least one Capability Record registered by a party other than the DNSO — a real developer or tool provider using <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">POST /register</code> against the live registry. This demonstrates the namespace is open, not closed.</p></div></div>
+        <div class="milestone"><div class="ms-icon">05</div><div class="ms-body"><h4>Documented Revocation</h4><p>At least one publicly documented revocation operation with a logged reason, demonstrating that the governance mechanism — not just the storage mechanism — is operational and exercised.</p></div></div>
+      </div>
+    </section>
+
+    <!-- S13 -->
+    <section class="section" id="s13">
+      <div class="section-header"><span class="sec-num">§ 13</span><h1 class="sec-title">Relationship to the Stack</h1></div>
+
+      <p>The Dillweed Registry is the third core infrastructure specification in the coordination stack. Each document is necessary; none is sufficient alone.</p>
+
+      <div class="compare">
+        <div class="compare-card">
+          <div class="compare-head">What each document defines</div>
+          <div class="compare-body">
+            <ul>
+              <li><strong style="color:var(--navy);">Namespace Standard</strong> — naming model, URI syntax, trust tier definitions, governance philosophy</li>
+              <li><strong style="color:var(--navy);">DillClaw Spec</strong> — resolution protocol, query language, trust scoring algorithm, API contract</li>
+              <li><strong style="color:var(--navy);">Registry Spec</strong> — data model, signing authority, registration validation, revocation semantics</li>
+            </ul>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-head">What each document depends on</div>
+          <div class="compare-body">
+            <ul>
+              <li><strong style="color:var(--navy);">Namespace Standard</strong> — standalone; defines the foundation others build on</li>
+              <li><strong style="color:var(--navy);">DillClaw Spec</strong> — references the Namespace Standard for URI syntax and trust tier definitions</li>
+              <li><strong style="color:var(--navy);">Registry Spec</strong> — depends on both; defines what the namespace names and the resolver reads</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <p>The pattern mirrors every durable infrastructure stack in computing: a naming model, a resolution protocol, and an authoritative data store. HTTP named resources; servers served them; DNS resolved them. Kubernetes named workloads; kubelets ran them; etcd stored their state. The Dillweed stack follows the same structure — and like those predecessors, its durability depends on the registry being operated consistently, not just the protocols being specified clearly.</p>
+
+      <div class="pull-quote">
+        The namespace defines what can exist.<br>
+        The resolver defines how it is found.<br>
+        The registry defines what actually exists.
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Publication Note</div>
+        <p>This document is published as a working specification — it documents a system that exists as a deployable reference implementation and is being refined through operation. The reference implementation is available at dillweed.com and forms the basis for the authoritative registry. Feedback, registration inquiries, and technical integration questions may be directed to the Dillweed Namespace Stewardship Office via dillweed.com.</p>
+      </div>
+    </section>
+
+    <!-- Appendix A — Future Work (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Future Work (Non-Normative)</h1></div>
+
+      <p>This appendix records items intended for a future revision of the Registry Specification. It is non-normative: nothing in this appendix imposes conformance requirements on implementations of this specification. It is included to disclose the anticipated direction of the specification so that implementers can make informed decisions about extensibility and ecosystem participants can plan for forthcoming changes.</p>
+
+      <h2 class="sub-title">A.1 Registrant Identity Model</h2>
+      <p>The current specification uses a single administrative bearer token as the sole write-path access control, held exclusively by the DNSO steward. A future revision is expected to introduce a registrant identity model in which each registrant holds a distinct credential bound to a verified identity, and in which access to the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/revoke</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/promote</code> endpoints is scoped by registrant. Under such a model, a registrant would retain authority to revoke only records the same registrant originally submitted, while the DNSO would retain override authority for governance-level revocations. This change will affect §7, §8.2, and §11.1.</p>
+
+      <h2 class="sub-title">A.2 DNSO Review for Verified and Canonical Tiers</h2>
+      <p>The current specification permits registrants to self-assign trust tiers up to and including <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code> as provisional claims, with resolvers applying weighting penalties until DNSO attestation is established through an audit-logged promotion. A future revision is expected to require DNSO identity review as a precondition for registering or being promoted to the <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">verified</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">canonical</code> tiers, at which point the provisional-claim pathway for those tiers will close. This change will affect §7 and §9.</p>
+
+      <h2 class="sub-title">A.3 Internationalized Namespace Components</h2>
+      <p>The current specification restricts namespace components to lowercase ASCII letters, digits, and hyphens to guarantee unambiguous byte-level comparison and stable canonical JSON signing. A future revision is expected to extend the component rule to accept internationalized names encoded per IDNA 2008 (RFC 5891) punycode, with a clear normalization rule that prevents the same logical name from producing distinct signed records. This change will affect §3.1 and §7.</p>
+
+      <h2 class="sub-title">A.4 Additional Anticipated Items</h2>
+      <p>Additional items that may be addressed in future revisions include: a formal canonical-JSON serialization profile referenced by RFC for signature interoperability across non-JavaScript implementations; a structured metadata field for capability provenance (source repository, license, vulnerability disclosure channel); and a standardized mirror synchronization protocol that supersedes the ad hoc snapshot-and-hash mechanism in §2.2 and §10.3. These items are under consideration and are recorded here to solicit community input rather than to commit the DNSO to a specific implementation path.</p>
+
+      <h2 class="sub-title">A.5 Anthill Integration</h2>
+      <p>This specification does not address integration with the <a href="/anthill-spec.html" style="color:var(--rg-accent);">Dillweed Anthill Observability Plane Specification</a>, which describes Registry-side hooks for generating ANT-TC (Trust Tier Drift) and ANT-EC (Ecosystem Concentration Risk) signals from registration and attestation activity (Anthill §8). A future revision is expected to define the hook interface, including conformance level for signal emission, delivery model (push to an Anthill aggregation endpoint or pull from a Registry feed), signal payload schema, and configuration surface by which a Registry operator binds to a specific Anthill aggregation endpoint and signing key. This change will affect a new Registry section addressing observability integration, and is intended to be developed jointly with the corresponding revision of the Anthill specification.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The Registry Specification defines the canonical record format, Ed25519 signing architecture, trust tier attestation predicates, and revocation model that give the namespace its authority and verifiability.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#6ea8fe;font-weight:500;">Registry ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">Dillweed Registry Specification</div>
+  <div class="fm">v0.1.4 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:none; margin-top:0.25rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

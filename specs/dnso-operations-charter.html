@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="DNSO Operations Charter v1.0.3 — Dillweed Namespace Project">
+<meta property="og:description" content="Operational procedures, service commitments, and stewardship practice for the Dillweed Namespace Stewardship Office.">
+  <title>DNSO Operations Charter v1.0.3 — Dillweed Namespace Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #0d1b2a;
+      --blue:      #1a3a5c;
+      --ink:       #18202c;
+      --mid:       #445566;
+      --muted:     #6b7f94;
+      --rule:      #c9d8e8;
+      --white:     #ffffff;
+      --pale:      #f5f7fa;
+      --serif:     'Spectral', Georgia, serif;
+      --sans:      'IBM Plex Sans', system-ui, sans-serif;
+      --mono:      'IBM Plex Mono', 'Courier New', monospace;
+      --accent:    #0e6b6b;
+      --accent-lt: #1a9a9a;
+      --accent-pale: #e8f5f5;
+      --accent-light: #b8e0e0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+
+    .sidebar { position: fixed; top: 0; left: 0; width: 235px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--white); line-height: 1.25; }
+    .sb-sub { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--accent-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    main { margin-left: 235px; }
+
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(14,107,107,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(14,107,107,0.07) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -80px; right: -60px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(14,107,107,0.18) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 600; color: var(--white); line-height: 1.1; margin-bottom: 1.1rem; max-width: 620px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.5); max-width: 540px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-thesis { background: rgba(14,107,107,0.15); border: 1px solid rgba(14,107,107,0.35); border-radius: 6px; padding: 1rem 1.5rem; max-width: 600px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.9rem; font-style: italic; color: rgba(255,255,255,0.75); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    p a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(14,107,107,0.3); transition: border-color 0.15s; }
+    p a:hover { border-bottom-color: var(--accent); }
+
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--accent); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: #0a4040; font-size: 0.88rem; }
+    .callout p + p { margin-top: 0.5rem; }
+    .callout p strong { color: var(--navy); }
+
+    .pull-quote { font-family: var(--serif); font-size: 1.15rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.55; }
+
+    .tbl-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 7px; border: 1px solid var(--rule); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--pale); }
+    tbody td { padding: 0.75rem 1rem; color: var(--mid); line-height: 1.6; vertical-align: top; }
+    tbody td:first-child { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); white-space: nowrap; font-weight: 500; }
+
+    .steps { margin: 1.25rem 0; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.1rem; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.65rem; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .step-body p { margin: 0; font-size: 0.875rem; }
+
+    .posture-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .posture-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+    .posture-head { padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+    .posture-head.current { background: var(--accent); }
+    .posture-head.future  { background: var(--navy); }
+    .posture-body { padding: 0.9rem 1rem; background: var(--pale); font-size: 0.845rem; color: var(--mid); line-height: 1.65; }
+    .posture-body ul { list-style: none; padding: 0; }
+    .posture-body ul li { padding: 0.2rem 0 0.2rem 1rem; position: relative; }
+    .posture-body ul li::before { content: '·'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+    .stack-ref { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+    .stack-ref-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.75rem; }
+    .stack-ref a { display: flex; justify-content: space-between; align-items: baseline; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 0.82rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.15s; }
+    .stack-ref a:last-child { border-bottom: none; }
+    .stack-ref a:hover { color: rgba(255,255,255,0.85); }
+    .stack-ref a .doc-name { font-weight: 500; color: var(--accent-lt); }
+    .stack-ref a .doc-role { font-family: var(--mono); font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+
+    footer { margin-left: 235px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .posture-grid { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.5s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.13s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.21s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.29s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.37s; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">DNSO Operations Charter</div>
+    <span class="sb-version">v1.0.3</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#s1">1. Purpose</a>
+    <a href="#s2">2. Scope &amp; Authority</a>
+    <a href="#s3">3. DNSO Mission</a>
+    <a href="#s4">4. Trust Tier Attestation</a>
+    <a href="#s5">5. Key Management</a>
+    <a href="#s6">6. Revocation Procedures</a>
+    <a href="#s7">7. Public Disclosure</a>
+    <a href="#s8">8. Incident Response</a>
+    <a href="#s9">9. Registry Operations</a>
+    <a href="#s10">10. Service Level Posture</a>
+    <a href="#s11">11. Communication Channels</a>
+    <a href="#s12">12. Charter Amendment</a>
+
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Anthill Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+
+  <div class="cover">
+    <div class="cover-grid"></div> 
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Namespace Stewardship Office · Operations Charter</div>
+      <h1 class="cover-title">DNSO Operations Charter</h1>
+      <p class="cover-tagline">Operational procedures, service commitments, and stewardship practice for the Dillweed Namespace Stewardship Office during the founding phase.</p>
+      <div class="cover-thesis">
+        <p>The Governance Framework defines who holds authority. This charter defines how that authority is exercised — the day-to-day operational practices that make the namespace trustworthy, not just governed.</p>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">1.0.3</span></div>
+        <div class="cover-meta-item"><span class="label">Issued</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Phase</span><span class="value">Founding</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Operational</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Domain</span><span class="value">dillweed.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Purpose</h1></div>
+      <p>This charter defines the operational practices of the Dillweed Namespace Stewardship Office (DNSO) — the founding steward body responsible for operating the Dillweed Namespace during the founding phase. It translates the authority structures defined in the Governance Framework into concrete procedures: how trust is attested, how keys are managed, how revocations are executed, how incidents are handled, and what operational commitments the DNSO makes to the ecosystem.</p>
+      <p>This charter is a working document. It describes what the DNSO actually does, not aspirational standards that exceed current operational capacity. Commitments stated here are commitments the founding steward can keep.</p>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here. Most of this charter is operational prose; normative language is used sparingly and concentrates in §5 (key custody), §6 (revocation), §7 (disclosure windows), §8 (incident response), and §9 (registry operations). Internal organizational language about how the DNSO conducts its own work is deliberately left in plain prose. The service-level posture in §10 is stated as honest best effort during the founding phase and is not written as RFC 2119 commitments.</p>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Scope and Authority Boundaries</h1></div>
+      <p>This charter governs DNSO operational practice during the founding phase of the Dillweed Namespace Project. It operates within a defined stack of governing documents, each with distinct authority over different aspects of the project.</p>
+
+      <p><em>Cross-document version references in this and other Dillweed specifications are shown at major.minor granularity (e.g., v0.4 rather than v0.4.1) by deliberate convention, to keep architectural cross-references stable across patch releases. Exact current versions of each document are tracked in the Standards Overview's maturity table.</em></p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Document</th><th>Authority</th><th>This Charter's Relationship</th></tr></thead>
+          <tbody>
+            <tr><td>Governance Framework v1.1</td><td>Authority structure, stewardship roles, amendment process, succession</td><td>Defers to. This charter does not redefine governance structure — it operationalizes it.</td></tr>
+            <tr><td>Namespace Standard v0.4</td><td>Naming model, URI syntax, trust tier definitions</td><td>Defers to. Trust tier definitions used in this charter are those defined in the Namespace Standard.</td></tr>
+            <tr><td>Registry Specification v0.1</td><td>Data model, signing authority, registration validation, revocation semantics</td><td>Defers to. Operational procedures in this charter implement the registry spec's requirements.</td></tr>
+            <tr><td>DillClaw Resolver Specification v0.1</td><td>Resolution protocol, query handling, trust scoring</td><td>Informed by. Resolver behavior affects how DNSO attestation decisions propagate to consumers.</td></tr>
+            <tr><td>Anthill Observability Plane v0.1</td><td>Signal taxonomy, aggregation, anomaly detection</td><td>Informed by. Anthill provides the observational instrumentation for several procedures in this charter.</td></tr>
+            <tr><td>Continuity Protocol GSP-01 v1.0</td><td>Succession mechanics, key custody transfer, stewardship continuity</td><td>Defers to for succession, continuity transition, and delegated key-custody transfer procedures referenced in §5 and in matters of stewardship transition.</td></tr>
+            <tr><td>This Charter (DNSO Operations Charter v1.0.3)</td><td>Day-to-day DNSO operating procedures</td><td>Authoritative for operational practice. Does not supersede any of the above.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">2.1 Conflict Resolution</h2>
+      <p>In the event of an apparent conflict between this charter and any of the above documents, the following precedence order applies: Governance Framework, then Namespace Standard, then Registry Specification, then DillClaw Resolver Specification, then this DNSO Operations Charter, then Anthill Observability Plane Specification. For matters of stewardship succession, key custody transfer, or continuity transition, GSP-01 (Continuity Protocol) controls within the scope delegated to it by the Governance Framework. Conflicts SHOULD be logged as amendment candidates for the affected document rather than resolved through informal interpretation. The founding steward is responsible for identifying and surfacing such conflicts.</p>
+
+      <div class="callout">
+        <div class="callout-label">Founding Phase Scope</div>
+        <p>The procedures in this charter apply during the founding phase as defined in the Governance Framework §4.2. As the project transitions to multi-stakeholder governance, this charter will be superseded by or incorporated into a successor operations document adopted through the formal amendment process.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">DNSO Mission and Responsibilities</h1></div>
+      <p>The DNSO is the operational steward of the Dillweed Namespace. Its mission is to maintain the namespace as a neutral, trustworthy, and durable coordination layer for AI agent capability discovery — operated in the interest of the ecosystem, not any single participant.</p>
+
+      <h2 class="sub-title">3.1 Core Responsibilities</h2>
+      <ul class="props">
+        <li><strong>Registry operation</strong> — Maintain the authoritative Dillweed Registry, initially in local founding-phase deployment and later at a stable public endpoint, ensuring records are durably stored, cryptographically signed, and accurately served.</li>
+        <li><strong>Trust attestation</strong> — Review and confirm trust tier elevations to <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> for qualifying registrants.</li>
+        <li><strong>Key custody</strong> — Maintain exclusive custody of the DNSO Ed25519 signing keypair with appropriate security and backup procedures.</li>
+        <li><strong>Revocation authority</strong> — Exercise revocation authority promptly when required by governance or security events.</li>
+        <li><strong>Public disclosure</strong> — Maintain transparency with the ecosystem through timely disclosure of governance events, key operations, and material operational changes.</li>
+        <li><strong>Spec stewardship</strong> — Maintain and evolve the specification stack in accordance with the governance framework's amendment procedures.</li>
+        <li><strong>Neutrality preservation</strong> — Decline arrangements that would compromise the namespace's neutrality thesis, as defined in the Governance Framework §3.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Trust Tier Attestation</h1></div>
+      <p>Trust tier attestation is the process by which the DNSO confirms that a self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> tier declaration is substantiated. Until the DNSO issues attestation, such declarations are provisional and resolvers apply weighting penalties as specified in the Registry Specification §7.</p>
+
+      <h2 class="sub-title">4.1 Attestation Process — Verified Tier</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Attestation Request</h4><p>Registrant submits an attestation request via the DNSO contact channel, referencing the registered capability by name and version, and providing evidence of operator identity (organizational domain, publicly verifiable contact).</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Identity Verification</h4><p>The DNSO confirms the registrant controls the domain or organizational identity associated with the capability endpoint. This is typically accomplished through DNS TXT record verification using a DNSO-issued challenge string at a DNSO-published record name, organizational contact confirmation against a published address of record, or an equivalent mechanism agreed with the registrant at the start of the attestation.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Endpoint Review</h4><p>The DNSO confirms the registered endpoint is live, responsive, and consistent with the registered schema. A minimum 30-day active registration history is required before a verified attestation may be issued.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Attestation or Decline</h4><p>The DNSO issues attestation by executing <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">POST /promote</code> with the confirmed tier, logging the attestation event to the audit trail. If declined, the DNSO notifies the registrant with a reason and any remediation path. Evidence used to support a verified attestation MUST be retained in the DNSO operational log for at least the lifetime of the attestation and 12 months thereafter.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">4.2 Attestation Process — Canonical Tier</h2>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> tier is DNSO-designated only and is not available by registrant request. The DNSO may designate a canonical capability when a clear reference implementation exists for a namespace category and no reasonable dispute about its primacy exists. Canonical designations are logged publicly and may be withdrawn if circumstances change.</p>
+
+      <h2 class="sub-title">4.3 Attestation Response Time</h2>
+      <p>During the founding phase, the DNSO acknowledges attestation requests within 14 calendar days of receipt. Substantive attestation decisions are targeted as capacity permits and are not subject to a fixed completion deadline. Acknowledgment is a commitment to confirm receipt and note that review is underway; it is not a commitment to a substantive decision within the same window. See §10 for the full service level posture.</p>
+
+      <div class="callout">
+        <div class="callout-label">Provisional Tier Behavior</div>
+        <p>A self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> record is signed by the DNSO at registration time — the signature attests that the DNSO wrote the record, not that the tier is confirmed. Resolvers distinguish attested from provisional tiers via the presence of a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">provisional_tier</code> audit log entry without a corresponding <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">promote</code> entry.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Key Management</h1></div>
+      <p>The DNSO Ed25519 signing keypair is the cryptographic root of trust for the entire namespace. During the founding phase, all authoritative Capability Records are signed with the DNSO private key. Its integrity and security are the single most critical operational responsibility of the DNSO.</p>
+
+      <h2 class="sub-title">5.1 Key Custody Requirements</h2>
+      <ul class="props">
+        <li><strong>Storage</strong> — Private key MUST be stored at file mode <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">0600</code> on the registry host, outside the database, and MUST NOT be committed to version control.</li>
+        <li><strong>Backup</strong> — At minimum two encrypted backup copies on physically separate media (for example, an encrypted USB drive in a separate physical location, and an encrypted password manager vault) MUST be maintained. Backup integrity MUST be verified at least monthly.</li>
+        <li><strong>Transmission</strong> — Private key MUST NOT be transmitted over any network interface. The public key is published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed.com/dnso_public.pem</code> over HTTPS.</li>
+        <li><strong>Access</strong> — Private key access is restricted to the founding steward during the founding phase. An access log MUST be maintained.</li>
+      </ul>
+
+      <h2 class="sub-title">5.2 Planned Key Rotation</h2>
+      <p>The DNSO SHOULD perform planned key rotation at intervals no greater than 24 months. Rotation procedure:</p>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Announce rotation</h4><p>Public disclosure of planned rotation at least 30 days in advance, specifying the overlap window start and end dates.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Generate new keypair</h4><p>New Ed25519 keypair generated. During the overlap window, the DNSO public-key endpoint at <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed.com/dnso_public.pem</code> may publish both the current and prior public keys, labeled by key identifier and validity window. The prior key also remains available at <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">/pubkey?previous=true</code> on the registry endpoint for the duration of the overlap (Registry Specification §5.6). This registry-served prior key is for operational discovery and mirror compatibility; canonical verification relies on the DNSO-published public key material at the stable public-key URL.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Overlap window (minimum 30 days)</h4><p>Current and prior public keys remain discoverable during the overlap window. Resolvers that have cached the prior key continue to verify existing records while refreshing to the new key at their next scheduled cycle.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Re-sign all active records</h4><p>All active Capability Records MUST be re-signed under the new key before the prior key is retired.</p></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><h4>Retire prior key</h4><p>Prior key removed from public endpoint. Rotation completion disclosed publicly. Audit log entry recorded.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">5.3 Emergency Keypair Reset</h2>
+      <p>If the private key is compromised or lost, an emergency keypair reset is required. This is a registry trust reset event: all existing signatures become unverifiable under the old key. The DNSO MUST immediately generate a new keypair, publish the new public key, re-sign all active records, and issue a public disclosure with the nature of the incident and remediation steps taken. Emergency resets are logged as critical incidents under §8.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Revocation Procedures</h1></div>
+      <p>Revocation is the governance mechanism that makes trust tiers meaningful. The DNSO exercises revocation authority to remove bad actors, retire stale capabilities, and maintain the integrity of the namespace.</p>
+
+      <h2 class="sub-title">6.1 Revocation Triggers</h2>
+      <ul class="props">
+        <li><strong>Endpoint failure</strong> — A registered endpoint has been unreachable for 90 consecutive days with no registrant contact.</li>
+        <li><strong>Identity fraud</strong> — A registrant is found to have misrepresented their organizational identity during attestation.</li>
+        <li><strong>Malicious capability</strong> — A registered capability is found to cause harm to consuming agents or their operators.</li>
+        <li><strong>Governance violation</strong> — A registrant has violated the terms under which a tier was attested.</li>
+        <li><strong>Registrant request</strong> — The registrant requests retirement of their own capability.</li>
+        <li><strong>Namespace collision</strong> — A registration is found to conflict with an existing canonical capability in a way that creates harmful ambiguity.</li>
+      </ul>
+
+      <h2 class="sub-title">6.2 Revocation Process</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Notice (where feasible)</h4><p>Where the revocation trigger is not an emergency and registrant contact exists, the DNSO provides 7 days advance notice of intended revocation, allowing the registrant to respond or remediate.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Execute revocation</h4><p>DNSO executes <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">POST /revoke</code> with a documented reason string. Revoked records are retained in the audit log indefinitely per Registry Specification §8.1.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Log and disclose</h4><p>Revocation is logged to the registration audit trail. Revocations for governance or security reasons are publicly disclosed per §7. Registrant-requested retirements are logged but not individually disclosed unless the registrant requests it.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">6.3 Emergency Revocation</h2>
+      <p>For malicious capabilities or active security incidents, the DNSO MAY execute immediate revocation without advance notice. Emergency revocations MUST be disclosed publicly within 48 hours of execution.</p>
+      <p>Where immediate public disclosure of technical detail would materially worsen active exploitation, the DNSO may withhold technical detail from the initial disclosure while still disclosing that an emergency revocation has occurred and naming the affected capability. Full technical detail MUST follow within 30 days of the emergency revocation, or within 7 days of the upstream vulnerability being patched, whichever comes first. The 30-day hard cap protects the disclosure commitment while preserving the active-exploitation carve-out; it is not extensible by the DNSO acting alone.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Public Disclosure Obligations</h1></div>
+      <p>Transparency is a core operating principle of the DNSO. The following events require timely public disclosure at <a href="https://dillweed.com">dillweed.com</a> or an equivalent canonical disclosure channel:</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Event</th><th>Disclosure Window</th><th>Required Content</th></tr></thead>
+          <tbody>
+            <tr><td>Governance framework amendment</td><td>Prior to adoption (30-day notice)</td><td>Proposed change, rationale, effective date</td></tr>
+            <tr><td>Continuity trustee designation</td><td>Within 30 days of designation</td><td>Designation confirmed (identity need not be disclosed)</td></tr>
+            <tr><td>Planned key rotation</td><td>30 days prior to overlap window start</td><td>Overlap window dates, rotation rationale</td></tr>
+            <tr><td>Emergency keypair reset</td><td>Within 48 hours</td><td>Nature of incident, remediation steps, new public key URL</td></tr>
+            <tr><td>Governance-triggered revocation</td><td>Within 48 hours of revocation</td><td>Capability name, revocation reason category (detail at DNSO discretion)</td></tr>
+            <tr><td>Emergency revocation — technical detail</td><td>30 days after revocation, or 7 days after upstream patch, whichever is earlier (see §6.3)</td><td>Technical root cause and remediation detail</td></tr>
+            <tr><td>Foundation formation</td><td>Prior to execution</td><td>Proposed structure, asset arrangement, continuity role preservation</td></tr>
+            <tr><td>Major operational change</td><td>14 days prior where feasible</td><td>Nature of change, effective date, impact on registrants</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Disclosure Principle</div>
+        <p>Disclosures should be clear, factual, and timely. The goal is to give ecosystem participants the information they need to make informed decisions about their use of the namespace — not to manage reputation or minimize the appearance of problems. Honest disclosure of difficulties builds more durable trust than the appearance of smooth operation.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Incident Response</h1></div>
+
+      <h2 class="sub-title">8.1 Incident Classification</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Class</th><th>Definition</th><th>Target Response</th></tr></thead>
+          <tbody>
+            <tr><td>Critical</td><td>Private key compromise or loss; registry data corruption; active malicious capability causing harm to agents</td><td>Immediate action, public disclosure within 48 hours</td></tr>
+            <tr><td>High</td><td>Registry unavailability exceeding 4 hours; unauthorized access to write endpoints; identity fraud confirmed</td><td>Response within 24 hours, disclosure within 72 hours if public impact</td></tr>
+            <tr><td>Medium</td><td>Registry performance degradation; failed backup verification; unresolved attestation dispute</td><td>Response within 7 days</td></tr>
+            <tr><td>Low</td><td>Registrant complaint; minor operational anomaly; documentation gap</td><td>Response within 14 days</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">8.2 Private Key Compromise Response</h2>
+      <p>A compromised private key is the most severe incident the DNSO can face. Upon confirmed or suspected compromise the DNSO MUST:</p>
+      <ul class="props">
+        <li>Take the registry offline immediately to prevent further signing under the compromised key</li>
+        <li>Execute emergency keypair reset per §5.3</li>
+        <li>Issue public disclosure within 48 hours including the nature of the compromise, the scope of potentially affected records, and the remediation steps taken</li>
+        <li>Notify any known implementers or institutional partners directly</li>
+        <li>Document the incident fully in the operational log for governance review</li>
+      </ul>
+
+      <h2 class="sub-title">8.3 Registry Unavailability</h2>
+      <p>DillClaw Resolvers are designed to operate from cached records during registry downtime, disclosing staleness to callers. Extended unavailability degrades the namespace's utility but does not break existing resolution. The DNSO prioritizes registry restoration and communicates status and estimated restoration time through the public disclosure channel during extended outages.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Registry Operational Standards</h1></div>
+
+      <h2 class="sub-title">9.1 Backup and Durability</h2>
+      <ul class="props">
+        <li><strong>Database backup frequency</strong> — A daily automated backup of <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">data/registry.db</code> MUST be written to at least one off-host location.</li>
+        <li><strong>Keypair backup</strong> — As specified in §5.1. Backup integrity MUST be verified monthly.</li>
+        <li><strong>Backup restoration test</strong> — Full restoration from backup MUST be tested at least once every six months. The target restoration time from the most recent verified backup is 24 hours during the founding phase.</li>
+        <li><strong>Audit log retention</strong> — The registration log MUST be retained indefinitely. No rows may be deleted or modified.</li>
+        <li><strong>Operational log integrity</strong> — Operational log entries MUST be append-only and MUST NOT be altered retroactively except through superseding correction entries that reference the original entry being corrected. This immutability requirement mirrors the registry's audit discipline and ensures the log remains a reliable governance record.</li>
+      </ul>
+
+      <h2 class="sub-title">9.2 Software Maintenance</h2>
+      <ul class="props">
+        <li>Node.js runtime and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">better-sqlite3</code> dependency SHOULD be kept within one major version of current stable release.</li>
+        <li>Security advisories for dependencies MUST be reviewed within 7 days of publication.</li>
+        <li>Registry software updates MUST be tested against the existing database before deployment to the authoritative registry instance.</li>
+      </ul>
+
+      <h2 class="sub-title">9.3 Monitoring</h2>
+      <p>During the founding phase the DNSO operates with best-effort monitoring appropriate to a single-steward operation. The <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">/health</code> endpoint is the primary operational signal. External uptime monitoring is recommended but not required in the founding phase. As adoption grows and institutional partners appear, monitoring expectations will be formalized. The Anthill Observability Plane (v0.1) specifies the cross-stack signal taxonomy, aggregation windows, and DNSO review cadences; it specifies how several monitoring obligations described in this charter may be instrumented, aggregated, and reviewed as the project matures.</p>
+    </section>
+
+    <section class="section" id="s10">
+      <div class="section-header"><span class="sec-num">§ 10</span><h1 class="sec-title">Founding-Phase Service Level Posture</h1></div>
+
+      <p>The Dillweed Namespace is operated by a single founding steward. This section states the honest service level posture for the founding phase — not enterprise SLAs, but clear expectations that registrants and implementers can rely on.</p>
+
+      <div class="pull-quote">
+        During the founding phase, the DNSO prioritizes integrity over availability,<br>
+        and transparency over the appearance of smooth operation.
+      </div>
+
+      <div class="posture-grid">
+        <div class="posture-card">
+          <div class="posture-head current">Founding Phase — Current Commitments</div>
+          <div class="posture-body">
+            <ul>
+              <li>Best-effort availability — no guaranteed uptime percentage</li>
+              <li>No 24/7 staffed response — single steward, human response times</li>
+              <li>Critical security incidents prioritized above all other activity</li>
+              <li>Registry downtime disclosed publicly when exceeding 4 hours</li>
+              <li>Attestation requests acknowledged within 14 days</li>
+              <li>Governance revocations disclosed within 48 hours</li>
+              <li>Backup integrity verified monthly</li>
+              <li>Audit log retained indefinitely, never modified</li>
+            </ul>
+          </div>
+        </div>
+        <div class="posture-card">
+          <div class="posture-head future">Post-Founding — Anticipated Evolution</div>
+          <div class="posture-body">
+            <ul>
+              <li>Formal uptime SLA as infrastructure partners join</li>
+              <li>Staffed response window commensurate with adoption</li>
+              <li>Defined attestation turnaround SLA</li>
+              <li>External monitoring and status page</li>
+              <li>Multi-party key custody</li>
+              <li>TSC-reviewed operational standards</li>
+              <li>Formal incident post-mortem process</li>
+              <li>Participant Council operational review rights</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Honest Posture Principle</div>
+        <p>Registrants and implementers who rely on the Dillweed Namespace deserve an accurate picture of what it is today. A namespace operated with clear, honest constraints is more trustworthy than one with ambitious commitments it cannot reliably keep. Operational expectations will tighten as adoption grows and the governance structure matures.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header"><span class="sec-num">§ 11</span><h1 class="sec-title">Communication Channels</h1></div>
+      <p>During the founding phase, all DNSO communications are channeled through dillweed.com. The following contact categories are recognized:</p>
+
+      <ul class="props">
+        <li><strong>Attestation requests</strong> — Registrants seeking trust tier attestation should initiate contact through dillweed.com with the capability name, version, and evidence of operator identity as described in §4.1.</li>
+        <li><strong>Registration inquiries</strong> — Questions about namespace path selection, protocol compatibility, or the registration process may be directed through dillweed.com.</li>
+        <li><strong>Security disclosures</strong> — Responsible disclosure of security vulnerabilities or operational concerns should be sent to the DNSO contact channel. The DNSO commits to acknowledging security disclosures within 7 days.</li>
+        <li><strong>Institutional partnership</strong> — Organizations seeking implementer, contributor, infrastructure partner, or governance participant relationships should initiate contact through dillweed.com, referencing the Governance Framework §7 for the categories of engagement available.</li>
+        <li><strong>Public disclosures</strong> — Operational disclosures required under §7 will be published at dillweed.com and referenced from a canonical disclosure record maintained by the DNSO.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s12">
+      <div class="section-header"><span class="sec-num">§ 12</span><h1 class="sec-title">Charter Amendment</h1></div>
+      <p>This charter is subject to the amendment process defined in the Governance Framework §5.6. During the founding phase, amendments require concurrence of the founding continuity seat. Once the Technical Steering Committee is constituted, amendments additionally require TSC majority concurrence and 30-day Participant Council review.</p>
+      <p>Operational changes that do not alter the charter's stated commitments or conflict with the governing documents may be implemented by the founding steward without formal amendment. Changes that reduce stated commitments, alter disclosure obligations, or affect registrant or implementer expectations require formal amendment.</p>
+
+      <div class="stack-ref">
+        <div class="stack-ref-label">Dillweed Specification Stack</div>
+        <a href="/namespace-standard.html"><span class="doc-name">Namespace Standard v0.4</span><span class="doc-role">naming model · trust tier definitions · governance philosophy</span></a>
+        <a href="/dillclaw-spec.html"><span class="doc-name">DillClaw Resolver Spec v0.1</span><span class="doc-role">resolution protocol · trust scoring · API contract</span></a>
+        <a href="/registry-spec.html"><span class="doc-name">Registry Specification v0.1</span><span class="doc-role">data model · signing authority · revocation semantics</span></a>
+        <a href="/governance.html"><span class="doc-name">Governance Framework v1.1</span><span class="doc-role">authority structure · succession · amendment process</span></a>
+        <a href="/dnso-operations-charter.html"><span class="doc-name">DNSO Operations Charter v1.0.3</span><span class="doc-role">operating procedures · service posture · this document</span></a>
+        <a href="/anthill-spec.html"><span class="doc-name">Anthill Observability Spec v0.1</span><span class="doc-role">signal taxonomy · anomaly detection · DNSO instrumentation</span></a>
+        <a href="/standards-overview.html"><span class="doc-name">Standards Overview</span><span class="doc-role">integrated standards-facing reference</span></a>
+        <a href="/continuity-protocol.html"><span class="doc-name">Continuity Protocol GSP-01 v1.0</span><span class="doc-role">succession · key custody · stewardship continuity</span></a>
+      </div>
+
+      <div class="pull-quote">
+        The namespace defines what can exist.<br>
+        The resolver defines how it is found.<br>
+        The registry defines what actually exists.<br>
+        The governance defines who decides.<br>
+        This charter defines how they do it.
+      </div>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The DNSO Operations Charter defines the operational procedures, stewardship obligations, and incident response protocols that translate governance doctrine into day-to-day namespace operations.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#6ea8fe;font-weight:500;">Operations Charter ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">DNSO Operations Charter</div>
+  <div class="fm">v1.0.3 · May 2026 · Stack Family 2026.04 · dillweed.com</div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:none; margin-top:0.25rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

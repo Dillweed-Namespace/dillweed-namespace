@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Dillweed Namespace Stack — Standards-Facing Overview v1.0.10">
+  <meta property="og:description" content="A proposed trust and coordination layer for portable agentic systems. Five core governance-and-resolution specifications supported by cross-cutting observability and continuity documents.">
+  <meta property="og:url" content="https://dillweed.com/standards-overview.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>Dillweed Namespace Stack — Standards-Facing Overview v1.0.10</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #0d1b2a;
+      --ink:       #18202c;
+      --mid:       #445566;
+      --muted:     #6b7f94;
+      --rule:      #c9d8e8;
+      --white:     #ffffff;
+      --pale:      #f5f7fa;
+      --serif:     'Spectral', Georgia, serif;
+      --sans:      'IBM Plex Sans', system-ui, sans-serif;
+      --mono:      'IBM Plex Mono', 'Courier New', monospace;
+      --accent:    #1a5c8a;
+      --accent-lt: #2e85c3;
+      --accent-pale: #e8f1f8;
+      --accent-light: #b8d4ea;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+
+    .sidebar { position: fixed; top: 0; left: 0; width: 235px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--white); line-height: 1.25; }
+    .sb-sub { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--accent-lt); background: rgba(255,255,255,0.06); }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    main { margin-left: 235px; }
+
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(26,92,138,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(26,92,138,0.08) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -80px; right: -60px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(26,92,138,0.2) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 600; color: var(--white); line-height: 1.1; margin-bottom: 1rem; max-width: 620px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.5); max-width: 560px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-thesis { background: rgba(26,92,138,0.18); border: 1px solid rgba(26,92,138,0.4); border-radius: 6px; padding: 1.1rem 1.5rem; max-width: 620px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.95rem; font-style: italic; color: rgba(255,255,255,0.8); line-height: 1.65; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.55rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    p a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(26,92,138,0.3); }
+    p a:hover { border-bottom-color: var(--accent); }
+
+    .spec-stack { margin: 1.5rem 0 2rem; }
+    .spec-card { border: 1px solid var(--rule); border-radius: 0; overflow: hidden; margin-bottom: -1px; position: relative; }
+    .spec-card.highlight { border-left: 4px solid var(--accent); background: var(--accent-pale); }
+    .spec-header { display: flex; align-items: stretch; }
+    .spec-marker { font-family: var(--mono); font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.85); background: var(--navy); padding: 1rem 1.1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 52px; letter-spacing: 0.08em; }
+    .spec-card.highlight .spec-marker { background: var(--accent); color: white; }
+    .spec-body { padding: 1rem 1.25rem; flex: 1; }
+    .spec-body h4 { font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: 0.15rem; }
+    .spec-body .spec-answer { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .spec-body p { margin: 0; font-size: 0.84rem; color: var(--mid); line-height: 1.6; }
+
+    .tag-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+    .tag { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; color: var(--accent); background: var(--accent-pale); border: 1px solid var(--accent-light); padding: 0.25rem 0.65rem; border-radius: 2px; }
+
+    .analogy-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0; }
+    .analogy-card { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+    .analogy-head { background: var(--navy); padding: 0.6rem 1rem; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+    .analogy-body { padding: 0.75rem 1rem; background: var(--pale); }
+    .analogy-body .analogy-tech { font-family: var(--serif); font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .analogy-body .analogy-role { font-size: 0.8rem; color: var(--mid); font-weight: 300; }
+
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; color: #0d3a5c; font-size: 0.88rem; line-height: 1.7; }
+    .callout p + p { margin-top: 0.5rem; }
+
+    .prompt-box { background: var(--navy); border-radius: 6px; padding: 1.75rem 2rem; margin: 1.5rem 0; }
+    .prompt-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.75rem; }
+    .prompt-box p { font-family: var(--serif); font-size: 1rem; font-style: italic; color: rgba(255,255,255,0.8); line-height: 1.65; margin: 0; }
+
+    .stack-links { background: var(--pale); border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+    .stack-links-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .stack-links a { display: block; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); text-decoration: none; padding: 0.3rem 0; border-bottom: 1px solid var(--rule); transition: color 0.15s; }
+    .stack-links a:last-child { border-bottom: none; }
+    .stack-links a:hover { color: var(--navy); }
+
+    .tbl-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 6px; border: 1px solid var(--rule); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--rule); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--pale); }
+    tbody td { padding: 0.75rem 1rem; color: var(--mid); line-height: 1.55; vertical-align: top; font-size: 0.86rem; }
+    tbody td:first-child { font-family: var(--mono); font-size: 0.76rem; color: var(--accent); white-space: nowrap; font-weight: 500; }
+
+    footer { margin-left: 235px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .analogy-row { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.5s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.13s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.21s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.29s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.37s; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">Standards Overview</div>
+    <span class="sb-version">v1.0.10 · May 2026</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#summary">Executive Summary</a>
+    <a href="#architecture">Specification Architecture</a>
+    <a href="#relevance">Standards Relevance</a>
+    <a href="#neutrality">Why Neutral Naming Authority</a>
+    <a href="#maturity">Current Maturity</a>
+    <a href="#discussion">Discussion Prompt</a>
+
+    <div class="sb-nav-label">Core Specifications</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+
+    <div class="sb-nav-label">Governance Documents</div>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+
+    <div class="sb-nav-label">Supporting Documents</div>
+    <a href="/anthill-spec.html">Anthill&#8482; Observability Plane</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Namespace Project · Standards-Facing Overview · v1.0.10 · May 2026</div>
+      <h1 class="cover-title">Dillweed Namespace Stack</h1>
+      <p class="cover-tagline">A proposed trust and coordination layer for portable agentic systems — a specification stack for multi-party trust management, naming authority, revocation, and neutral governance.</p>
+      <div class="cover-thesis">
+        <p>Agent state can move across runtimes and administrative domains. Trust cannot move unless naming authority and attestation evidence move with it. The Dillweed stack is an architectural proposal for that missing layer.</p>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Document Type</span><span class="value">Standards Briefing Note</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">1.0.10</span></div>
+        <div class="cover-meta-item"><span class="label">Issued</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Maturity</span><span class="value">Specs Published; Implementations in Local Deployment</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Domain</span><span class="value">dillweed.com (est. 1997)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <section class="section" id="summary">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Executive Summary</h1></div>
+      
+      <p>The Dillweed Namespace Stack is a proposed trust and coordination layer for portable agentic systems. As agents become persistent software entities capable of moving across runtimes, providers, and administrative domains, the underdeveloped infrastructure layer is no longer primarily model capability — it is stable naming authority, trust-aware resolution, durable registry truth, and neutral governance continuity. As agent token economics tighten, the cost of selecting the wrong capability on the first try becomes structural; a resolution layer that gives agents a stable, attested means of finding the right capability reduces that cost. Without such a layer, agent trust is rebuilt from scratch at every provider boundary — fragmenting cross-domain reliability and recreating the same fragility with every new deployment.</p>
+      <p>The stack is organized around five core governance-and-resolution specifications covering multi-party trust management, cross-domain agent interoperability, cryptographic attestation, revocation, and operational accountability — supported by two cross-cutting documents (Anthill for observability and the Continuity Protocol for stewardship continuity), and intentionally aligned, by architectural analogy, with the PKI trust-root model underlying existing international identity standards including X.509.</p>
+      <p>Its neutrality thesis is structural: a namespace operated by a major platform participant would face an unavoidable neutrality challenge, because the operator would simultaneously occupy two roles — provider of competing services and arbiter of discovery and trust policy among them — that the namespace's coordination function is structured to keep separate. The domain <strong>dillweed.com</strong> has been under continuous independent single-owner stewardship since 1997, providing an unusual independent provenance basis for a neutral naming authority layer, while leaving formal multi-party governance evolution to the Governance Framework and Operations Charter.</p>
+
+      <div class="callout">
+        <div class="callout-label">Central Thesis</div>
+        <p>Agent state can move across runtimes and administrative domains. Trust cannot move unless naming authority and attestation evidence move with it. The Dillweed stack is an architectural proposal for that missing layer.</p>
+      </div>
+
+      <h2 class="sub-title">What This Is Not</h2>
+      <p>The Dillweed stack is not a model provider, agent runtime, application framework, or proprietary agent marketplace, nor a substitute for existing identity, PKI, or DNS infrastructure. It is a proposed neutral coordination layer for naming, resolution, attestation, revocation, governance continuity, and observability across agentic systems — designed to interoperate with the identity and PKI systems already in use rather than to replace them. Its purpose is not to own agent execution, but to make cross-domain capability discovery and trust resolution more stable, attestable, and governable.</p>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Specification Architecture</h1></div>
+      <p>The stack is organized around five core governance-and-resolution specifications, each with a distinct authority boundary and a defined standards-relevant question it answers, supported by two cross-cutting documents (Anthill for observability, the Continuity Protocol for stewardship continuity). Technical semantics are separated from governance authority; operational practice is separated from specification contracts; founding-phase stewardship is designed to evolve toward multi-party institutional models. The five core specifications are listed below; the supporting documents are listed in §05.</p>
+
+      <div class="spec-stack">
+
+        <div class="spec-card">
+          <div class="spec-header">
+            <div class="spec-marker">01</div>
+            <div class="spec-body">
+              <h4>Namespace Standard — Naming Authority and Trust Framework</h4>
+              <div class="spec-answer">What may exist?</div>
+              <p>Defines the semantic identity layer: canonical namespace paths, persistent capability naming, long-lived authority boundaries, trust tier definitions, neutrality principles, and governance compatibility across relying parties and operators. Establishes the trust framework within which all resolution and attestation operates.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-header">
+            <div class="spec-marker">02</div>
+            <div class="spec-body">
+              <h4>DillClaw Resolver — Trust-Aware Resolution and Candidate Selection</h4>
+              <div class="spec-answer">How is the correct capability found?</div>
+              <p>Defines trust-aware resolution behavior: namespace lookup, relying party routing with trust policy enforcement, deterministic selection across trust tiers, traceable failure semantics, and resolver-side weighting of candidates by attested trust tier under a documented scoring profile. Provides verifiable audit trails for resolution decisions.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="spec-card highlight">
+          <div class="spec-header">
+            <div class="spec-marker">03</div>
+            <div class="spec-body">
+              <h4>Registry Specification — Authoritative Truth Substrate with Cryptographic Binding</h4>
+              <div class="spec-answer">What actually exists?</div>
+              <p>Defines the authoritative data layer: cryptographically signed capability records using Ed25519 — consistent, by architectural analogy, with the PKI trust-root model underlying X.509 — durable append-only registration history, canonical metadata, revocation state with mandatory audit reason, mirror freshness semantics, and independent signature verification. Signed records establish cryptographic binding between namespace identity and capability endpoint, verifiable by any relying party without trusting the registry itself.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-header">
+            <div class="spec-marker">04</div>
+            <div class="spec-body">
+              <h4>Governance Framework — Institutional Legitimacy and Neutrality Continuity</h4>
+              <div class="spec-answer">Who decides?</div>
+              <p>Defines institutional legitimacy through governance continuity stewardship, technical steering committee evolution, participant council review rights, neutrality preservation mechanisms, amendment and public disclosure controls, and succession continuity provisions. Design is consistent with durable commons governance practice. Explicitly prohibits arrangements that would transfer effective control to any single platform participant.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-header">
+            <div class="spec-marker">05</div>
+            <div class="spec-body">
+              <h4>DNSO Operations Charter — Trust Practice and Attestation Evidence</h4>
+              <div class="spec-answer">How is trust practiced operationally?</div>
+              <p>Defines stewardship practice: trust tier attestation workflows with evidence retention obligations, DNSO key custody and planned rotation procedures, incident classification and response, public disclosure obligations, registry operational standards including backup and restoration targets, and founding-phase service level posture. Attestation evidence is retained for the lifetime of the attestation plus twelve months to support dispute resolution and governance review.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="relevance">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">Standards Relevance</h1></div>
+      <p>This architecture is directly relevant to standards work in the following areas:</p>
+
+      <div class="tag-grid">
+        <span class="tag">Trust Management</span>
+        <span class="tag">Naming Authority</span>
+        <span class="tag">Governance Continuity</span>
+        <span class="tag">Cryptographic Attestation</span>
+        <span class="tag">Trust Tiers</span>
+        <span class="tag">Revocation and Disclosure</span>
+        <span class="tag">Cross-Domain Agent Interoperability</span>
+        <span class="tag">Multi-Party Namespace Neutrality</span>
+        <span class="tag">Relying Party Trust Frameworks</span>
+        <span class="tag">PKI Lineage</span>
+        <span class="tag">Attestation Evidence Retention</span>
+        <span class="tag">Succession and Continuity</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Specification</th><th>Standards Domain</th><th>Relevant Standards Work</th></tr></thead>
+          <tbody>
+            <tr><td>Namespace Standard</td><td>Naming and identity</td><td>Canonical naming authority, trust framework definitions, trust tier taxonomy</td></tr>
+            <tr><td>DillClaw Resolver</td><td>Resolution and routing</td><td>Trust-aware resolution, relying party routing, trust policy enforcement, DNS architecture analogy</td></tr>
+            <tr><td>Registry Specification</td><td>Cryptographic trust infrastructure</td><td>Ed25519 signing model, revocation semantics, PKI trust-root architectural analogy (e.g., X.509)</td></tr>
+            <tr><td>Governance Framework</td><td>Institutional governance</td><td>Multi-stakeholder governance, neutrality preservation, amendment procedures, durable commons governance practice</td></tr>
+            <tr><td>DNSO Operations Charter</td><td>Operational trust practice</td><td>Trust tier attestation evidence workflows, key management lifecycle, incident response, disclosure obligations</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">PKI Lineage Note</div>
+        <p>The Registry Specification uses Ed25519 signatures over canonical JSON with versioned signature prefixing. The trust root model — where a signing authority publishes its public key at a stable, TLS-protected URL and signs all registry records — follows, by analogy, the same architectural pattern as X.509 certificate authority infrastructure. Any relying party can independently verify registry records without trusting the registry itself, using only the published public key.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Forum Relevance</div>
+        <p>The specification domains above map most directly onto the work of ITU-T Study Group 17 (Security), and in particular Working Party 1 on Digital Identity and PKI. The trust tier model, cryptographic attestation approach, and PKI lineage position the stack as a natural discussion input for SG17's ongoing work on digital identity and trust frameworks for multi-party environments. The stack is also relevant to IETF working groups addressing agent coordination and cross-domain naming, and to NIST work on trust frameworks and identity. The forum most appropriate for standards discussion is a decision for the standards community rather than this project to make; this note identifies the natural mappings, not a claimed allegiance.</p>
+      </div>
+    </section>
+
+    <section class="section" id="neutrality">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Why Neutral Naming Authority Matters</h1></div>
+      <p>A portable agent ecosystem cannot rely indefinitely on hardcoded provider endpoints, proprietary registries, prompt-local tool selection, or single-platform identity systems. As agents become persistent, stateful, and cross-domain entities, these dependencies create structural fragility in the trust layer.</p>
+      <p>The Dillweed proposal introduces a neutral naming authority layer capable of supporting cross-provider trust continuity, canonical identity preservation across administrative boundaries, verifiable resolver behavior, transparent revocation with mandatory audit evidence, and standards-aligned governance evolution toward multi-party institutional models.</p>
+
+      <p>The structural role is analogous to prior infrastructure layers:</p>
+
+      <div class="analogy-row">
+        <div class="analogy-card">
+          <div class="analogy-head">Addressability</div>
+          <div class="analogy-body">
+            <div class="analogy-tech">DNS</div>
+            <div class="analogy-role">Stable naming above provider infrastructure</div>
+          </div>
+        </div>
+        <div class="analogy-card">
+          <div class="analogy-head">Trust Roots</div>
+          <div class="analogy-body">
+            <div class="analogy-tech">PKI / X.509</div>
+            <div class="analogy-role">Cryptographic binding independent of endpoint</div>
+          </div>
+        </div>
+        <div class="analogy-card">
+          <div class="analogy-head">Portability</div>
+          <div class="analogy-body">
+            <div class="analogy-tech">Unix / POSIX</div>
+            <div class="analogy-role">Composable primitives across execution contexts</div>
+          </div>
+        </div>
+      </div>
+
+      <p>The Dillweed stack proposes to play a structurally equivalent role for agent capability coordination: stable naming authority above the provider layer, cryptographic trust binding independent of the capability endpoint, and composable resolution primitives across administrative and runtime boundaries.</p>
+
+      <div class="callout">
+        <div class="callout-label">Neutrality Structural Condition</div>
+        <p>A namespace operated by a major platform participant would face an unavoidable neutrality challenge, because the operator would simultaneously occupy two roles — provider of competing services and arbiter of discovery and trust policy among them — that the namespace's coordination function is structured to keep separate. The dillweed.com domain has been under continuous independent single-owner stewardship since 1997, providing an unusual independent provenance basis for a neutral naming authority layer that a platform entrant would struggle to replicate credibly, while leaving formal multi-party governance evolution to the Governance Framework and Operations Charter.</p>
+      </div>
+    </section>
+
+    <section class="section" id="maturity">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Current Maturity and Availability</h1></div>
+      <p>The stack currently exists as published technical specifications, a governance framework, a DNSO operations charter, and Node.js reference implementations now operational in local deployment for the Registry, the DillClaw Resolver, and the Anthill Observability Plane. All specification documents are publicly available at dillweed.com; the reference implementations are running on local development infrastructure and are not yet exposed at public endpoints.</p>
+      <p>The stack is currently in its founding phase, with reference implementations now operational in local deployment, and is intended for standards dialogue and early experimentation rather than immediate production adoption.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Component</th><th>Status</th><th>URL</th></tr></thead>
+          <tbody>
+            <tr><td>Namespace Standard v0.4.2</td><td>Published specification</td><td>dillweed.com/namespace-standard.html</td></tr>
+            <tr><td>DillClaw Resolver Spec v0.1.3</td><td>Published specification; Node.js reference implementation deployed locally</td><td>dillweed.com/dillclaw-spec.html</td></tr>
+            <tr><td>Registry Specification v0.1.3</td><td>Published specification; Node.js reference implementation deployed locally</td><td>dillweed.com/registry-spec.html</td></tr>
+            <tr><td>Governance Framework v1.1.3</td><td>Published — canonical release</td><td>dillweed.com/governance.html</td></tr>
+            <tr><td>DNSO Operations Charter v1.0.3</td><td>Published — canonical release</td><td>dillweed.com/dnso-operations-charter.html</td></tr>
+            <tr><td>Anthill&#8482; Observability Plane Spec v0.1.2</td><td>Published specification; Node.js reference implementation deployed locally</td><td>dillweed.com/anthill-spec.html</td></tr>
+            <tr><td>Continuity Protocol GSP-01 v1.0.3</td><td>Published — Founding Phase</td><td>dillweed.com/continuity-protocol.html</td></tr>
+            <tr><td>Glossary v1.0.2</td><td>Published — source-grounded reference companion (86 entries)</td><td>dillweed.com/glossary.html</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="stack-links">
+        <div class="stack-links-label">Specification Documents</div>
+        <a href="/namespace-standard.html">dillweed.com/namespace-standard.html — Namespace Standard v0.4.2</a>
+        <a href="/dillclaw-spec.html">dillweed.com/dillclaw-spec.html — DillClaw Resolver Specification v0.1.3</a>
+        <a href="/registry-spec.html">dillweed.com/registry-spec.html — Registry Specification v0.1.3</a>
+        <a href="/governance.html">dillweed.com/governance.html — Governance Framework v1.1.3</a>
+        <a href="/dnso-operations-charter.html">dillweed.com/dnso-operations-charter.html — DNSO Operations Charter v1.0.3</a>
+        <a href="/anthill-spec.html">dillweed.com/anthill-spec.html — Anthill&#8482; Observability Plane Specification v0.1.2</a>
+        <a href="/continuity-protocol.html">dillweed.com/continuity-protocol.html — Continuity Protocol GSP-01 v1.0.3</a>
+        <a href="/glossary.html">dillweed.com/glossary.html — Glossary v1.0.2</a>
+      </div>
+
+      <p>The immediate standards objective is dialogue around trust management, governance neutrality, trust tier attestation models, and cross-domain naming authority for portable agent ecosystems. The founding-phase governance structure is explicitly designed to evolve toward multi-stakeholder institutional models as adoption develops — the transition trigger is ecosystem participation rather than a fixed date.</p>
+    </section>
+
+    <section class="section" id="discussion">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Discussion Prompt for Standards Bodies</h1></div>
+      <p>Themes commonly raised in SG17-adjacent trust management discussions — that discovery requires a significant zoom in, that trust management is the common denominator between human and agentic AI, and that a digital identity stack agreed by all parties is needed — map directly onto the architectural problem this stack addresses.</p>
+
+      <div class="prompt-box">
+        <div class="prompt-label">Framing Question</div>
+        <p>How should trust, naming authority, trust tier attestation, revocation, and governance continuity operate when portable agents move across administrative and provider boundaries — and what structural conditions must a neutral naming authority satisfy to be credibly trusted by all parties?</p>
+      </div>
+
+      <p>The Dillweed stack is offered as a concrete architectural proposal for that discussion — a published reference architecture with accompanying reference implementations now operational in local deployment, covering the namespace, resolution, registry, governance, and operational layers that the pre-standardisation conversation requires as a reference point.</p>
+
+      <p>The Dillweed Anthill&#8482; Observability Plane, listed as a supporting document in §05, provides operational visibility across this stack and is now in local deployment alongside the core reference implementations.</p>
+
+      <p>Inquiries and engagement may be directed through <a href="https://dillweed.com">dillweed.com</a>.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">Dillweed Namespace Stack — Standards Overview</div>
+  <div class="fm">v1.0.10 · May 2026 · Stack Family 2026.04 · dillweed.com · © 1997–2026</div>
+  <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:none; margin-top:0.25rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Dillweed Anthill&#8482; is a trademark of Richard McClelland. Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

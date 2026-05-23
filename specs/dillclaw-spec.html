@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.3 — Dillweed Namespace Project">
+<meta property="og:description" content="The resolution protocol, trust scoring algorithm, and API contract for the Dillweed Namespace. How agents find and evaluate capabilities.">
+<meta property="og:url" content="https://dillweed.com/dillclaw-spec.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0d1b2a;
+      --blue:        #1a3a5c;
+      --accent:      #2468a2;
+      --accent-lt:   #3d89c8;
+      --pale:        #f0f5fb;
+      --light-blue:  #dceaf7;
+      --ink:         #18202c;
+      --mid:         #445566;
+      --muted:       #6b7f94;
+      --rule:        #c9d8e8;
+      --white:       #ffffff;
+      --serif:       'Spectral', Georgia, serif;
+      --sans:        'IBM Plex Sans', system-ui, sans-serif;
+      --mono:        'IBM Plex Mono', 'Courier New', monospace;
+      --oc-accent:   #1e7a6e;
+      --oc-lt:       #2baa97;
+      --oc-pale:     #e8f6f4;
+      --oc-light:    #cceee9;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); font-weight: 300; color: var(--ink); background: var(--white); line-height: 1.75; }
+    .sidebar { position: fixed; top: 0; left: 0; width: 230px; height: 100vh; background: var(--navy); overflow-y: auto; z-index: 200; display: flex; flex-direction: column; padding-bottom: 2rem; }
+    .sb-brand { padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--white); line-height: 1.2; }
+    .sb-sub { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 0.3rem; }
+    .sb-version { display: inline-block; margin-top: 0.6rem; background: var(--oc-accent); color: white; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+    .sb-nav-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 1.25rem 1.5rem 0.4rem; }
+    .sidebar nav a { display: block; padding: 0.4rem 1.5rem; font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.48); text-decoration: none; border-left: 2px solid transparent; transition: all 0.18s; line-height: 1.45; }
+    .sidebar nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+    .sidebar nav a.active { color: var(--white); border-left-color: var(--oc-lt); background: rgba(255,255,255,0.06); }
+    main { margin-left: 230px; }
+    .cover { background: var(--navy); padding: 5rem 5rem 4.5rem; position: relative; overflow: hidden; }
+    .cover-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(30,122,110,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(30,122,110,0.08) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    .cover-glow { position: absolute; top: -100px; right: -80px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(30,122,110,0.2) 0%, transparent 65%); pointer-events: none; }
+    .cover-inner { position: relative; z-index: 1; }
+    .cover-eyebrow { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--oc-lt); margin-bottom: 1.5rem; }
+    .cover-title { font-family: var(--serif); font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight: 600; color: var(--white); line-height: 1.08; margin-bottom: 1.25rem; max-width: 640px; }
+    .cover-tagline { font-size: 1rem; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.55); max-width: 560px; margin-bottom: 2rem; line-height: 1.65; font-family: var(--serif); }
+    .cover-problem { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 1.25rem 1.5rem; max-width: 620px; margin-bottom: 1.5rem; }
+    .cover-problem p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.7; margin: 0 0 0.6rem; }
+    .cover-problem p:last-child { margin-bottom: 0; }
+    .cover-problem strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+    .cover-thesis { background: rgba(30,122,110,0.18); border: 1px solid rgba(30,122,110,0.4); border-radius: 6px; padding: 1rem 1.5rem; max-width: 620px; margin-bottom: 2.5rem; }
+    .cover-thesis p { font-family: var(--serif); font-size: 0.92rem; font-style: italic; color: rgba(255,255,255,0.78); line-height: 1.6; margin: 0; }
+    .cover-meta { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .cover-meta-item .label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 0.2rem; }
+    .cover-meta-item .value { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+    .doc-body { max-width: 840px; padding: 4rem 5rem 5rem; }
+    .section { margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--rule); }
+    .sec-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--oc-accent); font-weight: 500; flex-shrink: 0; }
+    h1.sec-title { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--navy); line-height: 1.2; }
+    h2.sub-title { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; color: var(--oc-accent); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.75rem; }
+    p { color: var(--mid); font-size: 0.93rem; line-height: 1.82; margin-bottom: 1rem; }
+    p strong { color: var(--navy); font-weight: 600; }
+    .callout { border-left: 3px solid var(--oc-accent); background: var(--oc-pale); padding: 1.1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .callout-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--oc-accent); margin-bottom: 0.4rem; }
+    .callout p { margin: 0; font-style: italic; color: #1a4a44; font-size: 0.88rem; }
+    .callout p + p { margin-top: 0.5rem; }
+    .callout p strong { color: var(--navy); }
+    .pull-quote { font-family: var(--serif); font-size: 1.2rem; font-style: italic; color: var(--navy); border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); padding: 1.4rem 0; margin: 2rem 0; text-align: center; line-height: 1.55; }
+    .code-block { background: var(--navy); border-radius: 7px; padding: 1.25rem 1.5rem; margin: 1rem 0 1.25rem; overflow-x: auto; }
+    .code-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.6rem; }
+    .code-block code { font-family: var(--mono); font-size: 0.82rem; line-height: 1.65; white-space: pre; display: block; }
+    .c-uri   { color: #7dd3fc; }
+    .c-key   { color: #86efac; }
+    .c-str   { color: #f9a8d4; }
+    .c-muted { color: rgba(255,255,255,0.35); }
+    .c-white { color: rgba(255,255,255,0.85); }
+    .c-teal  { color: #5eead4; }
+    .c-gold  { color: #fcd34d; }
+    .c-red   { color: #fca5a5; }
+    .c-comment { color: rgba(255,255,255,0.22); font-style: italic; }
+    ul.props { list-style: none; margin: 0.5rem 0 1.25rem; padding: 0; }
+    ul.props li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); font-size: 0.9rem; color: var(--mid); line-height: 1.65; }
+    ul.props li:last-child { border-bottom: none; }
+    ul.props li::before { content: '›'; color: var(--oc-accent); font-size: 1rem; flex-shrink: 0; font-weight: 600; }
+    ul.props li strong { color: var(--navy); font-weight: 500; }
+    .tbl-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 7px; border: 1px solid var(--rule); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--pale); }
+    tbody td { padding: 0.75rem 1rem; color: var(--mid); line-height: 1.6; vertical-align: top; }
+    tbody td:first-child { font-family: var(--mono); font-size: 0.78rem; color: var(--oc-accent); white-space: nowrap; font-weight: 500; }
+    .steps { margin: 1.25rem 0; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.1rem; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--oc-accent); color: white; font-family: var(--mono); font-size: 0.65rem; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .step-body p { margin: 0; font-size: 0.875rem; }
+    .scenario { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.5rem 0; }
+    .scenario-header { background: var(--navy); padding: 0.85rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .scenario-header .s-badge { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--oc-lt); }
+    .scenario-header .s-title { font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.8); }
+    .scenario-body { padding: 0; }
+    .scenario-step { display: flex; gap: 0; border-bottom: 1px solid var(--rule); }
+    .scenario-step:last-child { border-bottom: none; }
+    .ss-num { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.5); background: var(--blue); padding: 0.85rem 1rem; display: flex; align-items: flex-start; flex-shrink: 0; min-width: 48px; justify-content: center; padding-top: 1rem; }
+    .ss-content { padding: 0.85rem 1.25rem; flex: 1; }
+    .ss-content h4 { font-size: 0.82rem; font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .ss-content p { margin: 0; font-size: 0.85rem; line-height: 1.65; }
+    .ss-content code { font-family: var(--mono); font-size: 0.8rem; color: var(--oc-accent); background: var(--oc-light); padding: 0.1rem 0.35rem; border-radius: 3px; }
+    .arch { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.5rem 0; }
+    .arch-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); }
+    .arch-row:last-child { border-bottom: none; }
+    .arch-row.hl { background: linear-gradient(90deg, var(--oc-light), var(--oc-pale)); border-left: 3px solid var(--oc-accent); }
+    .arch-num { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); padding: 1rem 1rem 1rem 1.25rem; display: flex; align-items: center; flex-shrink: 0; min-width: 50px; }
+    .arch-row.hl .arch-num { color: var(--oc-accent); }
+    .arch-content { padding: 1rem 1.25rem 1rem 0; flex: 1; }
+    .arch-content h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .arch-content p { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .arch-arrow { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--rule); background: var(--pale); padding: 0.2rem; border-bottom: 1px solid var(--rule); }
+    .endpoint-group { margin: 1.5rem 0; }
+    .endpoint-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; margin-bottom: 1rem; }
+    .endpoint-header { background: var(--navy); padding: 0.7rem 1.25rem; display: flex; align-items: center; gap: 1rem; }
+    .method-badge { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; padding: 0.18rem 0.55rem; border-radius: 3px; flex-shrink: 0; }
+    .method-get  { background: #166534; color: #bbf7d0; }
+    .method-post { background: #1e40af; color: #bfdbfe; }
+    .endpoint-path { font-family: var(--mono); font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+    .endpoint-body { padding: 1rem 1.25rem; background: var(--pale); }
+    .endpoint-body p { margin: 0 0 0.75rem; font-size: 0.875rem; }
+    .endpoint-body p:last-child { margin-bottom: 0; }
+    .milestones { margin: 1rem 0; }
+    .milestone { display: flex; gap: 1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
+    .milestone:last-child { border-bottom: none; }
+    .ms-icon { width: 32px; height: 32px; border: 2px solid var(--rule); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); font-size: 0.6rem; color: var(--muted); }
+    .ms-body h4 { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+    .ms-body p { margin: 0; font-size: 0.85rem; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .compare-card { border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+    .compare-head { background: var(--navy); padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .compare-body { padding: 1rem; background: var(--pale); }
+    .compare-body ul { list-style: none; padding: 0; }
+    .compare-body ul li { font-size: 0.825rem; color: var(--mid); padding: 0.2rem 0 0.2rem 1rem; position: relative; }
+    .compare-body ul li::before { content: '·'; position: absolute; left: 0; color: var(--oc-accent); font-weight: 700; }
+    footer { margin-left: 230px; background: var(--navy); padding: 1.75rem 5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    footer .fb { font-family: var(--serif); font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.55); }
+    footer .fm { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+    @media (max-width: 860px) { .sidebar { display: none; } main, footer { margin-left: 0; } .cover { padding: 2.5rem 2rem; } .doc-body { padding: 2rem; } .compare { grid-template-columns: 1fr; } }
+    @media print { .sidebar { display: none; } main, footer { margin-left: 0; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .cover-inner > * { animation: fadeUp 0.55s ease both; }
+    .cover-inner > *:nth-child(1) { animation-delay: 0.05s; }
+    .cover-inner > *:nth-child(2) { animation-delay: 0.14s; }
+    .cover-inner > *:nth-child(3) { animation-delay: 0.22s; }
+    .cover-inner > *:nth-child(4) { animation-delay: 0.30s; }
+    .cover-inner > *:nth-child(5) { animation-delay: 0.38s; }
+    .cover-inner > *:nth-child(6) { animation-delay: 0.46s; }
+    .sb-footer { margin-top: auto; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.25); line-height: 1.7; }
+    .sb-footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .sb-footer a:hover { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">DillClaw&#x2122;<br>Resolver</div>
+    <div class="sb-sub">Technical Specification</div>
+    <span class="sb-version">v0.1.3</span>
+  </div>
+  <div class="sb-nav-label">Sections</div>
+  <nav>
+    <a href="#abstract">Abstract</a>
+    <a href="#s1">1. Role in the Stack</a>
+    <a href="#s2">2. Architecture</a>
+    <a href="#s3">3. Resolution Protocol</a>
+    <a href="#s4">4. Query Language</a>
+    <a href="#s5">5. API Reference</a>
+    <a href="#s6">6. Trust Evaluation</a>
+    <a href="#s7">7. Caching &amp; Performance</a>
+    <a href="#s8">8. Error Handling</a>
+    <a href="#s9">9. Integration Guide</a>
+    <a href="#s10">10. A Worked Example</a>
+    <a href="#s11">11. Security Model</a>
+    <a href="#s12">12. What Must Be Built</a>
+    <a href="#s13">13. Relationship to DNS</a>
+    <a href="#appendix-a">Appendix A: Future Work</a>
+<div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Anthill Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+    <div class="sb-footer">
+    Dillweed® Registered Trademark<br>
+    Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <header class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.3 Published</div>
+     <h1 class="cover-title">DillClaw Resolver <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
+      <p class="cover-tagline">The resolution layer for the Dillweed Namespace — turning stable names into trusted, invocable capabilities.</p>
+
+      <div class="cover-problem">
+        <p>A namespace without a resolver is a map with no roads. Agents can call tools. They cannot reliably choose the right one across providers and time. DillClaw is the resolution engine for the Dillweed Namespace. It takes a namespace URI, applies trust policy, selects the best capability, and returns an invocable endpoint — in a single, auditable operation.</p>
+        <p>This document specifies the <strong>protocol, API, trust evaluation logic, integration patterns, and deployment requirements</strong> for DillClaw implementations. As the number of capabilities grows beyond human-scale, resolution becomes a prerequisite, not an optimization. At sufficient scale, capability selection becomes the bottleneck. Resolution is not optional — it is required infrastructure.</p>
+      </div>
+
+      <div class="cover-thesis">
+        <p>DillClaw does not replace MCP, A2A, or any capability protocol. It sits above them — providing the naming, trust, and selection layer that makes those protocols usable at scale, across providers, across time.</p>
+      </div>
+
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.3</span></div>
+        <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dillweed NS Standard v0.4</a></span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Published Specification</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-body">
+
+    <section class="section" id="abstract">
+      <div class="section-header"><h1 class="sec-title">Abstract</h1></div>
+
+      <p>The Dillweed Namespace Standard defines how capabilities are named and governed. DillClaw defines how they are <em>found, evaluated, and selected</em>. These are complementary specifications: the namespace provides stable identity; the resolver provides operational access.</p>
+
+      <p>DillClaw is a resolver specification and implementation layer — a structured intermediary that accepts agent queries expressed against the Dillweed namespace, consults the authoritative registry, applies trust and policy filters, and returns ranked, invocable Capability Records. It is not a proxy, not a gateway, and not a capability provider itself. Its role is resolution: mapping names to endpoints in a way that is trustworthy, auditable, and consistent across time.</p>
+
+      <p>Without a resolver layer, a namespace remains descriptive. DillClaw makes it operational.</p>
+
+      <p>This specification defines the resolution protocol, the query syntax, the trust evaluation model, the HTTP API, integration patterns for MCP and A2A, error semantics, and the caching strategy. Implementations that conform to this specification are considered DillClaw-compliant resolvers.</p>
+
+      <div class="callout">
+        <div class="callout-label">Scope of This Document</div>
+        <p>This document specifies the DillClaw Resolver layer only. Capability Record schema, namespace URI syntax, trust tier definitions, and governance rules are defined in the <a href="https://dillweed.com/namespace-standard.html" style="color:var(--oc-accent);">Dillweed Namespace Standard v0.4</a>. This document defers to that specification on those topics and should be read alongside it.</p>
+      </div>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119" style="color:var(--oc-accent);">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174" style="color:var(--oc-accent);">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here.</p>
+    </section>
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Role in the Stack</h1></div>
+
+      <p>DillClaw occupies a specific position in the agentic AI infrastructure stack. Understanding that position is essential to understanding what it does — and what it deliberately does not do.</p>
+
+      <div class="arch">
+        <div class="arch-row">
+          <div class="arch-num">L1</div>
+          <div class="arch-content"><h4>Human Gateway Layer</h4><p>Platform-scale access, identity, and policy. Examples: Meta, Google, Apple, Microsoft, Salesforce. These layers surface capabilities to end users and enterprise systems.</p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-num">L2</div>
+          <div class="arch-content"><h4>Dillweed Namespace Layer</h4><p>Stable naming, trust accumulation, and governance. Defines the URI structure, Capability Record schema, and trust tiers. Governed by the DNSO (Dillweed Namespace Stewardship Office). <em>Defined in the <a href="https://dillweed.com/namespace-standard.html" style="color:var(--oc-accent);">Dillweed Namespace Standard v0.4</a>.</em></p></div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row hl">
+          <div class="arch-num">L3</div>
+          <div class="arch-content">
+            <h4>DillClaw Resolver Layer &nbsp;<span style="font-family:var(--mono);font-size:0.65rem;color:var(--oc-accent);font-weight:500">← this document</span></h4>
+            <p>Query parsing, registry lookup, trust evaluation, candidate ranking, and invocation target selection. The operational bridge between namespace and capability.</p>
+          </div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-row">
+          <div class="arch-num">L4</div>
+          <div class="arch-content"><h4>Capability Layer</h4><p>Individual tools, agents, APIs, and data sources registered within the Dillweed Namespace. Invoked using MCP, A2A, REST, gRPC, or custom protocols as specified in their Capability Records.</p></div>
+        </div>
+      </div>
+
+      <p>DillClaw's role is narrow by design. It does not store capabilities, does not proxy requests to them, and does not make policy decisions about which agents may invoke what. It resolves names to endpoints and returns the information needed for an agent to invoke a capability directly.</p>
+
+      <p>Without this layer, agents must rely on hardcoded endpoints, brittle registries, or provider-specific abstractions — none of which survive scale, substitution, or time. Today, this function is fragmented across hardcoded endpoints, provider registries, and prompt-level tool selection. DillClaw replaces that fragmentation with a single, governed resolution layer.</p>
+
+      <div class="callout">
+        <div class="callout-label">The Resolver Contract</div>
+        <p>Given a valid Dillweed namespace query and a caller's trust policy, DillClaw returns the best available Capability Record — or a structured explanation of why none could be returned. That is the complete contract. Everything else is implementation detail.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">What This Is Not</div>
+        <p>DillClaw is not a proxy, gateway, agent runtime, policy authority, or capability provider. It does not execute agent tasks or own capability endpoints. It resolves namespace queries into ranked, signed Capability Records according to caller-supplied trust policy and documented resolver behavior.</p>
+      </div>
+
+      <p>Resolver operations produce observable coordination events — query breadth, no-match patterns, signature failures, stale-cache responses, and revocation-cache behavior — that may be emitted as Anthill signals for coordination-layer observability. DillClaw does not depend on Anthill for its normative behavior; the relationship is one of optional emission rather than required coupling. The hook interface for this emission is tracked in Appendix A.7.</p>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Architecture</h1></div>
+
+      <p>A DillClaw Resolver consists of five functional components. These may be deployed as a single service or as independent modules; the specification is agnostic to deployment topology as long as the external behavior is conformant.</p>
+
+      <h2 class="sub-title">2.1 Functional Components</h2>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+          <tbody>
+            <tr><td>Query Parser</td><td>Validates and normalizes incoming namespace queries. Rejects malformed paths before any network operation. Expands wildcard patterns into candidate path sets.</td></tr>
+            <tr><td>Registry Client</td><td>Communicates with the authoritative Dillweed Registry to retrieve Capability Records matching parsed query paths. Handles registry unavailability gracefully.</td></tr>
+            <tr><td>Trust Evaluator</td><td>Filters and scores candidate records against the caller's declared trust policy. Applies tier minimums, permission checks, and signature verification.</td></tr>
+            <tr><td>Ranking Engine</td><td>When multiple candidates remain after trust filtering, ranks them by relevance, trust tier, usage history, and version preference.</td></tr>
+            <tr><td>Response Composer</td><td>Packages the selected Capability Record into the standardized resolver response, including resolution metadata, trust signals, and audit identifiers.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">2.2 Data Flow</h2>
+
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Receive Query</h4><p>Agent submits a resolution request containing a namespace path (or pattern), a minimum trust tier, required permissions, and optional context hints.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Parse &amp; Validate</h4><p>The Query Parser validates URI syntax, normalizes path components, and expands wildcards. Malformed queries return immediately with a structured error — no registry contact occurs.</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Cache Check</h4><p>The resolver checks its local cache for a valid, non-expired Capability Record matching the query. Cache hits bypass registry contact entirely and proceed directly to trust evaluation.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Registry Lookup</h4><p>On cache miss, the Registry Client queries the authoritative Dillweed Registry, retrieves all matching Capability Records, and stores them in the local cache with appropriate TTLs.</p></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><h4>Trust Filter &amp; Rank</h4><p>The Trust Evaluator removes records that fail the caller's minimum trust tier or lack required permissions. The Ranking Engine orders remaining candidates by trust score and contextual relevance.</p></div></div>
+        <div class="step"><div class="step-dot">6</div><div class="step-body"><h4>Compose &amp; Return</h4><p>The top-ranked record is packaged into a resolver response. The response includes the full Capability Record, a resolution trace for audit, and the trust signals used in ranking.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">2.3 Deployment Modes</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Mode</th><th>Description</th><th>Typical Use</th></tr></thead>
+          <tbody>
+            <tr><td>Hosted</td><td>DillClaw operated as a shared service at a known endpoint. Agents query it via HTTP.</td><td>Most agents; lowest integration overhead</td></tr>
+            <tr><td>Embedded</td><td>DillClaw library linked directly into an agent runtime. Shares process with the agent.</td><td>Latency-sensitive or airgapped deployments</td></tr>
+            <tr><td>Sidecar</td><td>DillClaw runs as a local process alongside an agent container, communicating over loopback.</td><td>Containerized deployments requiring isolation</td></tr>
+            <tr><td>Gateway</td><td>DillClaw integrated into a platform gateway layer, resolving on behalf of all downstream agents.</td><td>Enterprise or platform-scale deployments</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">Resolution Protocol</h1></div>
+
+      <p>The resolution protocol defines the contract between a calling agent and a DillClaw Resolver. It specifies what a valid request contains, what a conformant response MUST include, and how failure states are communicated.</p>
+
+      <h2 class="sub-title">3.1 Request Structure</h2>
+
+      <div class="code-block">
+        <div class="code-label">Resolution Request — JSON Schema</div>
+        <code><span class="c-muted">{</span>
+  <span class="c-key">"query"</span><span class="c-white">:          </span><span class="c-str">"dllwd://research.market.*.vendors"</span><span class="c-muted">,   </span><span class="c-comment">// required</span>
+  <span class="c-key">"trust_minimum"</span><span class="c-white">:  </span><span class="c-str">"verified"</span><span class="c-muted">,                          </span><span class="c-comment">// optional, default: "experimental"</span>
+  <span class="c-key">"permissions"</span><span class="c-white">:    </span><span class="c-muted">[</span><span class="c-str">"query"</span><span class="c-muted">, </span><span class="c-str">"export"</span><span class="c-muted">],               </span><span class="c-comment">// optional</span>
+  <span class="c-key">"version_pref"</span><span class="c-white">:   </span><span class="c-str">"stable"</span><span class="c-muted">,                          </span><span class="c-comment">// optional: "stable" | "latest" | semver</span>
+  <span class="c-key">"context"</span><span class="c-white">:        </span><span class="c-muted">{</span>
+    <span class="c-key">"caller_id"</span><span class="c-white">:    </span><span class="c-str">"agent:procurement-v2"</span><span class="c-muted">,</span>
+    <span class="c-key">"session_id"</span><span class="c-white">:   </span><span class="c-str">"sess_abc123"</span>
+  <span class="c-muted">},</span>
+  <span class="c-key">"max_results"</span><span class="c-white">:    </span><span class="c-teal">3</span>                                    <span class="c-comment">// optional, default: 1</span>
+<span class="c-muted">}</span></code>
+      </div>
+
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">version_pref</code> field accepts three forms. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"stable"</code> selects the highest semver version (per <a href="https://semver.org" style="color:var(--oc-accent);">semver.org</a>) without a pre-release identifier and without a build-metadata tag, from among candidates surviving the trust filter. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"latest"</code> selects the highest semver version including pre-release identifiers. An explicit semver string or semver range (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">1.2.0</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">^1.2</code>) selects the highest version satisfying that constraint.</p>
+
+      <h2 class="sub-title">3.2 Response Structure</h2>
+
+      <div class="code-block">
+        <div class="code-label">Resolution Response — JSON Schema</div>
+        <code><span class="c-muted">{</span>
+  <span class="c-key">"status"</span><span class="c-white">:         </span><span class="c-str">"resolved"</span><span class="c-muted">,                        </span><span class="c-comment">// "resolved" | "no_match" | "error"</span>
+  <span class="c-key">"query"</span><span class="c-white">:          </span><span class="c-str">"dllwd://research.market.*.vendors"</span><span class="c-muted">,</span>
+  <span class="c-key">"resolved_at"</span><span class="c-white">:    </span><span class="c-str">"2026-03-27T14:22:01Z"</span><span class="c-muted">,</span>
+  <span class="c-key">"trace_id"</span><span class="c-white">:       </span><span class="c-str">"trc_9f2a..."</span><span class="c-muted">,</span>
+  <span class="c-key">"results"</span><span class="c-white">:        </span><span class="c-muted">[</span>
+    <span class="c-muted">{</span>
+      <span class="c-key">"rank"</span><span class="c-white">:           </span><span class="c-teal">1</span><span class="c-muted">,</span>
+      <span class="c-key">"capability"</span><span class="c-white">:     </span><span class="c-muted">{</span> <span class="c-comment">/* full Capability Record */</span> <span class="c-muted">},</span>
+      <span class="c-key">"trust_score"</span><span class="c-white">:    </span><span class="c-teal">0.940</span><span class="c-muted">,</span>
+      <span class="c-key">"trust_signals"</span><span class="c-white">: </span><span class="c-muted">[</span><span class="c-str">"dnso_verified"</span><span class="c-muted">, </span><span class="c-str">"14mo_history"</span><span class="c-muted">, </span><span class="c-str">"sig_valid"</span><span class="c-muted">],</span>
+      <span class="c-key">"cache_hit"</span><span class="c-white">:      </span><span class="c-teal">false</span>
+    <span class="c-muted">}</span>
+  <span class="c-muted">],</span>
+  <span class="c-key">"resolver_version"</span><span class="c-white">: </span><span class="c-str">"dillclaw/0.1.2"</span><span class="c-muted">,</span>
+  <span class="c-key">"scoring_profile"</span><span class="c-white">: </span><span class="c-str">"dillclaw-default-v1"</span>
+<span class="c-muted">}</span></code>
+      </div>
+
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">resolved_at</code> field MUST be formatted as an RFC 3339 date-time in UTC with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">Z</code> offset and second precision (<code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">YYYY-MM-DDTHH:MM:SSZ</code>). Non-UTC offsets and fractional seconds MUST NOT be used. This matches the format used for the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">last_updated</code> field in the <a href="https://dillweed.com/registry-spec.html" style="color:var(--oc-accent);">Registry Specification §3.1</a>.</p>
+
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">scoring_profile</code> field identifies the deterministic scoring profile under which the trust scores in this response were computed. Conformant resolvers MUST return this field; the default profile is <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">dillclaw-default-v1</code>, defined in §6.2. Future profiles may be introduced for governance-approved scoring variants; profile identifiers are versioned independently of this specification's document version. Callers comparing scores across responses MUST verify that the responses share the same scoring profile.</p>
+
+      <h2 class="sub-title">3.3 Resolution Guarantees</h2>
+      <ul class="props">
+        <li><strong>Determinism</strong> — Given the same query and registry state, a conformant resolver MUST return the same ranked result. Determinism requires pinned arithmetic for trust scoring and deterministic tie-breaking — both specified in §6.2.</li>
+        <li><strong>No silent failure</strong> — Every request MUST return a structured response. A resolver that cannot answer MUST return a documented error state, never an empty body or unhandled exception.</li>
+        <li><strong>Auditability</strong> — Every response MUST include a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trace_id</code> that can be used to reconstruct the full resolution decision from resolver logs.</li>
+        <li><strong>Trust transparency</strong> — The trust signals used in ranking MUST always be returned alongside the result, so the calling agent can evaluate the basis for selection.</li>
+        <li><strong>Signature pass-through</strong> — DNSO cryptographic signatures on Capability Records MUST NOT be stripped or modified by the resolver. The agent receives them verbatim for independent verification.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Query Language</h1></div>
+
+      <p>DillClaw queries are expressed as Dillweed namespace URIs, extended with a small set of matching operators. The query language is deliberately minimal — sufficient for precise and pattern-based resolution, but not expressive enough to become a general-purpose query system with attendant complexity.</p>
+
+      <h2 class="sub-title">4.1 Exact Match</h2>
+      <p>A fully qualified path resolves to exactly one registered capability:</p>
+      <div class="code-block">
+        <div class="code-label">Exact match</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.intel.vendors</span></code>
+      </div>
+
+      <h2 class="sub-title">4.2 Wildcard Matching</h2>
+      <p>A single asterisk (<code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">*</code>) matches any single path component. This allows agents to express intent at a category level without specifying an exact provider:</p>
+      <div class="code-block">
+        <div class="code-label">Wildcard — match any capability in the market.intel subcategory</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.</span><span class="c-gold">*</span><span class="c-white">.vendors</span></code>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Wildcard — match any capability in the research.market category</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.</span><span class="c-gold">*</span></code>
+      </div>
+
+      <h2 class="sub-title">4.3 Version Pinning</h2>
+      <p>A version suffix pins the query to a specific capability version or range:</p>
+      <div class="code-block">
+        <div class="code-label">Version pin — exact</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.intel.vendors</span><span class="c-muted">:</span><span class="c-teal">1.2.0</span></code>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Version pin — semver range (stable minor)</div>
+        <code><span class="c-uri">dllwd://</span><span class="c-white">research.market.intel.vendors</span><span class="c-muted">:</span><span class="c-teal">^1.2</span></code>
+      </div>
+
+      <h2 class="sub-title">4.4 Query Constraints</h2>
+      <ul class="props">
+        <li>Wildcards MUST NOT appear in the first path component (the domain segment)</li>
+        <li>A query MUST contain at most two wildcards</li>
+        <li>Double-star (<code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">**</code>) recursive matching is not supported; a future revision may introduce it (see Appendix A)</li>
+        <li>A wildcard query whose expansion would match more than 200 candidates MUST be rejected with <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">QUERY_TOO_BROAD</code> (see §8.2). The caller is expected to narrow the query.</li>
+        <li>Queries with no matching results MUST return <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">status: "no_match"</code> with a documented reason — never an empty results array without explanation</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">API Reference</h1></div>
+
+      <p>A DillClaw Resolver exposes a minimal HTTP API. All endpoints accept and return <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">application/json</code>. Authentication is OPTIONAL but RECOMMENDED for production deployments.</p>
+
+      <h2 class="sub-title">5.1 Core Endpoints</h2>
+
+      <div class="endpoint-group">
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/resolve</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Primary resolution endpoint. Accepts a resolution request body and returns a ranked list of matching Capability Records. This is the only endpoint required for a minimally conformant implementation.</p>
+            <div class="code-block">
+              <div class="code-label">Minimal request</div>
+              <code><span class="c-muted">POST /resolve HTTP/1.1
+Content-Type: application/json
+
+{</span>
+  <span class="c-key">"query"</span><span class="c-white">: </span><span class="c-str">"dllwd://research.market.intel.vendors"</span>
+<span class="c-muted">}</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/capability/{path}</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Direct Capability Record retrieval by fully qualified namespace path. Returns a single record or <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">404</code> if not found. No trust filtering is applied — the raw registered record is returned. Useful for verification and tooling workflows.</p>
+            <div class="code-block">
+              <div class="code-label">Example</div>
+              <code><span class="c-muted">GET /capability/research.market.intel.vendors HTTP/1.1</span></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/health</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Returns resolver health status, current registry connection state, cache statistics, and the resolver's own version string. REQUIRED for all conformant implementations.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-path">/trace/{trace_id}</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Returns the full resolution trace for a past resolution operation, identified by the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trace_id</code> included in every response. Enables audit and debugging. Traces SHOULD be retained for a minimum of 72 hours; production deployments may retain traces longer for compliance purposes.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-path">/batch</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Accepts an array of resolution requests (maximum 50 per batch) and returns an array of responses in matching order. Useful for agents that need to resolve multiple capabilities in a single operation. Partial failure is permitted — individual request failures return error objects in-place without failing the entire batch.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 class="sub-title">5.2 Request Headers</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Content-Type</td><td>Yes</td><td>MUST be <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">application/json</code></td></tr>
+            <tr><td>X-DillClaw-Caller</td><td>No</td><td>Caller identifier for audit logging. RECOMMENDED for production.</td></tr>
+            <tr><td>X-DillClaw-Session</td><td>No</td><td>Session identifier for grouping related resolution operations in traces.</td></tr>
+            <tr><td>Authorization</td><td>No</td><td>Bearer token if the resolver requires authentication. An authenticated caller identity model is anticipated in a future revision; see Appendix A.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Trust Evaluation Engine</h1></div>
+
+      <p>Trust evaluation is the core value proposition of DillClaw beyond simple registry lookup. A raw registry can return what exists. DillClaw answers what should be used — through a documented, auditable evaluation process applied to every candidate.</p>
+
+      <p>The trust score ranks candidates that survive hard eligibility filters; it does not override tier gates, permission checks, signature policy, or caller-defined constraints. Scoring is a ranking mechanism applied to already-eligible candidates, not an authorization decision.</p>
+
+      <h2 class="sub-title">6.1 Evaluation Pipeline</h2>
+
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Tier Gate</h4><p>Any candidate with a trust tier below the caller's <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trust_minimum</code> MUST be rejected immediately. This is a hard filter — no scoring applied to eliminated candidates.</p></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Permission Check</h4><p>Any candidate lacking a required permission from the caller's <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">permissions</code> array MUST be rejected. Permission checking is exact-match only; richer permission semantics are anticipated in a future revision (see Appendix A).</p></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Signature Verification</h4><p>DNSO cryptographic signatures MUST be verified against the DNSO public key published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">https://dillweed.com/dnso_public.pem</code> (per <a href="https://dillweed.com/registry-spec.html" style="color:var(--oc-accent);">Registry Specification §5.4</a>). Candidates with <strong>invalid signatures</strong> MUST be rejected unless the resolver is operating in an explicitly declared diagnostic mode. Candidates with <strong>missing signatures</strong> MAY be returned only if caller policy permits unsigned records, and MUST be marked <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">sig_unverified</code>. The distinction is architectural: an invalid signature is evidence of tampering or key mismatch and warrants rejection; a missing signature reflects record-state incompleteness (legacy records, mirror gaps) and remains a caller-policy decision.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Endpoint Liveness</h4><p>Endpoint liveness probing is OPTIONAL; the default is that no probe is performed. The caller does not control probing directly through the resolution request today. A <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> request field is anticipated in a future revision (see Appendix A). Probe results, when performed, are cached per TTL to avoid probe overhead on every request.</p></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><h4>Trust Scoring</h4><p>Surviving candidates are scored on a 0–1 scale using the pinned formula specified in §6.2.</p></div></div>
+      </div>
+
+      <h2 class="sub-title">6.2 Trust Score Composition</h2>
+      <p>Trust scores are computed deterministically using the formula and signal values specified below. Every conformant resolver MUST produce the same trust score for the same candidate given the same inputs — this is the foundation of the determinism guarantee in §3.3.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Signal</th><th>Weight</th><th>Value Domain</th></tr></thead>
+          <tbody>
+            <tr><td>Trust tier</td><td>0.40</td><td><code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">canonical</code>&nbsp;=&nbsp;1.0, <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">verified</code>&nbsp;=&nbsp;0.85, <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trusted</code>&nbsp;=&nbsp;0.65, <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">experimental</code>&nbsp;=&nbsp;0.30</td></tr>
+            <tr><td>Usage history</td><td>0.30</td><td><code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">min(months_registered, 24) / 24</code>&nbsp;(linear, clamped)</td></tr>
+            <tr><td>Signature validity</td><td>0.20</td><td>Present&nbsp;and&nbsp;valid&nbsp;=&nbsp;1.0, absent&nbsp;=&nbsp;0.5, invalid&nbsp;=&nbsp;0.0</td></tr>
+            <tr><td>Endpoint liveness</td><td>0.10</td><td>Reachable&nbsp;=&nbsp;1.0, unchecked&nbsp;=&nbsp;0.5, unreachable&nbsp;=&nbsp;0.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The aggregate score is the weighted sum of the four signal values:</p>
+      <div class="code-block">
+        <div class="code-label">Aggregate formula</div>
+        <code>score <span class="c-white">=</span> <span class="c-teal">0.40</span> · tier <span class="c-white">+</span> <span class="c-teal">0.30</span> · history <span class="c-white">+</span> <span class="c-teal">0.20</span> · sig <span class="c-white">+</span> <span class="c-teal">0.10</span> · liveness</code>
+      </div>
+
+      <p>The aggregate score MUST be rounded to three decimal places using banker's rounding (round-half-to-even, IEEE 754 roundTiesToEven). For example, a raw value of 0.7245 rounds to 0.724; 0.7255 rounds to 0.726. Conformant implementations MUST produce byte-identical rounded values for the same inputs.</p>
+
+      <p>The weights and signal value mappings above define the <strong>default scoring profile</strong>, identified as <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">dillclaw-default-v1</code>. Future governance-approved profiles may revise weights or signal mappings, provided that profile identifiers are returned in resolver responses (see §3.2) and that scoring remains deterministic within each profile. The determinism guarantee in §3.3 holds within a profile, not across profiles. Profile versioning is independent of this specification's document version: the profile identifier tracks scoring behavior, not document edits.</p>
+
+      <h2 class="sub-title">6.3 Tie-Breaking</h2>
+      <p>When two candidates produce identical rounded trust scores, the ranking engine MUST break the tie as follows, evaluating each rule in order until the tie is resolved:</p>
+      <ul class="props">
+        <li><strong>Rule 1 — Namespace path.</strong> Ascending lexicographic order on the fully qualified namespace path, comparing UTF-8 bytes. Since namespace components are restricted to lowercase ASCII (per <a href="https://dillweed.com/registry-spec.html" style="color:var(--oc-accent);">Registry Specification §3.1</a>), this is equivalent to ASCII sort order.</li>
+        <li><strong>Rule 2 — Semver version.</strong> Ascending semver precedence (per <a href="https://semver.org" style="color:var(--oc-accent);">semver.org §11</a>) on the capability version string.</li>
+      </ul>
+      <p>No further tie-breaking rules are defined; the combination of namespace path and version is unique per active record by registry design, so these two rules suffice to order any candidate set deterministically.</p>
+
+      <div class="callout">
+        <div class="callout-label">On Trust Score Transparency</div>
+        <p>Trust scores are always returned with their constituent signals, never as a single opaque number. An agent receiving a result with a score of 0.724 SHOULD also receive the breakdown showing why — so it can apply its own judgment to the resolver's recommendation rather than treating it as authoritative.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Caching &amp; Performance</h1></div>
+
+      <p>Resolution latency is a first-class concern. For agentic systems making many capability decisions in sequence, resolver overhead accumulates quickly. DillClaw's caching model is designed to make the common case — repeated resolution of stable, frequently-used capabilities — extremely fast.</p>
+
+      <h2 class="sub-title">7.1 Cache Architecture</h2>
+      <ul class="props">
+        <li><strong>Local record cache</strong> — Capability Records retrieved from the registry are cached locally. Cache key is the fully qualified namespace path. TTL is set by the registry per record and MUST be respected.</li>
+        <li><strong>Liveness probe cache</strong> — Endpoint liveness results are cached independently with a shorter TTL (default: 60 seconds). Probes MUST NOT be repeated on every resolution request.</li>
+        <li><strong>Negative cache</strong> — Not-found responses from the registry are cached with a short TTL (default: 30 seconds) to prevent thundering-herd behavior on repeated queries for nonexistent paths.</li>
+      </ul>
+
+      <h2 class="sub-title">7.2 TTL Rules</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Cache Type</th><th>Source of TTL</th><th>Default TTL</th><th>Maximum TTL</th></tr></thead>
+          <tbody>
+            <tr><td>Capability Record</td><td>Registry-provided per record</td><td>300s</td><td>3600s</td></tr>
+            <tr><td>Endpoint liveness</td><td>Resolver-configured</td><td>60s</td><td>300s</td></tr>
+            <tr><td>Negative (not found)</td><td>Resolver-configured</td><td>30s</td><td>120s</td></tr>
+            <tr><td>Stale-while-revalidate window</td><td>Resolver-configured</td><td>900s</td><td>1800s</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The stale-while-revalidate window governs how long a resolver may continue serving stale cached records after the registry becomes unreachable. When the window expires, subsequent requests MUST return <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">REGISTRY_UNAVAILABLE</code> rather than older stale data.</p>
+
+      <h2 class="sub-title">7.3 Stale-While-Revalidate</h2>
+      <p>When the registry is unreachable, DillClaw MUST NOT fail open by silently serving stale data without disclosure. Conformant behavior: serve the most recently cached Capability Record if within the stale window, and include a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">stale: true</code> flag and <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">cached_at</code> timestamp (RFC 3339 UTC, second precision, per §3.2) in the response. If no cached record exists and the registry is unreachable, return a structured error.</p>
+
+      <h2 class="sub-title">7.4 Performance Targets</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Scenario</th><th>Target P50</th><th>Target P99</th></tr></thead>
+          <tbody>
+            <tr><td>Cache hit, no liveness probe</td><td>&lt; 5ms</td><td>&lt; 20ms</td></tr>
+            <tr><td>Cache miss, registry reachable</td><td>&lt; 80ms</td><td>&lt; 300ms</td></tr>
+            <tr><td>Cache miss + liveness probe</td><td>&lt; 150ms</td><td>&lt; 500ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Error Handling</h1></div>
+
+      <p>Every error state in DillClaw MUST return a structured JSON response with a machine-readable error code, a human-readable message, and where applicable, a corrective suggestion. HTTP status codes are used in the conventional way. No error state results in an empty body.</p>
+
+      <h2 class="sub-title">8.1 Error Response Format</h2>
+      <div class="code-block">
+        <div class="code-label">Error Response</div>
+        <code><span class="c-muted">{</span>
+  <span class="c-key">"status"</span><span class="c-white">:      </span><span class="c-str">"error"</span><span class="c-muted">,</span>
+  <span class="c-key">"error_code"</span><span class="c-white">:  </span><span class="c-str">"QUERY_MALFORMED"</span><span class="c-muted">,</span>
+  <span class="c-key">"message"</span><span class="c-white">:     </span><span class="c-str">"Path component 'RESEARCH' must be lowercase ASCII"</span><span class="c-muted">,</span>
+  <span class="c-key">"suggestion"</span><span class="c-white">:  </span><span class="c-str">"Use 'research' instead of 'RESEARCH'"</span><span class="c-muted">,</span>
+  <span class="c-key">"trace_id"</span><span class="c-white">:    </span><span class="c-str">"trc_err_7c3f..."</span><span class="c-muted">,</span>
+  <span class="c-key">"query"</span><span class="c-white">:       </span><span class="c-str">"dllwd://RESEARCH.market.intel"</span>
+<span class="c-muted">}</span></code>
+      </div>
+
+      <h2 class="sub-title">8.2 Error Codes</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>HTTP</th><th>Error Code</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>400</td><td>QUERY_MALFORMED</td><td>Namespace URI fails syntax validation. Resolver stopped before registry contact.</td></tr>
+            <tr><td>400</td><td>QUERY_TOO_BROAD</td><td>Wildcard pattern would match more than 200 candidates. Narrow the query.</td></tr>
+            <tr><td>404</td><td>NO_MATCH</td><td>Query is valid but no registered capabilities match it.</td></tr>
+            <tr><td>404</td><td>TRUST_FILTERED</td><td>Candidates exist but all were eliminated by the caller's trust policy.</td></tr>
+            <tr><td>422</td><td>PERMISSION_MISMATCH</td><td>Candidates exist and meet trust tier, but none carry all required permissions.</td></tr>
+            <tr><td>503</td><td>REGISTRY_UNAVAILABLE</td><td>Resolver could not contact the authoritative registry and has no valid cached data.</td></tr>
+            <tr><td>503</td><td>REGISTRY_STALE</td><td>Serving stale cached data. Registry unreachable. Includes <code style="font-family:var(--mono);font-size:0.8em;color:var(--oc-accent)">cached_at</code> timestamp.</td></tr>
+            <tr><td>500</td><td>RESOLVER_FAULT</td><td>Internal resolver error. Includes trace ID for diagnostics. Should be reported.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Integration Guide</h1></div>
+
+      <p>DillClaw is designed to be integrated into existing agent runtimes with minimal friction. The resolution step slots naturally between the point at which an agent identifies a capability need and the point at which it invokes an endpoint.</p>
+
+      <h2 class="sub-title">9.1 MCP Integration</h2>
+      <p>For agents using the Model Context Protocol, DillClaw resolution can replace or augment hardcoded tool definitions. Instead of embedding tool endpoints in system prompts or configuration files, the agent resolves capabilities at runtime:</p>
+
+      <div class="code-block">
+        <div class="code-label">MCP integration pattern — pseudocode</div>
+        <code><span class="c-comment"># Instead of: tool = hardcoded_tools["vendor_comparison"]</span>
+
+<span class="c-key">result</span> <span class="c-white">=</span> dillclaw.resolve(
+  query       <span class="c-white">=</span> <span class="c-str">"dllwd://research.market.intel.vendors"</span>,
+  trust_min   <span class="c-white">=</span> <span class="c-str">"verified"</span>,
+  permissions <span class="c-white">=</span> [<span class="c-str">"query"</span>, <span class="c-str">"export"</span>]
+)
+
+<span class="c-comment"># Result contains MCP-compatible endpoint and schema</span>
+<span class="c-key">tool</span> <span class="c-white">=</span> MCPTool(
+  endpoint    <span class="c-white">=</span> result.capability.endpoint,
+  input_schema<span class="c-white">=</span> result.capability.input_schema,
+  protocol    <span class="c-white">=</span> <span class="c-str">"mcp"</span>
+)
+<span class="c-key">response</span> <span class="c-white">=</span> tool.call(vendor_list)</code>
+      </div>
+
+      <h2 class="sub-title">9.2 A2A Integration</h2>
+      <p>For agent-to-agent communication using A2A, DillClaw can resolve target agents by namespace path rather than by hardcoded agent card URL. This allows agent networks to remain stable even as underlying agent implementations change providers or infrastructure:</p>
+
+      <div class="code-block">
+        <div class="code-label">A2A integration pattern — pseudocode</div>
+        <code><span class="c-comment"># Resolve the target agent by namespace path</span>
+<span class="c-key">result</span> <span class="c-white">=</span> dillclaw.resolve(
+  query    <span class="c-white">=</span> <span class="c-str">"dllwd://agents.analysis.financial.*"</span>,
+  trust_min<span class="c-white">=</span> <span class="c-str">"trusted"</span>
+)
+
+<span class="c-comment"># Use the resolved endpoint to fetch the A2A agent card</span>
+<span class="c-key">agent_card</span> <span class="c-white">=</span> A2A.fetch_card(result.capability.endpoint)
+<span class="c-key">response</span>   <span class="c-white">=</span> A2A.send_task(agent_card, task_payload)</code>
+      </div>
+
+      <h2 class="sub-title">9.3 REST / Direct Invocation</h2>
+      <p>For capabilities exposed as plain REST APIs, the resolved endpoint is used directly. DillClaw returns the full Capability Record including input and output schemas, which the agent can use to construct and validate its request without additional documentation lookup:</p>
+
+      <div class="code-block">
+        <div class="code-label">REST integration pattern — pseudocode</div>
+        <code><span class="c-key">result</span> <span class="c-white">=</span> dillclaw.resolve(<span class="c-str">"dllwd://data.enrichment.company.profile"</span>)
+
+<span class="c-comment"># Validate request body against resolved input schema</span>
+validate(request_body, result.capability.input_schema)
+
+<span class="c-comment"># Invoke directly</span>
+<span class="c-key">response</span> <span class="c-white">=</span> http.post(
+  url     <span class="c-white">=</span> result.capability.endpoint,
+  body    <span class="c-white">=</span> request_body
+)</code>
+      </div>
+
+      <h2 class="sub-title">9.4 Recommended Integration Pattern</h2>
+      <ul class="props">
+        <li><strong>Resolve once, cache locally</strong> — For capabilities used repeatedly in a session, resolve once and retain the result in agent-level memory. Do not call the resolver on every tool invocation.</li>
+        <li><strong>Use trace IDs in logs</strong> — Include the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trace_id</code> from each resolution response in your agent's audit logs. This enables post-hoc debugging if a resolved capability later behaves unexpectedly.</li>
+        <li><strong>Handle TRUST_FILTERED gracefully</strong> — Design agents to surface trust filter rejections to their orchestrators rather than silently failing or falling back to lower-trust alternatives without acknowledgment.</li>
+        <li><strong>Verify DNSO signatures independently</strong> — For high-stakes capability invocations, verify the DNSO signature in the returned Capability Record against the public key published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">https://dillweed.com/dnso_public.pem</code> rather than relying solely on resolver trust evaluation.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s10">
+      <div class="section-header"><span class="sec-num">§ 10</span><h1 class="sec-title">A Worked Example</h1></div>
+
+      <p>To make the resolver mechanics concrete, the following traces a single resolution operation from the agent's perspective through to invocation — showing each protocol step and the data at each stage.</p>
+
+      <div class="scenario">
+        <div class="scenario-header">
+          <span class="s-badge">End-to-End Trace</span>
+          <span class="s-title">Financial analysis agent resolving a company enrichment capability</span>
+        </div>
+        <div class="scenario-body">
+          <div class="scenario-step">
+            <div class="ss-num">1</div>
+            <div class="ss-content">
+              <h4>Agent identifies capability need</h4>
+              <p>A financial analysis agent needs to enrich a company identifier with current firmographic data. It has been configured to use the Dillweed namespace for capability resolution rather than a hardcoded endpoint.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">2</div>
+            <div class="ss-content">
+              <h4>Agent submits resolution request</h4>
+              <p>The agent posts to <code>/resolve</code> with query <code>dillweed://data.enrichment.company.*</code>, <code>trust_minimum: "verified"</code>, and <code>permissions: ["query", "export"]</code>. The <code>*</code> wildcard signals intent to find the best available enrichment capability, not a specific provider.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">3</div>
+            <div class="ss-content">
+              <h4>DillClaw parses and checks cache</h4>
+              <p>The Query Parser validates the URI and expands the wildcard. The cache contains a 4-minute-old record for <code>data.enrichment.company.profile</code> within TTL — the registry is not contacted. Trust evaluation proceeds against the cached record.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">4</div>
+            <div class="ss-content">
+              <h4>Trust evaluation filters and scores</h4>
+              <p>Three candidates exist in the expanded match set. One is <code>experimental</code> — eliminated by tier gate. One is <code>trusted</code> but lacks the <code>export</code> permission — eliminated by permission check. The remaining candidate is <code>verified</code>, carries a valid DNSO signature, and has 18 months of continuous registration. Applying the §6.2 formula: <code>0.40·0.85 + 0.30·(18/24) + 0.20·1.0 + 0.10·0.5 = 0.340 + 0.225 + 0.200 + 0.050 = 0.815</code>. Trust score: 0.815.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">5</div>
+            <div class="ss-content">
+              <h4>Response returned to agent</h4>
+              <p>DillClaw returns <code>status: "resolved"</code> with the full Capability Record, trust score 0.815, signals <code>["dnso_verified", "18mo_history", "sig_valid"]</code>, <code>cache_hit: true</code>, and a <code>trace_id</code>. Total resolver latency: 3ms.</p>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="ss-num">6</div>
+            <div class="ss-content">
+              <h4>Agent validates signature and invokes</h4>
+              <p>The agent verifies the DNSO signature independently, validates its request payload against the returned <code>input_schema</code>, then calls the resolved endpoint directly. The resolver is not in the invocation path — it returned the map; the agent navigates it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">What This Trace Demonstrates</div>
+        <p>The agent never knew the underlying provider. It never needed to. It expressed an intent, received a trusted endpoint, verified it cryptographically, and invoked. If the underlying provider changes next week, the namespace path remains stable, the trust signals are re-evaluated at the next resolution, and the agent's code is unchanged.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header"><span class="sec-num">§ 11</span><h1 class="sec-title">Security Model</h1></div>
+
+      <p>DillClaw's security model is deliberately limited to the resolver's scope: it does not attempt to secure capability invocation, enforce access control at the capability layer, or authenticate agents to providers. It secures the resolution step only. Production deployments SHOULD enforce per-IP or per-token rate limits on wildcard and batch resolution requests.</p>
+
+      <h2 class="sub-title">11.1 Threat Model</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Threat</th><th>Mitigation</th></tr></thead>
+          <tbody>
+            <tr><td>Registry poisoning</td><td>DNSO cryptographic signatures on Capability Records. Invalid signatures result in trust score penalty or elimination per caller policy.</td></tr>
+            <tr><td>Cache poisoning</td><td>TTLs enforced strictly. Cached records include the DNSO signature, verified at scoring time regardless of cache source.</td></tr>
+            <tr><td>Resolver impersonation</td><td>Resolvers SHOULD be identified by DNS + TLS. A resolver identity certificate model is anticipated in a future revision; see Appendix A.</td></tr>
+            <tr><td>Stale trust signals</td><td>Stale responses are disclosed explicitly. Agents MAY reject stale results by policy. Trust score does not degrade on staleness alone.</td></tr>
+            <tr><td>Query enumeration</td><td>Wildcard queries return a maximum of 200 results. Production deployments SHOULD enforce per-IP or per-token rate limits on wildcard and batch queries.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sub-title">11.2 What DillClaw Does Not Secure</h2>
+      <ul class="props">
+        <li>The capability endpoint itself — authentication and authorization to the capability are the provider's responsibility</li>
+        <li>The content of capability responses — DillClaw makes no representation about what a capability returns</li>
+        <li>Agent identity — the current specification does not authenticate which agent is making a resolution request. A caller-identity model is anticipated in a future revision; see Appendix A.</li>
+        <li>Data in transit to the capability — TLS for the resolution request is expected; TLS for the capability invocation is the agent's responsibility</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s12">
+      <div class="section-header"><span class="sec-num">§ 12</span><h1 class="sec-title">What Must Be Built</h1></div>
+
+      <p>This specification describes a protocol and an architecture. DillClaw becomes real infrastructure only through implementation and demonstrated operation. The following milestones define the minimum viable resolver — the point at which this specification stops being a proposal and becomes a running system. As of this revision, the Node.js reference implementation operating in local deployment has achieved milestones 01 and 02; the remaining milestones define the path to public availability.</p>
+
+      <div class="milestones">
+        <div class="milestone"><div class="ms-icon">01</div><div class="ms-body"><h4>Conformant Resolver Implementation</h4><p>A working implementation of the <code>/resolve</code> and <code>/health</code> endpoints, passing against a reference test suite. Language-agnostic; the first implementation may be any stack.</p></div></div>
+        <div class="milestone"><div class="ms-icon">02</div><div class="ms-body"><h4>Live Registry Connection</h4><p>The resolver connected to a live Dillweed Registry endpoint returning real Capability Records for at least three registered capabilities across two namespace categories.</p></div></div>
+        <div class="milestone"><div class="ms-icon">03</div><div class="ms-body"><h4>End-to-End Resolution Trace</h4><p>A publicly documented resolution trace — query in, Capability Record out, DNSO signature verified — demonstrating the full protocol path as specified in §10.</p></div></div>
+        <div class="milestone"><div class="ms-icon">04</div><div class="ms-body"><h4>MCP or A2A Integration Example</h4><p>A working integration with at least one of MCP or A2A, demonstrated with a real agent making at least one capability invocation via a DillClaw-resolved endpoint.</p></div></div>
+        <div class="milestone"><div class="ms-icon">05</div><div class="ms-body"><h4>Public Reference Deployment</h4><p>A hosted DillClaw endpoint at a stable URL (DillClaw.ai or equivalent) accepting resolution requests from any caller, with uptime monitoring and a public health status page.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="s13">
+      <div class="section-header"><span class="sec-num">§ 13</span><h1 class="sec-title">Relationship to DNS</h1></div>
+
+      <p>The architectural parallels between DillClaw and DNS are intentional and instructive — but the analogy has limits that are worth stating explicitly.</p>
+
+      <h2 class="sub-title">13.1 Where the Analogy Holds</h2>
+      <div class="compare">
+        <div class="compare-card">
+          <div class="compare-head">DNS</div>
+          <div class="compare-body">
+            <ul>
+              <li>Maps human-readable names to IP addresses</li>
+              <li>Hierarchical namespace with a governed root</li>
+              <li>Caching at multiple layers for performance</li>
+              <li>Authoritative + recursive resolver model</li>
+              <li>Stable names survive infrastructure changes</li>
+            </ul>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-head">DillClaw</div>
+          <div class="compare-body">
+            <ul>
+              <li>Maps semantic names to invocable endpoints</li>
+              <li>Hierarchical namespace with a governed root</li>
+              <li>Caching at resolver layer with TTL discipline</li>
+              <li>Authoritative registry + resolver model</li>
+              <li>Stable names survive provider changes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sub-title">13.2 Where the Analogy Breaks Down</h2>
+      <ul class="props">
+        <li><strong>DNS resolves to addresses; DillClaw resolves to capabilities.</strong> A Capability Record contains semantics, schemas, permissions, and trust signals that have no DNS equivalent. The resolution result is richer.</li>
+        <li><strong>DNS is neutral about content; DillClaw is not.</strong> Trust evaluation, permission filtering, and contextual ranking are core to DillClaw's function. DNS does not rank results or filter based on caller policy.</li>
+        <li><strong>DNS operates at network layer; DillClaw operates at application layer.</strong> DillClaw is not a replacement for DNS — it uses DNS for its own endpoint routing and relies on TLS in the conventional way.</li>
+        <li><strong>DNS has a 40-year installed base; DillClaw has none yet.</strong> The analogy is structural, not a claim of equivalence. DillClaw earns legitimacy through adoption, not through comparison to infrastructure that already won.</li>
+      </ul>
+
+      <div class="pull-quote">
+        DNS tells you where a server is.<br>
+        DillClaw tells you what to trust and use.
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Relationship to the Dillweed Namespace Standard</div>
+        <p>DillClaw is the operational layer for the Dillweed Namespace. The namespace defines what can exist and what it means. DillClaw defines how it is found, evaluated, and selected. Neither document is complete without the other. The full infrastructure is the combination: a governed naming layer and a conformant resolver that brings those names into operational reality.</p>
+      </div>
+
+      <h2 class="sub-title">13.3 Attestation Scope: Namespace Layer vs. Hardware and Code Layer</h2>
+      <p>DillClaw performs <em>namespace-layer attestation</em> — a distinct and narrower operation than the hardware attestation and code integrity verification performed by trusted execution environments, TPM-based platforms, and supply-chain security systems. Understanding this distinction matters both for correct implementation and for accurate descriptions of what DillClaw can and cannot guarantee.</p>
+      <p><strong>What DillClaw attests:</strong> DillClaw verifies that a Capability Record — comprising a namespace path, endpoint URL, declared trust tier, permissions, protocol, and schema metadata — was signed by the DNSO private key and has not been altered since signing. This is a statement about the <em>registry record</em>, not about the software running at the endpoint. A capability that passes DillClaw signature verification is a capability whose declared metadata is authentic. It is not a statement that the endpoint is running unmodified code, that the server hardware is in a known good state, or that the software supply chain is intact.</p>
+      <p><strong>What DillClaw does not attest:</strong> DillClaw does not perform firmware attestation, Trusted Platform Module (TPM) quote verification, Trusted Execution Environment (TEE) attestation, or any form of remote code measurement. It does not verify that the binary running at a capability endpoint matches a known-good hash, that the server operating system has not been modified, or that the execution environment is isolated from compromise. These are application-layer and infrastructure-layer concerns that fall outside the namespace coordination layer.</p>
+      <p><strong>Why the distinction matters:</strong> Hardware and code attestation systems — such as those used in confidential computing, secure enclaves, and hardware root-of-trust architectures — attest the integrity of an execution environment at a given moment. Namespace-layer attestation, as performed by DillClaw, attests the integrity of a coordination record over time. Both are valid and complementary forms of trust evidence. A well-governed agent system may use both: DillClaw to establish that a capability's identity and declared metadata are authentic, and a separate attestation layer to establish that the endpoint's execution environment is trustworthy at the time of invocation.</p>
+
+      <div class="callout">
+        <div class="callout-label">Scope Summary</div>
+        <p>DillClaw answers: <em>Is this capability record authentic and unaltered?</em> It does not answer: <em>Is the software running at this endpoint unmodified?</em> The first question is a namespace concern. The second is an infrastructure concern. Conflating them produces an inflated security claim that the specification does not make and the implementation does not provide.</p>
+      </div>
+    </section>
+
+    <!-- Appendix A — Future Work (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Future Work (Non-Normative)</h1></div>
+
+      <p>This appendix records items intended for a future revision of the DillClaw Resolver Specification. It is non-normative: nothing in this appendix imposes conformance requirements on implementations of this specification. It is included to disclose the anticipated direction of the specification so that implementers can make informed decisions about extensibility and ecosystem participants can plan for forthcoming changes.</p>
+
+      <h2 class="sub-title">A.1 Resolver Authentication and Caller Identity</h2>
+      <p>The current specification treats the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">Authorization</code> header as optional with no prescribed format, and does not authenticate the agent making a resolution request. A future revision is expected to define: (a) a bearer-token format and validation contract for resolver authentication, (b) a caller-identity attestation model that allows a resolver to verify the agent making each request, and (c) the resolver identity certificate model referenced in §11.1 for mitigating resolver-impersonation threats. These changes will affect §5.2, §11.1, and §11.2.</p>
+
+      <h2 class="sub-title">A.2 Caller-Controlled Endpoint Liveness Probing</h2>
+      <p>The current specification describes endpoint liveness probing as optional and controlled by resolver policy, but exposes no request field through which the caller can opt in or out of probing on a per-request basis. A future revision is expected to add a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> field to the resolution request schema, accepting boolean or enumerated values that specify the caller's preference. This change will affect §3.1 and §6.1.</p>
+
+      <h2 class="sub-title">A.3 Richer Permission Semantics</h2>
+      <p>The current specification performs exact-string matching on permissions declared by the caller against permissions declared by the capability. A future revision is expected to introduce structured permission scopes, hierarchical permissions (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read</code> implying <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read.metadata</code>), and permission negotiation where a capability may declare that it conditionally supports permissions depending on caller identity. This change will affect §6.1.</p>
+
+      <h2 class="sub-title">A.4 Recursive Wildcard Matching</h2>
+      <p>The current specification supports single-asterisk wildcards matching exactly one namespace component, with a limit of two wildcards per query. A future revision is expected to evaluate the addition of recursive wildcard matching (<code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">**</code>) for matching any number of intervening components, subject to stricter candidate-expansion limits to prevent query cost amplification. This change will affect §4.2 and §4.4.</p>
+
+      <h2 class="sub-title">A.5 Internationalized Namespace Components in Queries</h2>
+      <p>The current specification restricts namespace components in queries to lowercase ASCII letters, digits, and hyphens, matching the <a href="https://dillweed.com/registry-spec.html" style="color:var(--oc-accent);">Registry Specification §3.1</a> naming rule. A future revision is expected to extend the query syntax to accept internationalized names encoded per IDNA 2008 (RFC 5891) punycode once the registry accepts such names. This change will affect §4.1, §4.2, and §8.</p>
+
+      <h2 class="sub-title">A.6 Trust Signal String Format</h2>
+      <p>The current specification returns trust signals as unstructured strings in the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trust_signals</code> response array (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"18mo_history"</code>). A future revision is expected to pin the exact format of these strings — regular expressions, casing rules, zero-padding for numeric components — so that callers parsing signal strings produce consistent results across conformant resolvers. This change will affect §3.2 and §10.</p>
+
+      <h2 class="sub-title">A.7 Anthill Integration</h2>
+      <p>This specification does not address integration with the <a href="https://dillweed.com/anthill-spec.html" style="color:var(--oc-accent);">Dillweed Anthill Observability Plane Specification</a>, which describes resolver-side hooks for generating ANT-RC (Revocation Cascade), ANT-AB (Attestation Bypass), and ANT-RD (Resolver Drift) signals from resolution and verification activity (Anthill §3, §5). A future revision is expected to define the hook interface, including conformance level for signal emission, delivery model (push to an Anthill aggregation endpoint or pull from a Resolver-exported feed), signal payload schema, and configuration surface by which a Resolver operator binds to a specific Anthill aggregation endpoint and signing key. This change will affect a new Resolver section addressing observability integration, and is intended to be developed jointly with the corresponding revision of the Anthill specification.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">The DillClaw Resolver Specification defines the resolution protocol — how a dillweed:// namespace URI is resolved to a verified, trust-scored, invocable capability endpoint across organizational boundaries.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#5fd5c0;font-weight:500;">Resolver ◀ you are here</span>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/continuity-protocol.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">GSP-01 Continuity</a>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="fb">DillClaw Resolver — Technical Specification</div>
+  <div class="fm">v0.1.3 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+    <div class="fm" style="margin-top:0.5rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="DNSO Continuity and Stewardship Transition Protocol GSP-01 v1.0.3 — Dillweed Namespace Project">
+  <meta property="og:description" content="Succession mechanics, key custody transfer, and governance continuity procedures for the Dillweed Namespace Stewardship Office.">
+  <meta property="og:url" content="https://dillweed.com/continuity-protocol.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dillweed Namespace Project">
+  <title>DNSO Continuity and Stewardship Transition Protocol GSP-01 v1.0.3 — Dillweed Namespace Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:#0d1b2a;--ink:#18202c;--mid:#445566;--muted:#6b7f94;--rule:#c9d8e8;
+      --white:#ffffff;--pale:#f5f7fa;
+      --serif:'Spectral',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono','Courier New',monospace;
+      --accent:#7c4a00;--accent-lt:#b36a00;--accent-pale:#fdf3e7;--accent-light:#e8c48a;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:16px;scroll-behavior:smooth;}
+    body{font-family:var(--sans);color:var(--ink);background:var(--white);display:flex;min-height:100vh;}
+
+    .sidebar{width:220px;min-width:220px;background:var(--navy);color:rgba(255,255,255,0.75);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;font-family:var(--sans);font-size:0.72rem;}
+    .sb-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .sb-wordmark{font-family:var(--serif);font-size:0.85rem;font-weight:600;color:var(--white);letter-spacing:0.02em;line-height:1.3;}
+    .sb-sub{font-size:0.65rem;color:var(--accent-light);margin-top:0.35rem;letter-spacing:0.04em;line-height:1.4;}
+    .sb-version{display:inline-block;margin-top:0.4rem;font-size:0.6rem;font-family:var(--mono);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);padding:0.1rem 0.4rem;border-radius:2px;letter-spacing:0.06em;}
+    nav{padding:1rem 0;flex:1;}
+    .sb-nav-label{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0.6rem 1.25rem 0.25rem;}
+    nav a{display:block;padding:0.28rem 1.25rem;color:rgba(255,255,255,0.6);text-decoration:none;line-height:1.4;transition:color 0.15s,background 0.15s;}
+    nav a:hover{color:var(--white);background:rgba(255,255,255,0.05);}
+    nav a.active{color:var(--accent-light);border-left:2px solid var(--accent-lt);padding-left:calc(1.25rem - 2px);}
+    .sb-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);font-size:0.6rem;color:rgba(255,255,255,0.3);line-height:1.6;}
+    .sb-footer a{color:rgba(255,255,255,0.35);text-decoration:none;}
+
+    main{flex:1;min-width:0;}
+
+    .cover{background:var(--navy);color:var(--white);padding:4rem 4rem 3.5rem;position:relative;overflow:hidden;}
+    .cover-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,74,0,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(124,74,0,0.07) 1px,transparent 1px);background-size:40px 40px;}
+    .cover-glow{position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(124,74,0,0.2) 0%,transparent 70%);pointer-events:none;}
+    .cover-inner{position:relative;max-width:720px;}
+    .cover-eyebrow{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-light);margin-bottom:1.2rem;}
+    .cover-title{font-family:var(--serif);font-size:2.4rem;font-weight:300;line-height:1.15;letter-spacing:-0.02em;margin-bottom:1.2rem;}
+    .cover-title .hl{color:var(--accent-light);font-style:italic;}
+    .cover-tagline{font-size:1.05rem;line-height:1.65;color:rgba(255,255,255,0.7);max-width:620px;margin-bottom:1.8rem;}
+    .cover-thesis{border-left:2px solid var(--accent-lt);padding:0.9rem 1.2rem;background:rgba(124,74,0,0.12);border-radius:0 4px 4px 0;margin-bottom:2rem;}
+    .cover-thesis p{font-family:var(--serif);font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.85);font-style:italic;}
+    .cover-meta{display:flex;flex-wrap:wrap;gap:1.5rem;}
+    .cover-meta-item{display:flex;flex-direction:column;gap:0.2rem;}
+    .cover-meta-item .label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);}
+    .cover-meta-item .value{font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.75);}
+
+    .doc-body{max-width:760px;margin:0 auto;padding:3rem 4rem 5rem;}
+    .section{margin-bottom:3.5rem;}
+    .section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.4rem;padding-bottom:0.6rem;border-bottom:1px solid var(--rule);}
+    .sec-num{font-family:var(--mono);font-size:0.65rem;color:var(--accent-lt);letter-spacing:0.08em;white-space:nowrap;}
+    .sec-title{font-family:var(--serif);font-size:1.35rem;font-weight:400;color:var(--navy);letter-spacing:-0.01em;}
+    .sub-title{font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--navy);margin:1.8rem 0 0.7rem;}
+    p{font-family:var(--serif);font-size:1rem;line-height:1.78;color:#2a3340;margin-bottom:1rem;}
+    ul,ol{margin:0.5rem 0 1rem 1.5rem;}
+    li{font-family:var(--serif);font-size:0.97rem;line-height:1.7;color:#2a3340;margin-bottom:0.3rem;}
+    a{color:var(--accent-lt);}
+    .props{list-style:none;margin-left:0;}
+    .props li{padding:0.4rem 0;border-bottom:1px solid #eef1f5;}
+    .props li:last-child{border-bottom:none;}
+    .props strong{color:var(--navy);font-family:var(--mono);font-size:0.85rem;}
+    .callout{background:var(--accent-pale);border-left:3px solid var(--accent-lt);border-radius:0 6px 6px 0;padding:1rem 1.25rem;margin:1.4rem 0;}
+    .callout-label{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;}
+    .callout p{margin-bottom:0;font-size:0.95rem;}
+    .warning{background:#fff8f0;border-left:3px solid #c0392b;border-radius:0 6px 6px 0;padding:1rem 1.25rem;margin:1.4rem 0;}
+    .warning-label{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#c0392b;margin-bottom:0.5rem;}
+    .warning p{margin-bottom:0;font-size:0.95rem;}
+    .succession-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0;}
+    .succession-card{border:1px solid var(--rule);border-radius:6px;padding:1rem;}
+    .succession-card-title{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-lt);margin-bottom:0.5rem;}
+    .succession-card p{font-size:0.88rem;line-height:1.6;margin-bottom:0;}
+    table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.88rem;}
+    th{background:var(--navy);color:var(--white);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 0.8rem;text-align:left;}
+    td{padding:0.6rem 0.8rem;border-bottom:1px solid var(--rule);font-family:var(--serif);vertical-align:top;line-height:1.55;}
+    tr:last-child td{border-bottom:none;}
+    tr:nth-child(even) td{background:var(--pale);}
+    code{font-family:var(--mono);font-size:0.83em;background:#eef1f5;padding:0.1em 0.35em;border-radius:3px;color:var(--navy);}
+    footer{background:var(--navy);color:rgba(255,255,255,0.4);padding:1.5rem 4rem;display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
+    .fb{font-family:var(--serif);font-size:0.8rem;color:rgba(255,255,255,0.6);}
+    .fm{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.06em;}
+    @media(max-width:900px){.sidebar{display:none;}.cover{padding:2.5rem 1.5rem;}.doc-body{padding:2rem 1.5rem 4rem;}.succession-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
+    <div class="sb-sub">DNSO Continuity and Stewardship Transition Protocol</div>
+    <span class="sb-version">GSP-01 · v1.0.3</span>
+  </div>
+  <nav>
+    <div class="sb-nav-label">Contents</div>
+    <a href="#s1">1. Purpose</a>
+    <a href="#s2">2. Scope</a>
+    <a href="#s3">3. Trigger Conditions</a>
+    <a href="#s4">4. Continuity Trustee</a>
+    <a href="#s5">5. Key Custody Transfer</a>
+    <a href="#s6">6. Operational Continuity</a>
+    <a href="#s7">7. Specification Authority</a>
+    <a href="#s8">8. Public Disclosure</a>
+    <a href="#s9">9. Pending Matters</a>
+    <a href="#s10">10. Long-Term Transition</a>
+    <a href="#s11">11. Contact</a>
+    <a href="#appendix-a">Appendix A: Revision History</a>
+    <div class="sb-nav-label">Stack Documents</div>
+    <a href="/namespace-standard.html">Namespace Standard</a>
+    <a href="/dillclaw-spec.html">DillClaw Resolver Spec</a>
+    <a href="/registry-spec.html">Registry Specification</a>
+    <a href="/governance.html">Governance Framework</a>
+    <a href="/dnso-operations-charter.html">DNSO Operations Charter</a>
+    <a href="/anthill-spec.html">Dillweed Anthill&#8482; Observability Plane</a>
+    <a href="/standards-overview.html">Standards Overview</a>
+    <a href="/continuity-protocol.html">Continuity Protocol</a>
+  </nav>
+  <div class="sb-footer">
+    Dillweed® Registered Trademark<br>Classes 35, 41, and 42<br>
+    <a href="https://dillweed.com">dillweed.com</a> · © 1997–2026
+  </div>
+</aside>
+
+<main>
+  <div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Dillweed Namespace Project · Governance Support Protocol 01 · Founding Phase</div>
+      <h1 class="cover-title">DNSO Continuity and<br><span class="hl">Stewardship Transition</span><br>Protocol</h1>
+      <p class="cover-tagline">Succession mechanics, key custody transfer, and governance continuity procedures for the Dillweed Namespace Stewardship Office in the event of founding-steward incapacity, unavailability, or planned succession.</p>
+      <div class="cover-thesis">
+        <p>The governance obligations of the DNSO travel with the stewardship role, not with the original steward. This document specifies how those obligations — and the assets that underpin them — transfer to a designated continuity authority without disruption to the namespace's trust fabric.</p>
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><span class="label">Document</span><span class="value">GSP-01</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">1.0.3</span></div>
+        <div class="cover-meta-item"><span class="label">Issued</span><span class="value">May 2026</span></div>
+        <div class="cover-meta-item"><span class="label">Status</span><span class="value">Founding Phase</span></div>
+        <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
+        <div class="cover-meta-item"><span class="label">Domain</span><span class="value">dillweed.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <section class="section" id="s1">
+      <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Purpose of This Document</h1></div>
+      <p>The Dillweed Namespace Project is currently operated under a single-steward founding-phase governance model. The founding steward holds the DNSO private signing key, the namespace domain assets, the specification authority, and the operational obligations defined in the DNSO Operations Charter. This concentration of authority in one person is intentional for the founding phase — it enables rapid, coherent development of the trust architecture and preserves namespace continuity — but it creates a question that any institutional partner or standards audience will eventually ask: what happens if the founding steward is unavailable?</p>
+      <p>This document — Governance Support Protocol 01 (GSP-01) — specifies the answer operationally. It defines the conditions that trigger a stewardship transition, identifies the four succession objects that must transfer, describes the continuity trustee designation mechanism, and documents the procedures by which key custody, operational obligations, specification authority, and governance commitments survive the founding steward's unavailability.</p>
+      <div class="callout">
+        <div class="callout-label">Design Principle</div>
+        <p>This protocol is intentionally honest about the current single-steward reality. Its value is that it converts an implicit governance dependency into an explicit, documented transition path — turning a personal risk into a role-bound obligation structure that any designated successor can inherit.</p>
+      </div>
+      <p>GSP-01 is a Governance Support Protocol, not a core specification. It sits alongside the five core governance-and-resolution specifications, the cross-cutting Anthill observability document, the Standards Overview, and the DNSO Operations Charter without replacing or revising any of them. It is the operational complement to the continuity provisions already embedded in the Governance Framework and the DNSO Operations Charter.</p>
+
+      <div class="callout">
+        <div class="callout-label">Revision Note — v1.0.3 (May 2026)</div>
+        <p><strong>Taxonomy and convention:</strong> §01 stack-reference framing and §07 specification-authority framing are updated from "seven core specification documents" to the current five-core-plus-supporting-documents taxonomy aligned with the Standards Overview and Governance Framework. §11 framing sentence is corrected from "six core specifications" to "five core governance-and-resolution specifications, the cross-cutting Anthill observability document, and the Standards Overview." A cross-document version-convention note is added before the §11 stack list, parallel to the convention note in Governance Framework and DNSO Operations Charter. The §11 stack list now includes a self-reference entry for this document.</p>
+        <p><strong>Operational and legal precision:</strong> §05 adds an explicit clarification that the sealed predecessor private key exists for emergency continuity and archival verification, while planned succession prefers successor-key generation. §08 24-hour identity disclosure adds a documented exception path for legal, safety, or medical privacy constraints, with required notice of the basis for withholding and a target disclosure window. §07 and §10 neutrality covenant language softens from absolute formulations ("continue to run with the namespace assets," "irrevocable and run permanently") to intent framing ("are intended to continue," "intended to run permanently"), and a new §10 "Legal Instruments for Asset Transfer" subsection clarifies that legal transfer occurs according to applicable registrar, trademark, estate, trust, or entity-control instruments. Detailed revision history for prior versions has been moved to Appendix A. No substantive succession mechanics, trigger conditions, or continuity obligations are altered by this revision.</p>
+      </div>
+
+      <h2 class="sub-title">Conformance Terminology</h2>
+      <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here. Most of this protocol is operational prose describing succession procedures; normative language is used in the sections governing continuity trustee designation (§04), operational continuity duties (§06), disclosure obligations (§08), pending-matter handling (§09), and neutrality covenant permanence (§10).</p>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Scope</h1></div>
+      <p>This protocol covers the following four succession objects — the assets, authorities, and obligations that must transfer to a continuity authority in the event of a triggering condition:</p>
+      <div class="succession-grid">
+        <div class="succession-card">
+          <div class="succession-card-title">Namespace Assets</div>
+          <p>Domain registrations including dillweed.com, dillweed.ai, dllwd.com, dill.ai, dillclaw.ai, dillclaw.com, dillforge.ai, dillforge.com, and approximately 200 defensive registrations. Trademark registrations in Classes 35, 41, and 42.</p>
+        </div>
+        <div class="succession-card">
+          <div class="succession-card-title">Specification Authority</div>
+          <p>The right and obligation to maintain, revise, and publish the Dillweed specification stack and any governance support protocols, subject to the version governance rules in §07.</p>
+        </div>
+        <div class="succession-card">
+          <div class="succession-card-title">DNSO Key Custody</div>
+          <p>The Ed25519 DNSO private signing key and its recovery materials. The signing key is the cryptographic root of trust for all capability records in the registry. Its transfer is the most technically sensitive succession event.</p>
+        </div>
+        <div class="succession-card">
+          <div class="succession-card-title">Governance Obligations</div>
+          <p>All operational duties defined in the DNSO Operations Charter: trust tier attestation, revocation processing, incident disclosure, Anthill telemetry log custody, public key publication, and service continuity commitments.</p>
+        </div>
+      </div>
+      <p>This protocol does not cover the transfer of personal employment, financial arrangements, or non-namespace personal assets. It covers only what is necessary to maintain the namespace's trust fabric and operational continuity.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header"><span class="sec-num">§ 03</span><h1 class="sec-title">Trigger Conditions</h1></div>
+      <p>A stewardship transition is triggered by any of the following conditions. Triggers are classified as <strong>self-declared</strong> (initiated by the founding steward) or <strong>externally observed</strong> (initiated by the continuity trustee or, in future phases, the Technical Steering Committee).</p>
+      <table>
+        <thead>
+          <tr><th>Condition</th><th>Type</th><th>Threshold</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Founding steward self-declaration of incapacity or unavailability</td><td>Self-declared</td><td>Immediate upon declaration</td></tr>
+          <tr><td>Founding steward voluntary succession to continuity trustee</td><td>Self-declared</td><td>On planned transfer date</td></tr>
+          <tr><td>Confirmed death or legal incapacity of founding steward</td><td>Externally observed</td><td>Immediate upon confirmation</td></tr>
+          <tr><td>Unexplained operational silence exceeding 30 days with unmet DNSO obligations</td><td>Externally observed</td><td>30 days of unmet obligations</td></tr>
+          <tr><td>Failure to meet a critical revocation obligation within the charter-defined window</td><td>Externally observed</td><td>On obligation deadline failure</td></tr>
+          <tr><td>Failure to meet a required public incident disclosure within 48 hours</td><td>Externally observed</td><td>On disclosure deadline failure</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <div class="callout-label">Founding Phase Note</div>
+        <p>In the current founding phase, the continuity trustee is the primary external observer of trigger conditions. Future governance phases may vest trigger observation authority in the Technical Steering Committee or Participant Council. The trigger conditions themselves remain binding regardless of which body observes them.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Continuity Trustee Designation</h1></div>
+      <p>The continuity trustee is the designated individual or controlled entity authorized to receive the succession objects and assume DNSO governance obligations upon a triggering condition.</p>
+
+      <h2 class="sub-title">Designation Mechanism</h2>
+      <p>The founding steward designates the continuity trustee by executing a written Continuity Designation Instrument (CDI). The CDI specifies:</p>
+      <ul class="props">
+        <li><strong>trustee_identity</strong> — full legal name, contact information, and relationship to the founding steward</li>
+        <li><strong>scope_of_authority</strong> — which succession objects the trustee is authorized to receive</li>
+        <li><strong>trigger_conditions</strong> — which conditions activate the trustee's authority</li>
+        <li><strong>access_instructions</strong> — location and access method for sealed recovery materials</li>
+        <li><strong>succession_limitations</strong> — any constraints on the trustee's authority, including obligations to seek distributed governance within a defined timeframe</li>
+        <li><strong>successor_designation_authority</strong> — whether the trustee may designate their own successor if they become unavailable</li>
+      </ul>
+
+      <h2 class="sub-title">Where the Designation Is Held</h2>
+      <p>The CDI is held in at least two locations: a sealed physical copy held by a trusted third party (attorney, notary, or equivalent legal custodian), and an encrypted digital copy stored in a location accessible to the continuity trustee upon trigger, independent of the founding steward's personal systems. The existence of a continuity trustee designation is publicly acknowledged in this document. The identity of the designated trustee is held privately until a triggering condition occurs, at which point the trustee identity is publicly disclosed per §08.</p>
+
+      <h2 class="sub-title">Updating the Designation</h2>
+      <p>The founding steward may update the continuity trustee designation at any time by executing a revised CDI. The most recently executed CDI supersedes all prior versions. The founding steward SHALL review the CDI at intervals not exceeding 12 months and SHALL update it if circumstances change materially.</p>
+
+      <div class="warning">
+        <div class="warning-label">Current Status — Open Obligation</div>
+        <p>As of the initial publication of this protocol, the Continuity Designation Instrument is in preparation. This document publicly commits to its completion. The founding steward acknowledges this as an open obligation and commits to its resolution. See §11 for the full list of open obligations under this protocol.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header"><span class="sec-num">§ 05</span><h1 class="sec-title">Key Custody Transfer</h1></div>
+      <p>The DNSO Ed25519 private signing key is the cryptographic root of trust for all capability records registered in the Dillweed Registry. Its transfer is the most technically sensitive event in any stewardship succession. This section defines the procedures for both planned and emergency key transfer.</p>
+      <div class="callout">
+        <div class="callout-label">Trust Architecture Note</div>
+        <p>A compromised or lost key does not invalidate namespace governance — governance obligations are role-bound and continue regardless of key state — but it does require a trust-root reset event that affects the verifiability of all existing signatures. Key transfer must therefore be treated with the same care as key generation.</p>
+      </div>
+
+      <h2 class="sub-title">Sealed Recovery Materials</h2>
+      <p>The founding steward maintains sealed recovery materials held independently of their personal systems, accessible to the continuity trustee upon a triggering condition. These materials include:</p>
+      <ul>
+        <li>The DNSO private key in encrypted form, with decryption instructions accessible to the continuity trustee</li>
+        <li>The canonical public key location (<code>dillweed.com/dnso_public.pem</code>) and the process for updating it</li>
+        <li>Registry database access credentials and backup location</li>
+        <li>Domain registrar access credentials for namespace asset continuity</li>
+        <li>Hosting account access for dillweed.com and associated infrastructure</li>
+        <li>A current inventory of all defensive domain registrations and their renewal status</li>
+      </ul>
+
+      <p>The sealed predecessor private key exists for emergency continuity and archival verification. In planned succession, the preferred procedure is successor-key generation and trust-anchor transition, not long-term operation under the predecessor private key.</p>
+
+      <h2 class="sub-title">Planned Key Transfer Procedure</h2>
+      <p>In a planned succession, key transfer follows this sequence: the continuity trustee generates a new Ed25519 keypair in their own secure environment; the founding steward co-signs a transition attestation confirming the transfer; the new public key is published at the canonical URL with a minimum 30-day overlap period; all active registry records are re-signed under the new key during the overlap period; the old key is formally retired and its retirement publicly disclosed; and resolver operators are notified of the new trust anchor.</p>
+
+      <h2 class="sub-title">Emergency Key Transfer Procedure</h2>
+      <p>In an unplanned succession, the continuity trustee: accesses sealed recovery materials; takes the registry offline if key compromise is suspected; generates a new Ed25519 keypair; publishes the new public key at the canonical location; re-signs all active capability records; discloses the succession event publicly within 48 hours per §08; and marks the predecessor key status in the operational log.</p>
+
+      <h2 class="sub-title">Historical Signature Treatment</h2>
+      <p>Capability records signed under the predecessor key retain their signatures in the registry as archival evidence of their governance state at the time of signing. They are annotated with the predecessor key identifier and the date of key transition. Relying parties may treat predecessor-signed records as historically valid but should obtain re-verification under the successor key before relying on them for high-trust invocations.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Operational Continuity Duties</h1></div>
+      <p>Upon assuming stewardship authority, the continuity trustee inherits all operational duties defined in the DNSO Operations Charter. These duties are role-bound — they belong to whoever holds the DNSO stewardship role, not to any specific individual.</p>
+
+      <h2 class="sub-title">Duties Transferred</h2>
+      <ul class="props">
+        <li><strong>Trust tier attestation</strong> — reviewing and processing tier promotion and demotion requests according to the attestation predicates in the Registry Specification</li>
+        <li><strong>Revocation processing</strong> — executing capability revocations within the windows defined in the Operations Charter and ensuring propagation to resolver nodes</li>
+        <li><strong>Incident disclosure</strong> — issuing public incident notices within 48 hours of detected or suspected governance failures, key events, or service disruptions</li>
+        <li><strong>Anthill telemetry log custody</strong> — maintaining the append-only Anthill operational log and ensuring its integrity and availability</li>
+        <li><strong>Public key publication</strong> — maintaining the DNSO public key at its canonical URL reflecting the current valid signing key</li>
+        <li><strong>Service continuity</strong> — maintaining the registry at the availability posture committed in the Operations Charter for the current phase</li>
+        <li><strong>Domain and trademark maintenance</strong> — renewing domain registrations and trademark registrations on schedule. Domain renewals within 90 days of expiration take immediate operational priority during succession, superseding the reduced-availability posture of this section</li>
+      </ul>
+
+      <h2 class="sub-title">Temporary Service Posture</h2>
+      <p>In the period immediately following an unplanned succession trigger, the continuity trustee MAY declare a temporary reduced-availability posture for up to 30 days while establishing full operational control. During this period: the registry remains readable but MAY suspend new registrations; critical revocations continue without delay; a public status notice indicates the transition status; and known institutional partners and resolver operators are notified directly. No Canonical tier promotions MAY occur during the reduced-availability transition posture. This restriction protects governance legitimacy during the succession period and MAY only be lifted by the continuity trustee upon formal assumption of full operational authority.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header"><span class="sec-num">§ 07</span><h1 class="sec-title">Specification Authority Succession</h1></div>
+      <p>Specification authority — the right and obligation to maintain and revise the Dillweed specification stack and any governance support protocols — transfers to the continuity trustee upon succession.</p>
+
+      <h2 class="sub-title">Revision Authority Rules</h2>
+      <p>The continuity trustee may issue minor revisions (x.x.1 increments) to any specification document to correct errors, clarify language, or address operational necessities arising from the succession. Major revisions (x.1 or x.0 increments) require either a 30-day public comment period with documented rationale, or confirmation from a Technical Steering Committee if one has been constituted at the time of succession. The founding steward's published versions are preserved as archival references and are not retroactively altered.</p>
+
+      <h2 class="sub-title">Standards Body Migration</h2>
+      <p>If the continuity trustee determines that migrating specification stewardship to a neutral standards body is in the namespace's interest, this migration may proceed subject to the following constraints: the Dillweed® trademark and its registered rights remain with the designated stewardship entity, not with the standards body; neutrality covenants in the Governance Framework are intended to continue with the namespace assets regardless of where specification stewardship is housed; and prior published versions remain accessible under the original publication terms.</p>
+
+      <h2 class="sub-title">Archival Preservation</h2>
+      <p>The continuity trustee commits to maintaining accessible archives of all prior specification versions. The founding-phase specification family (Stack Family 2026.04) is preserved permanently as the constitutional founding corpus of the Dillweed Namespace.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header"><span class="sec-num">§ 08</span><h1 class="sec-title">Public Disclosure Obligations</h1></div>
+      <p>A stewardship succession is a significant namespace event and must be publicly disclosed promptly, regardless of the nature of the triggering condition. Transparency is a foundational commitment of the DNSO governance model.</p>
+
+      <h2 class="sub-title">Disclosure Timeline</h2>
+      <p>The continuity trustee MUST meet the following disclosure windows:</p>
+      <ul class="props">
+        <li><strong>Within 24 hours</strong> — publish a succession notice at a designated URL on dillweed.com confirming that a stewardship transition is underway and identifying the continuity trustee by name, unless legal, safety, or medical privacy constraints require temporary withholding of identity. If identity is temporarily withheld, the notice MUST identify the basis for withholding and provide a target disclosure window.</li>
+        <li><strong>Within 48 hours</strong> — publish a full transition disclosure covering the triggering condition, the succession objects being transferred, the timeline for key transition if applicable, and the temporary service posture if any</li>
+        <li><strong>Within 7 days</strong> — publish the new DNSO public key if a key transition is required, and notify known resolver operators and institutional partners directly</li>
+        <li><strong>Within 30 days</strong> — publish a transition completion notice confirming all succession objects have been transferred and the continuity trustee has assumed full operational authority</li>
+      </ul>
+
+      <h2 class="sub-title">Discretion in Sensitive Circumstances</h2>
+      <p>In circumstances involving the founding steward's death or medical incapacity, the continuity trustee MAY exercise reasonable discretion in the language of the disclosure while preserving the substantive requirements above. The triggering condition may be described as "founding steward unavailability" without further personal detail if appropriate.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header"><span class="sec-num">§ 09</span><h1 class="sec-title">Pending Governance Matters</h1></div>
+      <p>At the moment of a succession trigger, there may be unresolved governance matters in progress: pending attestation reviews, unprocessed revocation requests, open incident investigations, or in-progress partner or standards conversations. The continuity trustee inherits all of these.</p>
+
+      <h2 class="sub-title">Attestation Queue</h2>
+      <p>Pending trust tier attestation requests are paused during the transition period and resumed under the continuity trustee's authority. Requestors with pending applications are notified of the transition and the expected timeline for resumption. No tier changes are made during the transition period without explicit continuity trustee authorization.</p>
+
+      <h2 class="sub-title">Revocation Obligations</h2>
+      <p>Revocation requests are not paused. Critical revocation obligations — particularly those involving active capability abuse or security incidents — MUST be processed by the continuity trustee within the windows defined in the DNSO Operations Charter, regardless of any other transition activities underway.</p>
+
+      <h2 class="sub-title">Partner and Standards Conversations</h2>
+      <p>The continuity trustee notifies all active partner contacts and standards engagement participants of the transition. Active conversations — including any ongoing ITU-T engagement or partner diligence conversations — are continued by the continuity trustee at their discretion. The transition does not constitute a withdrawal from any standards engagement or partnership process.</p>
+    </section>
+
+    <section class="section" id="s10">
+      <div class="section-header"><span class="sec-num">§ 10</span><h1 class="sec-title">Long-Term Governance Transition</h1></div>
+      <p>Single-steward continuity is a founding-phase governance model, not the intended end state for the Dillweed Namespace. This protocol operationalizes succession within the founding phase. The longer-term governance path moves toward distributed authority and multi-party legitimacy.</p>
+
+      <div class="callout">
+        <div class="callout-label">Core Principle</div>
+        <p>The 28-year single-steward history of dillweed.com is not the neutrality guarantee — it is the provenance continuity that makes a credible neutrality transition possible. Neutrality becomes real through distributed governance, not through the longevity of any individual steward.</p>
+      </div>
+
+      <h2 class="sub-title">Intended Transition Paths</h2>
+      <p>As the namespace matures and ecosystem adoption grows, governance authority is intended to migrate toward one or more of the following structures. The specific path will depend on which institutional relationships develop and what governance model best serves the namespace's neutrality obligations:</p>
+      <ul>
+        <li><strong>Controlled stewardship entity</strong> — a purpose-formed legal entity holding the namespace assets under documented governance rules, separating the founding individual's personal identity from the stewardship role</li>
+        <li><strong>Trust wrapper with Participant Council</strong> — a governance structure in which registered capability providers and resolver operators participate in oversight of DNSO attestation and revocation decisions</li>
+        <li><strong>Licensed neutral operator model</strong> — analogous to the registry operator model in domain name infrastructure, in which a neutral operator holds the namespace assets and operates the registry under a governance license, with neutrality covenants running permanently with the assets</li>
+        <li><strong>Standards-hosted stewardship</strong> — transfer of specification authority to a neutral standards body while retaining trademark and neutrality covenant protection through a licensing structure</li>
+      </ul>
+
+      <h2 class="sub-title">Neutrality Covenants Run with the Assets</h2>
+      <p>The Governance Framework establishes neutrality covenants intended to run permanently with the namespace assets. No governance transition contemplated by this protocol may remove or weaken those covenants. Any successor stewardship structure inherits the neutrality obligations as a condition of the transfer.</p>
+
+      <h2 class="sub-title">Legal Instruments for Asset Transfer</h2>
+      <p>Legal transfer of domain and trademark assets occurs according to the applicable registrar, trademark, estate, trust, or entity-control instruments. This protocol defines the governance obligation and operational target state of asset continuity; it is not a substitute for those legal instruments, and the strength of the neutrality commitments described above will be reinforced as the supporting legal instruments are put in place.</p>
+
+      <h2 class="sub-title">Governance Concentration Is a Monitored Risk</h2>
+      <p>The Dillweed Anthill&#8482; Observability Plane defines Ecosystem Concentration Risk (ANT-EC) as a monitored signal for capability providers. The same principle applies to governance topology: single-steward concentration is accepted during the founding phase only while ecosystem scale remains low and public transition pathways are documented. This protocol is part of that documentation. As the namespace grows, distributed governance becomes not merely desirable but a governance obligation under the neutrality principles the namespace exists to embody.</p>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header"><span class="sec-num">§ 11</span><h1 class="sec-title">Contact and Current Status</h1></div>
+      <p>The Dillweed Namespace Project is operated by Richard McClelland. Founding Steward Jurisdiction: Colorado, United States. The project has been under continuous single-owner operation since 1997. Questions regarding this protocol or the namespace governance framework may be directed through the contact information published at <a href="https://dillweed.com">dillweed.com</a>.</p>
+
+      <h2 class="sub-title">Open Obligations Under This Protocol</h2>
+      <p>The following governance obligations identified in this protocol remain to be completed as of initial publication. Their identification here is a public commitment to their completion:</p>
+      <ul>
+        <li>Execution of the Continuity Designation Instrument (CDI) naming the continuity trustee</li>
+        <li>Assembly and secure placement of sealed recovery materials per §05</li>
+        <li>Attorney engagement for CDI custody and legal continuity planning</li>
+      </ul>
+
+      <h2 class="sub-title">Dillweed Specification Stack</h2>
+      <p>This protocol operates alongside the Dillweed Namespace Project's five core governance-and-resolution specifications, the cross-cutting Anthill observability document, and the Standards Overview. The current major.minor version families at the time of this revision are:</p>
+
+      <p><em>Cross-document version references in this and other Dillweed specifications are shown at major.minor granularity (e.g., v0.4 rather than v0.4.1) by deliberate convention, to keep architectural cross-references stable across patch releases. Exact current versions of each document are tracked in the Standards Overview's maturity table.</em></p>
+
+      <ul class="props">
+        <li><strong>Namespace Standard v0.4</strong> — <a href="/namespace-standard.html">namespace-standard.html</a> — naming model, trust tier definitions, governance philosophy</li>
+        <li><strong>DillClaw Resolver Spec v0.1</strong> — <a href="/dillclaw-spec.html">dillclaw-spec.html</a> — resolution protocol, trust scoring, API contract</li>
+        <li><strong>Registry Specification v0.1</strong> — <a href="/registry-spec.html">registry-spec.html</a> — data model, signing authority, revocation semantics</li>
+        <li><strong>Governance Framework v1.1</strong> — <a href="/governance.html">governance.html</a> — authority structure, succession, amendment process</li>
+        <li><strong>DNSO Operations Charter v1.0</strong> — <a href="/dnso-operations-charter.html">dnso-operations-charter.html</a> — operating procedures, attestation, service posture</li>
+        <li><strong>Anthill&#8482; Observability Plane v0.1</strong> — <a href="/anthill-spec.html">anthill-spec.html</a> — signal taxonomy, anomaly detection, DNSO instrumentation</li>
+        <li><strong>Standards Overview v1.0</strong> — <a href="/standards-overview.html">standards-overview.html</a> — integrated standards-facing reference</li>
+        <li><strong>This document:</strong> Continuity Protocol GSP-01 v1.0.3 — succession, key custody transfer, stewardship continuity</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-label">Publication Note</div>
+        <p>This document is published in advance of the completion of all obligations it defines, in order to provide institutional partners and standards audiences with a clear and honest picture of both what has been established and what remains to be operationalized. The open obligations above will be updated in subsequent versions of this document as they are completed.</p>
+      </div>
+    </section>
+
+    <!-- Appendix A — Revision History (non-normative) -->
+    <section class="section" id="appendix-a">
+      <div class="section-header"><span class="sec-num">APPENDIX A</span><h1 class="sec-title">Revision History (Non-Normative)</h1></div>
+      <p>This appendix records the revision history of GSP-01 prior to v1.0.3. Detailed notes for the current revision are at the top of this document. The entries below are preserved as institutional record of the document's evolution.</p>
+
+      <h2 class="sub-title">A.1 v1.0.2 (May 2026)</h2>
+      <p>Normalized the §11 stack-reference list cross-document version references to major.minor granularity for consistency with the other documents in the list (Governance Framework v1.1, DNSO Operations Charter v1.0); corrected the §11 framing sentence to reflect six core specifications and a Standards Overview document rather than seven specifications (subsequently updated to current five-core taxonomy in v1.0.3); applied a stack-wide system-flow navigation panel style update at the document footer. No substantive succession mechanics, trigger conditions, or continuity obligations were altered.</p>
+
+      <h2 class="sub-title">A.2 v1.0.1 (April 2026)</h2>
+      <p>Aligned the domain-asset portfolio reference with the Namespace Standard v0.4; added RFC 2119 conformance terminology; tightened §06 self-referential cross-reference language; selectively capitalized normative language in §06, §08, §09, and §10; added a stack-reference block in §11; and added the Dillweed Anthill™ mark in the sidebar.</p>
+    </section>
+
+  <!-- System Flow Navigation -->
+  <div style="margin:2.5rem 3rem 0; padding:1.5rem 2rem; background:var(--navy); border:1px solid rgba(255,255,255,0.08); border-radius:8px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:1rem;">Role in the Dillweed Namespace Stack</div>
+    <div style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;line-height:1.6;">GSP-01 is the continuity and succession doctrine — ensuring that governance authority, signing key custody, and stewardship obligations survive any transition of the founding steward role.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b7f94;margin-bottom:0.75rem;">System Flow</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;">
+      <a href="/namespace-standard.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Namespace Standard</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dillclaw-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Resolver</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/registry-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Registry</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/governance.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Governance</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/dnso-operations-charter.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Operations Charter</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <a href="/anthill-spec.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Anthill Observability</a>
+      <span style="color:rgba(255,255,255,0.2);">→</span>
+      <span style="color:#e8c75a;font-weight:500;">GSP-01 Continuity ◀ you are here</span>
+    </div>
+  </div>
+
+  </div>
+
+  <footer>
+    <div class="fb">DNSO Continuity and Stewardship Transition Protocol — GSP-01</div>
+    <div class="fm">v1.0.3 · May 2026 · Stack Family 2026.04 · dillweed.com</div>
+    <div style="width:100%;font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:0.08em;margin-top:0.25rem;text-align:center;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). This document may be referenced for governance review and standards discussion purposes.</div>
+  </footer>
+</main>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar nav a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>
