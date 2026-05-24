@@ -20,7 +20,7 @@ The v1 ship-verified baseline:
 |---|---|---|
 | Registry | 0.2.8 | `f0e329f51ab5eb1704d496084dd02525a02ef3d754618f26b08c3a9a69d2361a` |
 | Resolver | 0.1.8 | `2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a` |
-| Anthill  | 0.1.6 | `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` |
+| Anthill  | 0.1.5 | `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` |
 
 Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md).
 
