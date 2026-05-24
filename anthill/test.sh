@@ -13,7 +13,7 @@
 
 PORT="${ANTHILL_PORT:-9476}"
 BASE="http://localhost:$PORT"
-TOKEN="${ANTHILL_ADMIN_TOKEN:-}"
+TOKEN="${ANTHILL_ADMIN_TOKEN:-$(security find-generic-password -a anthill-admin -s dillweed-anthill -w 2>/dev/null || true)}"
 # Round-2 review (AS2-003 fix): AUTH_HEADER companion to TOKEN. When the
 # server is running in token-gated mode (ANTHILL_ADMIN_TOKEN set), every
 # authenticated endpoint test must include the Bearer header. The
@@ -438,12 +438,15 @@ run "Content-Type: app/json; charset=utf-8 ok → 201" "201" "$BASE/signal" \
 
 header "Round-1: request body size limit (AS-006)"
 # 300 KB body exceeds the 256 KB MAX_REQUEST_BODY_BYTES limit; expect 413.
-# Build the payload via printf + head -c (pure bash, no python).
+# Write to a tempfile to avoid shell argv-length limits with large payloads.
 BIG_PAD=$(head -c 300000 /dev/zero | tr '\0' 'A')
-BIG_BODY="{\"signal_class\":\"ANT-DN\",\"signal_timestamp\":\"$TS_BASE\",\"signal_nonce\":\"as006-$(date +%s%N)\",\"node_sequence\":1,\"originating_node\":\"as006-node${NODE_SUFFIX}\",\"severity\":\"INFORMATIONAL\",\"signal_payload\":{\"x\":\"$BIG_PAD\"}}"
+BIG_BODY_FILE=$(mktemp)
+printf '{"signal_class":"ANT-DN","signal_timestamp":"%s","signal_nonce":"as006-%s","node_sequence":1,"originating_node":"as006-node%s","severity":"INFORMATIONAL","signal_payload":{"x":"%s"}}' \
+    "$TS_BASE" "$(date +%s%N)" "$NODE_SUFFIX" "$BIG_PAD" > "$BIG_BODY_FILE"
 run "body > 256KB rejected                    → 413" "413" "$BASE/signal" \
     -X POST -H "Content-Type: application/json" ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
-    -d "$BIG_BODY"
+    -d "@$BIG_BODY_FILE"
+rm -f "$BIG_BODY_FILE"
 
 header "Round-1: reserved originating_node (AS-007)"
 run "originating_node=ANTHILL_AGGREGATOR rej. → 422" "422" "$BASE/signal" \

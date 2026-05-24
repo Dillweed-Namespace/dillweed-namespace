@@ -244,7 +244,7 @@ function parseBody(req, maxBytes = MAX_REQUEST_BODY_BYTES) {
       bytes += chunk.length;
       if (bytes > maxBytes) {
         aborted = true;
-        req.destroy();
+        req.resume(); // drain remaining data so the 413 response can be delivered
         const e = new Error('Request body too large');
         e.code = 'PAYLOAD_TOO_LARGE';
         return reject(e);
