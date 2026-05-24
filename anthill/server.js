@@ -32,7 +32,7 @@ const url    = require('url');
 // response and startup banner referenced a hardcoded '0.1.4' literal in
 // three places. Aligning with the project-wide convention: declare here,
 // reference everywhere.
-const VERSION       = 'dillweed-anthill/0.1.5';
+const VERSION       = 'dillweed-anthill/0.1.6';
 
 // Round-1 review (AS-012 fix): strict ANTHILL_PORT parsing. The prior
 // parseInt(process.env.ANTHILL_PORT || '9476', 10) accepted malformed

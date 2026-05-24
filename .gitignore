@@ -21,6 +21,8 @@ package-lock.json.bak
 *.sqlite
 *.sqlite3
 *.db-journal
+*.db-shm
+*.db-wal
 
 # Generated cryptographic material
 # (keys/.gitkeep is tracked so the directory structure is preserved)

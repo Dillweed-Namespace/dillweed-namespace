@@ -1,6 +1,6 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────────────────────
-#  DillClaw Resolver — Test Suite (v0.1.7)
+#  DillClaw Resolver — Test Suite (v0.1.9)
 #  Run while the server is running:  bash test.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
