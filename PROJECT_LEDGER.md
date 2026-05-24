@@ -2951,6 +2951,66 @@ the agent is a consumer of the namespace infrastructure, not part of it).
 
 ---
 
+### 2026-05-24 — INST-013 closed; INST-014 closed; F-003 closed; Anthill v0.1.6
+
+**Operator:** Richard McClelland
+
+**INST-013 (Anthill) — CLOSED.** Two fixes required, not one:
+
+1. test.sh: AS-006 body-size test replaced `curl -d "$BIG_BODY"` (shell argv-length
+   failure producing HTTP 000) with tempfile pattern (`mktemp` + `curl -d @$file` +
+   `rm -f`). The payload is written via `printf` (a shell builtin, not subject to
+   `execve` ARG_MAX).
+
+2. server.js: `req.destroy()` in the `parseBody` size-limit check replaced with
+   `req.resume()`. The original `req.destroy()` tore down the TCP socket before the
+   catch block could send the 413 response — curl saw an empty reply (HTTP 000).
+   `req.resume()` drains the remaining body bytes while keeping the socket alive,
+   allowing the 413 to be delivered. The original INST-013 diagnosis ("server-side
+   enforcement is intact, only the test method is unreliable") was partially wrong:
+   the enforcement logic was correct, but `req.destroy()` prevented it from reaching
+   the client.
+
+Both fixes applied to the repo and the installed copy at
+/usr/local/dillweed/anthill/dillweed-anthill/. Test result: 58/58 pass.
+
+Additional Anthill test.sh improvement: TOKEN fallback now queries macOS Keychain
+(`security find-generic-password -a anthill-admin -s dillweed-anthill -w`) when
+`ANTHILL_ADMIN_TOKEN` env var is not set, matching the pattern used by `start.sh`.
+Test suite can now be run without explicitly exporting the token.
+
+**INST-014 (Resolver) — CLOSED.** test.sh header version label updated from
+v0.1.7 to v0.1.9.
+
+**F-003 (website) — CLOSED.** Apache redirect added to dillweed.com `.htaccess`:
+`Redirect 301 /resolver-spec.html /dillclaw-spec.html`. Verified: HTTP 301
+returned with correct target.
+
+**Anthill version bump:** server.js VERSION constant updated from
+`dillweed-anthill/0.1.5` to `dillweed-anthill/0.1.6`. test.sh version-check
+test updated to match. `/health` endpoint now reports v0.1.6. Anthill service
+restarted via launchd.
+
+**Gitignore:** Added `*.db-shm` and `*.db-wal` patterns to catch SQLite
+Write-Ahead Log files that were appearing as untracked.
+
+**Post-session deployment state:**
+  Registry v0.2.8 — 9475 — unchanged
+  Resolver v0.1.8 — 9474 — test.sh label updated (INST-014)
+  Anthill  v0.1.6 — 9476 — server fix + test fix + version bump (INST-013)
+  All services healthy. 58/58 Anthill, 79/79 Registry test suites pass.
+
+**Token exposure note:** Claude Code retrieved the Anthill admin token via
+`security find-generic-password` and passed it inline during the debugging
+session, exposing it to Anthropic's API context. Acceptable for local reference
+deployment; token rotation recommended if deployment moves to multi-operator.
+
+**Commits:**
+  7a553f1 — Anthill v0.1.6: AS-006 test fix, req.destroy fix, Keychain fallback
+  da6ab0c — INST-014: Resolver test.sh label, Anthill version bump, gitignore WAL
+
+---
+
 ## NOTES ON THIS FILE
 
 - If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
