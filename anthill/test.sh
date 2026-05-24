@@ -1,6 +1,6 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────────────────────
-#  Dillweed Anthill™ — Test Suite (v0.1.5)
+#  Dillweed Anthill™ — Test Suite (v0..6)
 #  Run while the server is running:  bash test.sh
 #
 #  Covers Spec v0.1 conformance:
@@ -28,7 +28,7 @@ FAIL=0
 
 # Generate unique test nonces to avoid collisions across test runs
 NONCE_PREFIX=$(node -e "const c=require('crypto');process.stdout.write(c.randomBytes(8).toString('hex'))")
-# v0.1.5 patch (INST-006): unique originating_node values per test run.
+# v0.1.6 patch (INST-006): unique originating_node values per test run.
 # Hardcoded node names (test-resolver-001, REGISTRY, as005-node, etc.) collide
 # with preserved high-water-marks in the node_sequences table when test.sh is
 # re-run against an Anthill instance that wasn't reset to clean-slate (e.g.
@@ -301,8 +301,8 @@ run "Unknown route → 404" "404" "$BASE/unknown"
 
 header "Pre-review-1: VERSION constant + /health format"
 HEALTH_BODY=$(curl -s "$BASE/health")
-if echo "$HEALTH_BODY" | grep -q '"version"[[:space:]]*:[[:space:]]*"dillweed-anthill/0\.1\.5"'; then
-  ok "/health returns version='dillweed-anthill/0.1.5' (AAS-PRE-001)"
+if echo "$HEALTH_BODY" | grep -q '"version"[[:space:]]*:[[:space:]]*"dillweed-anthill/0\.1\.6"'; then
+  ok "/health returns version='dillweed-anthill/0.1.6' (AAS-PRE-001)"
 else
   fail "/health version field does not match VERSION constant"
 fi
