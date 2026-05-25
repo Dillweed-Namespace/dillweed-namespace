@@ -1,6 +1,6 @@
 {
   "name": "dillweed-anthill",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Dillweed Anthill\u2122 Observability Plane \u2014 reference implementation of the Anthill Observability Plane Specification v0.1",
   "main": "server.js",
   "scripts": {

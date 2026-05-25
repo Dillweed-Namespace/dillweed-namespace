@@ -42,7 +42,7 @@ The local reference deployment of the Dillweed stack consists of three services 
 |---|---|---|---|
 | Dillweed Registry | v0.2.8 | 9475 | `/usr/local/dillweed/registry/dillweed-registry/` |
 | DillClaw Resolver | v0.1.8 | 9474 | `/usr/local/dillweed/resolver/dillclaw-resolver/` |
-| Dillweed Anthill | v0.1.5 | 9476 | `/usr/local/dillweed/anthill/dillweed-anthill/` |
+| Dillweed Anthill | v0.1.6 | 9476 | `/usr/local/dillweed/anthill/dillweed-anthill/` |
 
 ### Persistent state locations
 

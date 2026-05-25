@@ -852,7 +852,7 @@ server.listen(PORT, '127.0.0.1', () => {
   // trademark-bearing "Dillweed Anthill™" prefix is human-readable branding.
   // The version portion is parsed out of VERSION so the banner can't drift
   // from the /health response.
-  const versionStr = VERSION.split('/').pop();   // 'dillweed-anthill/0.1.5' → '0.1.4'
+  const versionStr = VERSION.split('/').pop();   // 'dillweed-anthill/0.1.6' → '0.1.6'
   const bannerLine = `Dillweed Anthill\u2122  v${versionStr}`;
   console.log('');
   console.log('  ╔═══════════════════════════════════════════════╗');
