@@ -3011,6 +3011,65 @@ deployment; token rotation recommended if deployment moves to multi-operator.
 
 ---
 
+### 2026-05-25 — Steward consistency sweep + Anthill v0.1.6 doc/version reconciliation
+
+**Operator:** Richard McClelland
+**Agent:** dillweed.protocol-steward (review-and-recommend, read-only)
+  
+Full 6-check consistency sweep across the three authoritative surfaces (specs at
+dillweed.com / source repo / running deployment on dill-p-001). Result: **5 PASS,
+1 FINDING**. All steps gated by `enforce-boundary.sh`; each required capability was
+boundary-allowed and DillClaw-verified (`sig_valid` + `sig_verified`) before use.
+
+- **Step 1 Spec drift — PASS.** All 8 published specs byte-identical (normalized) to
+  `specs/`; all top-level versions match.
+- **Step 2 Version consistency — FINDING (now remediated, see below).** Registry 
+  v0.2.8 and Resolver v0.1.8 consistent on every surface. Anthill was split:
+  `server.js` + running deployment + the 2026-05-24 ledger entry at **v0.1.6**, but
+  `anthill/package.json`, `README.md`, the v1.0.0 release notes, and the operations
+  runbook still cited **v0.1.5**.
+- **Step 3 SHA verification — PASS.** All three tarball SHA256 match README, release  
+  notes, GitHub Release body, and the actual GitHub asset digests.
+- **Step 4 Trust root — PASS.** Served `dnso_public.pem` = canonical
+  `909891e9…6f33`; consistent across all referencing docs.
+- **Step 5 Deployment health — PASS.** All three services `status: ok`; Resolver
+  `registry.source=remote`, `dnso_key.configured=true`. Anthill `/health` reports
+  0.1.6 (corroborated the finding).
+- **Step 6 Capability resolution — PASS.** All 9 steward capabilities resolve with
+  `sig_valid` + `sig_verified`.
+
+**Remediation (steward-authorized, same session).** With explicit human approval,
+three edits were applied to reconcile the Anthill version (Finding 1). README.md and
+the v1.0.0 release notes were intentionally left at v0.1.5 — they describe the frozen
+v1.0.0 release tarball, which is correctly v0.1.5.
+
+  1. `anthill/package.json` — `"version"` 0.1.5 → 0.1.6
+  2. `anthill/server.js` (~L855) — stale banner comment corrected to reflect the
+     current `VERSION` constant (`'dillweed-anthill/0.1.6' → '0.1.6'`); comment-only,
+     no behavior change
+  3. `docs/operations-runbook.md` — Section 2 service inventory Anthill row
+     v0.1.5 → v0.1.6
+
+  Post-remediation state: every "current state" surface (package.json, server.js,
+  operations runbook, running deployment, ledger) reads **0.1.6**; only the frozen
+  v1.0.0 release artifacts (README, release notes) remain at v0.1.5, as intended.
+
+**Open items (steward review):**
+
+- LOW — `specs/standards-overview.html` (v1.0.10) component table lists Namespace
+    Standard v0.4.2 and Registry Spec v0.1.3, but the actual published specs are
+    v0.4.3 / v0.1.4. Identical on website and repo (not drift); the overview's summary
+    table has fallen behind. Correcting the published page would require `site.publish`
+    (outside the steward agent's boundary). GitHub issue drafted, not yet opened.
+
+**Artifacts produced by the agent:**
+  - `~/Dillweed-Agent/reports/steward-report-2026-05-25.md` (full sweep report)
+  - `~/Dillweed-Agent/reports/proposed-ledger-entry-2026-05-25.md` (this proposal)
+
+**Commits:** _ Three remediation edits committed
+  
+---
+
 ## NOTES ON THIS FILE
 
 - If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
