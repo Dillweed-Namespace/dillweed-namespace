@@ -55,6 +55,7 @@ The Registry never publishes its private key. The canonical public key is the si
 ├── registry/                       Dillweed Registry — source
 ├── resolver/                       DillClaw Resolver — source
 ├── anthill/                        Dillweed Anthill — source
+├── mcp-server/                     DillClaw MCP server — protocol adapter for MCP clients
 │
 ├── specs/                          spec documents (mirror of dillweed.com)
 ├── docs/
