@@ -1,0 +1,33 @@
+{
+  "name": "dillweed-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for the Dillweed Namespace — exposes DillClaw capability resolution, lookup, and verification as MCP tools.",
+  "type": "module",
+  "main": "server.js",
+  "bin": {
+    "dillweed-mcp": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.25.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dillweed-Namespace/dillweed-namespace"
+  },
+  "keywords": [
+    "dillweed",
+    "mcp",
+    "capability",
+    "namespace",
+    "resolver",
+    "ai-agents"
+  ]
+}
