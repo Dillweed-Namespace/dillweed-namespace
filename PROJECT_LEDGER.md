@@ -3090,3 +3090,27 @@ v1.0.0 release tarball, which is correctly v0.1.5.
   help with `fr_main.htm` (version bumps or other updates), that is a separate
   scoped request, not a continuation of this project's audit work. Decision
   recorded 2026-05-16.
+
+### Steward sweep — 2026-06-02
+
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 1 FINDING, 8 PASS, 0 BLOCKED
+
+**Summary of checks:**
+- Spec drift (Step 1): All 8 specs identical between dillweed.com and repo. PASS.
+- Version consistency (Step 2): FINDING — Anthill v0.1.5 in README, release notes,
+  and ledger; deployment and runbook report v0.1.6. See suggested issue.
+- SHA verification (Step 3): Registry, Resolver, Anthill SHAs consistent across
+  README, release notes, and GitHub Release. PASS.
+- Trust root (Step 4): dnso_public.pem SHA matches canonical value in all locations. PASS.
+- Deployment health (Step 5): All three services healthy (Resolver 9474, Registry 9475,
+  Anthill 9476). Uptime ~8.4 days. PASS.
+- Capability resolution (Step 6): All 9 steward capabilities resolve with sig_valid +
+  sig_verified through DillClaw. Trust score 0.595 across all. PASS.
+
+**Finding:** Anthill v0.1.6 is deployed but undocumented in README, release notes,
+and ledger. No v0.1.6 tarball published to GitHub Release. Issue opened:
+https://github.com/Dillweed-Namespace/dillweed-namespace/issues/1
+
+**Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-02.md`
