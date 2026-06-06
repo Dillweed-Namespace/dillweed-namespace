@@ -3137,3 +3137,47 @@ No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward)
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-05.md`
 
+  
+  ### Steward sweep — 2026-06-06 (first)
+  
+  - **Type:** Automated consistency sweep
+  - **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+  - **Result:** 1 RESOLVED, 2 FINDINGS, 1 COSMETIC, 5 PASS, 0 BLOCKED
+  
+  **Summary of checks:**
+  - Spec drift (Step 1): All 8 specs identical. PASS.
+  - Version consistency (Step 2): PASS — Finding 1 RESOLVED. All documents now
+    reference Anthill v0.1.6. Issue #1 can be closed.
+  - SHA verification (Step 3): Registry and Resolver SHAs consistent. FINDING:
+    GitHub Release body not updated with v0.1.6 SHA (Finding 2). FINDING:
+    CLAUDE.md protocol has stale v0.1.5 expected SHA (Finding 3).
+  - Trust root (Step 4): Unchanged. PASS.
+  - Deployment health (Step 5): All three services healthy. Uptime ~12 days. PASS.
+  - Capability resolution (Step 6): All 9 steward capabilities sig_valid +
+    sig_verified. Trust score 0.596. PASS.
+  
+  **Cosmetic:** PROJECT_LEDGER 2026-06-05 entry had stray EOF marker and 2-space
+  indent (Finding 4).
+  
+  **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06.md`
+  
+  ### Steward sweep — 2026-06-06 (second)
+  
+  - **Type:** Automated consistency sweep
+  - **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+  - **Result:** 2 RESOLVED, 1 FINDING (persistent), 6 PASS, 0 BLOCKED
+  
+  **Summary of checks:**
+  - Spec drift (Step 1): All 8 specs identical. PASS.
+  - Version consistency (Step 2): PASS.
+  - SHA verification (Step 3): FINDING (persistent) — GitHub Release body still
+    references Anthill v0.1.5 SHA (Finding 2). All other SHAs consistent. PASS.
+  - Trust root (Step 4): Unchanged. PASS.
+  - Deployment health (Step 5): All three services healthy. Uptime ~12.2 days. PASS.
+  - Capability resolution (Step 6): All 9 steward capabilities sig_valid +
+    sig_verified. Trust score 0.596. PASS.
+  
+  **Resolved:** Finding 3 (CLAUDE.md stale SHA) and Finding 4 (stray EOF in ledger).
+  
+  **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06b.md`
+  
