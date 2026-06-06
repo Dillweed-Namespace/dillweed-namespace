@@ -20,7 +20,7 @@ The v1 ship-verified baseline:
 |---|---|---|
 | Registry | 0.2.8 | `f0e329f51ab5eb1704d496084dd02525a02ef3d754618f26b08c3a9a69d2361a` |
 | Resolver | 0.1.8 | `2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a` |
-| Anthill  | 0.1.5 | `dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b` |
+| Anthill  | 0.1.6 | `3bda022d2213240cfbc4355e6c07e85b8f8b997a7ae398ad626f5cb58f574f36` |
 
 Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md).
 
@@ -103,11 +103,11 @@ If the canonical URL is unreachable, the installer aborts cleanly. To recover, e
 
 The Resolver runs on port 9474. It has no admin token in v0.1.8 — it's a read-only fetcher with no destructive endpoints.
 
-### Anthill (v0.1.5)
+### Anthill (v0.1.6)
 
 ```bash
 cd ~/Tarballs
-tar -xzf dillweed-anthill-v0.1.5.tar.gz
+tar -xzf dillweed-anthill-v0.1.6.tar.gz
 cd dillweed-anthill
 bash install.sh
 ```
@@ -153,7 +153,7 @@ cd /usr/local/dillweed/resolver/dillclaw-resolver
 bash test.sh          # 65 integration tests
 node unit-tests.js    # 29 unit tests
 
-# Anthill — expect 57/58 passing (one known issue, see INST-013 in the ledger)
+# Anthill — expect 58/58 passing
 export ANTHILL_ADMIN_TOKEN=$(security find-generic-password -s "dillweed-anthill" -a "anthill-admin" -w)
 cd /usr/local/dillweed/anthill/dillweed-anthill
 bash test.sh
@@ -166,7 +166,7 @@ See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. 
 - **INST-008 (LOW)** — partially closed; the Resolver *tarball filename* was corrected from `dillclaw-resolver-v0.1.8.tar.gz` to `dillweed-resolver-v0.1.8.tar.gz` at v1.0.0 publication. The tarball still extracts to a `dillclaw-resolver/` directory (the component-internal name) — this is a cosmetic inconsistency, not a functional issue, and is queued for cleanup in a future release
 - **INST-011 (info)** — admin tokens in launchd plist files are stored plaintext; acceptable for the v1 reference deployment but worth revisiting for multi-operator production scenarios
 - **INST-012 (info)** — Registry tarball ships an unused `resolver-patch.js` artifact; cosmetic
-- **INST-013 (LOW)** — Anthill's AS-006 body-size test sends a 300KB payload via `curl -d "$BIG_BODY"` and gets HTTP 000 due to shell argv-length handling; server-side limit enforcement is intact, only the test method is unreliable. Fix queued for v0.1.6 (`-d @<tempfile>` pattern).
+
 
 No HIGH-severity or MEDIUM-severity issues are open.
 
