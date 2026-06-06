@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.4 — Dillweed Namespace Project">
+  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.5 — Dillweed Namespace Project">
 <meta property="og:description" content="The resolution protocol, trust scoring algorithm, and API contract for the Dillweed Namespace. How agents find and evaluate capabilities.">
 <meta property="og:url" content="https://dillweed.com/dillclaw-spec.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dillweed Namespace Project">
-  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.4</title>
+  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.5</title>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -173,7 +173,7 @@
   <div class="sb-brand">
     <div class="sb-wordmark">DillClaw&#x2122;<br>Resolver</div>
     <div class="sb-sub">Technical Specification</div>
-    <span class="sb-version">v0.1.4</span>
+    <span class="sb-version">v0.1.5</span>
   </div>
   <div class="sb-nav-label">Sections</div>
   <nav>
@@ -214,7 +214,7 @@
     <div class="cover-grid"></div>
     <div class="cover-glow"></div>
     <div class="cover-inner">
-      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.4 Published</div>
+      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.5 Published</div>
      <h1 class="cover-title">DillClaw Resolver <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
       <p class="cover-tagline">The resolution layer for the Dillweed Namespace — turning stable names into trusted, invocable capabilities.</p>
 
@@ -228,7 +228,7 @@
       </div>
 
       <div class="cover-meta">
-        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.4</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.5</span></div>
         <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
         <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dillweed NS Standard v0.4</a></span></div>
         <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
@@ -597,6 +597,49 @@ Content-Type: application/json
       <div class="callout">
         <div class="callout-label">On Trust Score Transparency</div>
         <p>Trust scores are always returned with their constituent signals, never as a single opaque number. An agent receiving a result with a score of 0.724 SHOULD also receive the breakdown showing why — so it can apply its own judgment to the resolver's recommendation rather than treating it as authoritative.</p>
+      </div>
+
+      <h2 class="sub-title">6.4 Score Semantics and Consumer Guidance</h2>
+
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trust_score</code> is a <strong>deterministic composite resolution index</strong> produced by a named scoring profile. It represents the resolver's current assessment of a capability record's standing based on declared trust tier and verifiable resolution signals at the time of resolution.</p>
+
+      <h3>What the Score Is</h3>
+      <ul class="props">
+        <li><strong>Deterministic</strong> — the same record resolved under the same scoring profile always produces the same score. The formula, weights, signal values, and rounding rules are fully specified in §6.2.</li>
+        <li><strong>Composite</strong> — the score combines four independent signals (trust tier, usage history, signature validity, endpoint liveness), each weighted and bounded between 0 and 1.</li>
+        <li><strong>Profile-relative</strong> — scores are meaningful only within a named scoring profile. Consumers comparing scores across responses MUST verify that the responses share the same <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">scoring_profile</code> value.</li>
+        <li><strong>An explanatory resolver output</strong> — the score explains the resolver's assessment. It is returned alongside the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trust_signals</code> array so that consumers can evaluate the basis for the assessment rather than treating the number as opaque.</li>
+      </ul>
+
+      <h3>What the Score Is Not</h3>
+      <ul class="props">
+        <li>The trust score is <strong>not a probability</strong> of safety, correctness, or reliability. A score of 0.85 does not mean an 85% chance of trustworthiness.</li>
+        <li>The trust score is <strong>not an authorization decision</strong>. The resolver resolves capability standing; it does not decide whether the caller should invoke the capability. Authorization, admissibility, and execution governance are the responsibility of the consumer's own policy layer.</li>
+        <li>The trust score is <strong>not a guarantee</strong> of any kind. A high score indicates that the verifiable signals available to the resolver were favorable at the time of resolution. It does not certify the quality, safety, or correctness of the underlying capability.</li>
+        <li>The trust score is <strong>not comparable across scoring profiles</strong>. A score of 0.70 under <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">dillclaw-default-v1</code> has no defined relationship to a score of 0.70 under a future profile with different weights.</li>
+      </ul>
+
+      <h3>Consumer Guidance</h3>
+      <p>The resolver does not enforce accept/reject thresholds. Different consumers will have different tolerance levels depending on their deployment context and risk posture. The following table provides interpretive guidance under the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">dillclaw-default-v1</code> profile:</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Score Range</th><th>Typical Standing</th><th>Interpretation</th></tr></thead>
+          <tbody>
+            <tr><td>0.00 – 0.24</td><td>Low / incomplete</td><td>Record has weak or absent signals. Signature may be missing or invalid. Suitable only for development or testing contexts where trust is not required.</td></tr>
+            <tr><td>0.25 – 0.49</td><td>Experimental</td><td>Record exists and may have a valid signature, but trust tier is experimental and/or registration history is short. Suitable for evaluation, prototyping, and low-consequence invocation.</td></tr>
+            <tr><td>0.50 – 0.74</td><td>Verified</td><td>Record has verified trust tier, valid DNSO signature, and some registration history. Suitable for general-purpose resolution where the consumer applies its own policy layer.</td></tr>
+            <tr><td>0.75 – 0.89</td><td>Strong verified / canonical</td><td>Record has high trust tier, valid signature, substantial registration history, and potentially a confirmed-live endpoint. Suitable for enterprise and cross-organization resolution.</td></tr>
+            <tr><td>0.90 – 1.00</td><td>Reserved</td><td>Reserved for future high-assurance scoring profiles that may incorporate additional verification signals beyond those defined in <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">dillclaw-default-v1</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>These ranges are <strong>guidance, not policy</strong>. Consumers SHOULD establish their own minimum score thresholds based on their deployment context, risk tolerance, and regulatory requirements. The resolver's role is to compute and return the score transparently; the consumer's role is to decide what to do with it.</p>
+
+      <div class="callout">
+        <div class="callout-label">Boundary: Resolution vs. Authorization</div>
+        <p>The trust score answers: <em>"What is the current standing of this capability under this scoring profile?"</em> It does not answer: <em>"Should this capability be invoked in this context?"</em> That second question belongs to the consumer's execution governance layer — which may consider factors the resolver cannot observe, including organizational policy, regulatory constraints, caller identity, budget limits, and real-time risk conditions. Capability resolution provides the trust evidence that execution governance consumes; it does not substitute for it.</p>
       </div>
     </section>
 
@@ -1025,7 +1068,7 @@ validate(request_body, result.capability.input_schema)
 
 <footer>
   <div class="fb">DillClaw Resolver — Technical Specification</div>
-  <div class="fm">v0.1.4 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm">v0.1.5 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
     <div class="fm" style="margin-top:0.5rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 
