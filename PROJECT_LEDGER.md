@@ -3070,27 +3070,6 @@ v1.0.0 release tarball, which is correctly v0.1.5.
   
 ---
 
-## NOTES ON THIS FILE
-
-- If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
-  with a status note describing how far it got.
-- Items should be specific enough to execute but not so detailed they duplicate
-  the project documentation. This file points at work; it is not the work.
-- Decisions recorded here are Richard's. The review session executes them; it
-  does not silently revise them. If a recorded decision seems wrong on later
-  review, raise it with Richard rather than quietly changing it.
-
-## SCOPE NOTES
-
-- **`fr_main.htm`** is **outside
-  the scope of the Dillweed Namespace Project.** It points at the project but
-  is not part of it. It was not included in any conformance audit pass and
-  was not swept for AI-001. Future sessions should not treat it as part of
-  the spec stack or include it in audit/publication work. If Richard requests
-  help with `fr_main.htm` (version bumps or other updates), that is a separate
-  scoped request, not a continuation of this project's audit work. Decision
-  recorded 2026-05-16.
-
 ### Steward sweep — 2026-06-02
 
 - **Type:** Automated consistency sweep
@@ -3115,6 +3094,8 @@ https://github.com/Dillweed-Namespace/dillweed-namespace/issues/1
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-02.md`
 
+---
+
 ### Steward sweep — 2026-06-05
 
 - **Type:** Automated consistency sweep
@@ -3136,54 +3117,56 @@ https://github.com/Dillweed-Namespace/dillweed-namespace/issues/1
 No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward).
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-05.md`
+  
+---
 
+### Steward sweep — 2026-06-06 (first)
   
-  ### Steward sweep — 2026-06-06 (first)
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 1 RESOLVED, 2 FINDINGS, 1 COSMETIC, 5 PASS, 0 BLOCKED
   
-  - **Type:** Automated consistency sweep
-  - **Agent:** dillweed.protocol-steward (review-and-recommend mode)
-  - **Result:** 1 RESOLVED, 2 FINDINGS, 1 COSMETIC, 5 PASS, 0 BLOCKED
+**Summary of checks:**
+- Spec drift (Step 1): All 8 specs identical. PASS.
+- Version consistency (Step 2): PASS — Finding 1 RESOLVED. All documents now
+  reference Anthill v0.1.6. Issue #1 can be closed.
+- SHA verification (Step 3): Registry and Resolver SHAs consistent. FINDING:
+  GitHub Release body not updated with v0.1.6 SHA (Finding 2). FINDING:
+  CLAUDE.md protocol has stale v0.1.5 expected SHA (Finding 3).
+- Trust root (Step 4): Unchanged. PASS.
+- Deployment health (Step 5): All three services healthy. Uptime ~12 days. PASS.
+- Capability resolution (Step 6): All 9 steward capabilities sig_valid +
+  sig_verified. Trust score 0.596. PASS.
   
-  **Summary of checks:**
-  - Spec drift (Step 1): All 8 specs identical. PASS.
-  - Version consistency (Step 2): PASS — Finding 1 RESOLVED. All documents now
-    reference Anthill v0.1.6. Issue #1 can be closed.
-  - SHA verification (Step 3): Registry and Resolver SHAs consistent. FINDING:
-    GitHub Release body not updated with v0.1.6 SHA (Finding 2). FINDING:
-    CLAUDE.md protocol has stale v0.1.5 expected SHA (Finding 3).
-  - Trust root (Step 4): Unchanged. PASS.
-  - Deployment health (Step 5): All three services healthy. Uptime ~12 days. PASS.
-  - Capability resolution (Step 6): All 9 steward capabilities sig_valid +
-    sig_verified. Trust score 0.596. PASS.
+**Cosmetic:** PROJECT_LEDGER 2026-06-05 entry had stray EOF marker and 2-space
+indent (Finding 4).
   
-  **Cosmetic:** PROJECT_LEDGER 2026-06-05 entry had stray EOF marker and 2-space
-  indent (Finding 4).
+**Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06.md`
   
-  **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06.md`
-  
-  ### Steward sweep — 2026-06-06 (second)
-  
-  - **Type:** Automated consistency sweep
-  - **Agent:** dillweed.protocol-steward (review-and-recommend mode)
-  - **Result:** 2 RESOLVED, 1 FINDING (persistent), 6 PASS, 0 BLOCKED
-  
-  **Summary of checks:**
-  - Spec drift (Step 1): All 8 specs identical. PASS.
-  - Version consistency (Step 2): PASS.
-  - SHA verification (Step 3): FINDING (persistent) — GitHub Release body still
-    references Anthill v0.1.5 SHA (Finding 2). All other SHAs consistent. PASS.
-  - Trust root (Step 4): Unchanged. PASS.
-  - Deployment health (Step 5): All three services healthy. Uptime ~12.2 days. PASS.
-  - Capability resolution (Step 6): All 9 steward capabilities sig_valid +
-    sig_verified. Trust score 0.596. PASS.
-  
-  **Resolved:** Finding 3 (CLAUDE.md stale SHA) and Finding 4 (stray EOF in ledger).
-  
-  **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06b.md`
+---
 
-**Entry A — 2026-06-06 third sweep (pending from prior session):**
+### Steward sweep — 2026-06-06 (second)
+  
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 2 RESOLVED, 1 FINDING (persistent), 6 PASS, 0 BLOCKED
+  
+**Summary of checks:**
+- Spec drift (Step 1): All 8 specs identical. PASS.
+- Version consistency (Step 2): PASS.
+- SHA verification (Step 3): FINDING (persistent) — GitHub Release body still
+  references Anthill v0.1.5 SHA (Finding 2). All other SHAs consistent. PASS.
+- Trust root (Step 4): Unchanged. PASS.
+- Deployment health (Step 5): All three services healthy. Uptime ~12.2 days. PASS.
+- Capability resolution (Step 6): All 9 steward capabilities sig_valid +
+  sig_verified. Trust score 0.596. PASS.
+  
+**Resolved:** Finding 3 (CLAUDE.md stale SHA) and Finding 4 (stray EOF in ledger).
+  
+**Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06b.md`
 
-```markdown
+---
+
 ### Steward sweep — 2026-06-06 (third)
 
 - **Type:** Automated consistency sweep
@@ -3203,11 +3186,9 @@ No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward)
 **Finding 2 remains open.** Issue draft available in steward-report-2026-06-06.md.
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06c.md`
-```
 
-**Entry B — 2026-06-06 fourth sweep (this sweep):**
+---
 
-```markdown
 ### Steward sweep — 2026-06-06 (fourth)
 
 - **Type:** Automated consistency sweep
@@ -3228,6 +3209,55 @@ No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward)
 F4 (ledger EOF) — all closed across the 2026-06-02 through 2026-06-06 sweep series.
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06d.md`
-```
+
+---
+
+### Steward sweep — 2026-06-06 (fifth)
+
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 0 FINDINGS, 9 PASS, 0 BLOCKED
+
+**Summary of checks:**
+- All steps PASS. Second consecutive fully clean sweep.
+- Trust score: 0.597 (marginal increase from 0.596).
+- Uptime: ~12.4 days continuous across all three services.
+
+**Report:** ~/Dillweed-Agent/reports/steward-report-2026-06-06e.md
+
+---
+
+### 2026-06-06 — DillClaw spec v0.1.4 → v0.1.5; Issue #3 closed
+
+- DillClaw spec §7.5 Cache Freshness and Revocation Propagation (v0.1.4)
+- Integration test suite: 19/19 pass (register → resolve → verify → revoke → propagation)
+- DillClaw spec §6.4 Score Semantics and Consumer Guidance (v0.1.5)
+- Issue #1 closed (Anthill version docs)
+- Issue #3 closed (evaluation readiness — all three items complete)
+
+---
+
+## NOTES ON THIS FILE
+
+- If a session ends abruptly mid-work on an item, the item stays in OPEN ITEMS
+  with a status note describing how far it got.
+- Items should be specific enough to execute but not so detailed they duplicate
+  the project documentation. This file points at work; it is not the work.
+- Decisions recorded here are Richard's. The review session executes them; it
+  does not silently revise them. If a recorded decision seems wrong on later
+  review, raise it with Richard rather than quietly changing it.
+
+## SCOPE NOTES
+
+- **`fr_main.htm`** is **outside
+  the scope of the Dillweed Namespace Project.** It points at the project but
+  is not part of it. It was not included in any conformance audit pass and
+  was not swept for AI-001. Future sessions should not treat it as part of
+  the spec stack or include it in audit/publication work. If Richard requests
+  help with `fr_main.htm` (version bumps or other updates), that is a separate
+  scoped request, not a continuation of this project's audit work. Decision
+  recorded 2026-05-16.
+
+
 
   
