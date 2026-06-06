@@ -3180,4 +3180,54 @@ No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward)
   **Resolved:** Finding 3 (CLAUDE.md stale SHA) and Finding 4 (stray EOF in ledger).
   
   **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06b.md`
+
+**Entry A — 2026-06-06 third sweep (pending from prior session):**
+
+```markdown
+### Steward sweep — 2026-06-06 (third)
+
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 1 FINDING (persistent), 8 PASS, 0 BLOCKED
+
+**Summary of checks:**
+- Spec drift (Step 1): All 8 specs identical. PASS.
+- Version consistency (Step 2): PASS. Both prior 2026-06-06 ledger entries confirmed present.
+- SHA verification (Step 3): FINDING (persistent) — GitHub Release body still
+  references Anthill v0.1.5 SHA (Finding 2). All other SHAs consistent.
+- Trust root (Step 4): Unchanged. PASS.
+- Deployment health (Step 5): All three services healthy. Uptime ~12.2 days. PASS.
+- Capability resolution (Step 6): All 9 capabilities sig_valid + sig_verified.
+  Trust score 0.596. PASS.
+
+**Finding 2 remains open.** Issue draft available in steward-report-2026-06-06.md.
+
+**Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06c.md`
+```
+
+**Entry B — 2026-06-06 fourth sweep (this sweep):**
+
+```markdown
+### Steward sweep — 2026-06-06 (fourth)
+
+- **Type:** Automated consistency sweep
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+- **Result:** 0 FINDINGS, 9 PASS, 0 BLOCKED
+
+**Summary of checks:**
+- Spec drift (Step 1): All 8 specs identical. PASS.
+- Version consistency (Step 2): PASS.
+- SHA verification (Step 3): PASS — Finding 2 RESOLVED. GitHub Release body
+  updated to Anthill v0.1.6 SHA. Release body also updated to 58/58 pass.
+- Trust root (Step 4): Unchanged. PASS.
+- Deployment health (Step 5): All three services healthy. Uptime ~12.2 days. PASS.
+- Capability resolution (Step 6): All 9 capabilities sig_valid + sig_verified.
+  Trust score 0.596. PASS.
+
+**All findings resolved.** F1 (version drift), F2 (release body), F3 (CLAUDE.md SHA),
+F4 (ledger EOF) — all closed across the 2026-06-02 through 2026-06-06 sweep series.
+
+**Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-06d.md`
+```
+
   
