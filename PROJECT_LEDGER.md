@@ -3114,3 +3114,27 @@ and ledger. No v0.1.6 tarball published to GitHub Release. Issue opened:
 https://github.com/Dillweed-Namespace/dillweed-namespace/issues/1
 
 **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-02.md`
+
+  ### Steward sweep — 2026-06-05
+
+  - **Type:** Automated consistency sweep
+  - **Agent:** dillweed.protocol-steward (review-and-recommend mode)
+  - **Result:** 1 FINDING (persistent), 8 PASS, 0 BLOCKED
+
+  **Summary of checks:**
+  - Spec drift (Step 1): All 8 specs identical between dillweed.com and repo. PASS.
+  - Version consistency (Step 2): FINDING (persistent) — Anthill v0.1.5 in README,
+    release notes, and ledger; deployment and runbook report v0.1.6. Issue #1 open.
+  - SHA verification (Step 3): All three tarball SHAs consistent. PASS.
+  - Trust root (Step 4): dnso_public.pem SHA matches canonical value. PASS.
+  - Deployment health (Step 5): All three services healthy. Uptime ~11.5 days. PASS.
+    Informational: Anthill signals_received=117 unchanged since 2026-06-02 sweep.
+  - Capability resolution (Step 6): All 9 steward capabilities sig_valid + sig_verified.
+    Trust score 0.596. PASS.
+
+  **Finding:** Anthill version drift persists (Issue #1, opened 2026-06-02, still open).
+  No new findings. Issues #2, #3, #4 opened on 2026-06-05 (pre-drafted by steward).
+
+  **Report:** `~/Dillweed-Agent/reports/steward-report-2026-06-05.md`
+  EOF
+
