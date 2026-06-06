@@ -388,8 +388,8 @@
     <span class="c-muted">{</span>
       <span class="c-key">"rank"</span><span class="c-white">:           </span><span class="c-teal">1</span><span class="c-muted">,</span>
       <span class="c-key">"capability"</span><span class="c-white">:     </span><span class="c-muted">{</span> <span class="c-comment">/* full Capability Record */</span> <span class="c-muted">},</span>
-      <span class="c-key">"trust_score"</span><span class="c-white">:    </span><span class="c-teal">0.940</span><span class="c-muted">,</span>
-      <span class="c-key">"trust_signals"</span><span class="c-white">: </span><span class="c-muted">[</span><span class="c-str">"dnso_verified"</span><span class="c-muted">, </span><span class="c-str">"14mo_history"</span><span class="c-muted">, </span><span class="c-str">"sig_valid"</span><span class="c-muted">],</span>
+      <span class="c-key">"trust_score"</span><span class="c-white">:    </span><span class="c-teal">0.765</span><span class="c-muted">,</span>
+      <span class="c-key">"trust_signals"</span><span class="c-white">: </span><span class="c-muted">[</span><span class="c-str">"dnso_verified"</span><span class="c-muted">, </span><span class="c-str">"14mo_history"</span><span class="c-muted">, </span><span class="c-str">"sig_valid"</span><span class="c-muted">, </span><span class="c-str">"sig_verified"</span><span class="c-muted">, </span><span class="c-str">"endpoint_unchecked"</span><span class="c-muted">],</span>
       <span class="c-key">"cache_hit"</span><span class="c-white">:      </span><span class="c-teal">false</span>
     <span class="c-muted">}</span>
   <span class="c-muted">],</span>
@@ -547,7 +547,7 @@ Content-Type: application/json
     <section class="section" id="s6">
       <div class="section-header"><span class="sec-num">§ 06</span><h1 class="sec-title">Trust Evaluation Engine</h1></div>
 
-      <p>Trust evaluation is the core value proposition of DillClaw beyond simple registry lookup. A raw registry can return what exists. DillClaw answers what should be used — through a documented, auditable evaluation process applied to every candidate.</p>
+      <p>Trust evaluation is the core value proposition of DillClaw beyond simple registry lookup. A raw registry can return what exists. DillClaw determines which eligible capability has the strongest verified standing — through a documented, auditable evaluation process applied to every candidate.</p>
 
       <p>The trust score ranks candidates that survive hard eligibility filters; it does not override tier gates, permission checks, signature policy, or caller-defined constraints. Scoring is a ranking mechanism applied to already-eligible candidates, not an authorization decision.</p>
 
@@ -889,7 +889,7 @@ validate(request_body, result.capability.input_schema)
             <div class="ss-num">5</div>
             <div class="ss-content">
               <h4>Response returned to agent</h4>
-              <p>DillClaw returns <code>status: "resolved"</code> with the full Capability Record, trust score 0.815, signals <code>["dnso_verified", "18mo_history", "sig_valid"]</code>, <code>cache_hit: true</code>, and a <code>trace_id</code>. Total resolver latency: 3ms.</p>
+              <p>DillClaw returns <code>status: "resolved"</code> with the full Capability Record, trust score 0.815, signals <code>["dnso_verified", "18mo_history", "sig_valid", "sig_verified", "endpoint_unchecked"]</code>, <code>cache_hit: true</code>, and a <code>trace_id</code>. Total resolver latency: 3ms.</p>
             </div>
           </div>
           <div class="scenario-step">
