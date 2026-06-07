@@ -158,7 +158,6 @@ export ANTHILL_ADMIN_TOKEN=$(security find-generic-password -s "dillweed-anthill
 cd /usr/local/dillweed/anthill/dillweed-anthill
 bash test.sh
 ```
-
 ## Known issues
 
 See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. As of v1.0.0:
@@ -167,6 +166,11 @@ See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. 
 - **INST-011 (info)** — admin tokens in launchd plist files are stored plaintext; acceptable for the v1 reference deployment but worth revisiting for multi-operator production scenarios
 - **INST-012 (info)** — Registry tarball ships an unused `resolver-patch.js` artifact; cosmetic
 
+## Evaluation readiness
+
+- End-to-end trust-chain integration tests: 19/19 passing (register → resolve → verify → revoke → propagation)
+- Cache freshness and revocation propagation tradeoff documented (DillClaw spec §7.5)
+- Trust score semantics and consumer guidance documented (DillClaw spec §6.4)
 
 No HIGH-severity or MEDIUM-severity issues are open.
 
