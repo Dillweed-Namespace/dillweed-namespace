@@ -14,12 +14,12 @@ Component specifications are published at [dillweed.com](https://dillweed.com).
 
 For evaluators:
 
-1. Read the trust model.
-2. Install Registry, Resolver, and Anthill.
-3. Run component tests.
-4. Run integration-test.sh.
-5. Review Issue #2 before any public Resolver deployment.
-6. Review Issue #4 for v2 production-hardening scope.
+1. Read the [trust model](#trust-model) below.
+2. Install Registry, Resolver, and Anthill ([instructions](#installing-v1-components)).
+3. Run [component tests](#running-test-suites).
+4. Run `bash integration-test.sh` — full trust-chain lifecycle, 19/19 passing.
+5. Review [Issue #2](https://github.com/Dillweed-Namespace/dillweed-namespace/issues/2) before any public Resolver deployment.
+6. Review [Issue #4](https://github.com/Dillweed-Namespace/dillweed-namespace/issues/4) for v2 production-hardening scope.
 
 ## v1 release
 
