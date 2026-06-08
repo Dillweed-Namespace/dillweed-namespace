@@ -12,6 +12,15 @@ The Dillweed Namespace defines how capabilities — addressable, versioned, sign
 
 Component specifications are published at [dillweed.com](https://dillweed.com).
 
+For evaluators:
+
+1. Read the trust model.
+2. Install Registry, Resolver, and Anthill.
+3. Run component tests.
+4. Run integration-test.sh.
+5. Review Issue #2 before any public Resolver deployment.
+6. Review Issue #4 for v2 production-hardening scope.
+
 ## v1 release
 
 The v1 ship-verified baseline:
