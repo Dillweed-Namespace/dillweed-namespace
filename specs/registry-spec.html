@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Dillweed Registry Specification v0.1.4 — Dillweed Namespace Project">
+  <meta property="og:title" content="Dillweed Registry Specification v0.1.5 — Dillweed Namespace Project">
 <meta property="og:description" content="The authoritative data layer for the Dillweed Namespace. Capability records, cryptographic signing, trust tier governance, and revocation semantics.">
 <meta property="og:url" content="https://dillweed.com/registry-spec.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dillweed Namespace Project">
-  <title>Dillweed Registry Specification v0.1.4</title>
+  <title>Dillweed Registry Specification v0.1.5</title>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -179,7 +179,7 @@
   <div class="sb-brand">
     <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
     <div class="sb-sub">Registry Specification</div>
-    <span class="sb-version">v0.1.4</span>
+    <span class="sb-version">v0.1.5</span>
   </div>
   <nav>
     <div class="sb-nav-label">Contents</div>
@@ -221,7 +221,7 @@
     <div class="cover-grid"></div>
     <div class="cover-glow"></div>
     <div class="cover-inner">
-      <div class="cover-eyebrow">Dillweed Registry &nbsp;·&nbsp; Specification &nbsp;·&nbsp; Published Specification v0.1.4</div>
+      <div class="cover-eyebrow">Dillweed Registry &nbsp;·&nbsp; Specification &nbsp;·&nbsp; Published Specification v0.1.5</div>
       <h1 class="cover-title">Dillweed Registry <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
       <p class="cover-tagline">The authoritative data layer for the Dillweed Namespace — storing, signing, and serving Capability Records.</p>
 
@@ -235,7 +235,7 @@
       </div>
 
       <div class="cover-meta">
-        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.4</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.5</span></div>
         <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
         <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">NS Standard v0.4</a></span></div>
         <div class="cover-meta-item"><span class="label">Resolver Ref</span><span class="value"><a href="https://dillweed.com/dillclaw-spec.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">DillClaw Spec v0.1</a></span></div>
@@ -675,8 +675,8 @@
           <thead><tr><th>Tier</th><th>Meaning</th><th>Promotion Criteria</th></tr></thead>
           <tbody>
             <tr><td>experimental</td><td>Limited validation or early-stage capability. Use with explicit acknowledgment of provisional status. Default starting tier.</td><td>No criteria — default for new registrations.</td></tr>
-            <tr><td>trusted</td><td>Demonstrated reliability and usage history. Endpoint tested and found stable over a meaningful period.</td><td>Minimum 3 months continuous registration. Consistent endpoint liveness. No revocation history.</td></tr>
-            <tr><td>verified</td><td>Identity confirmed, endpoint tested, DNSO review complete. Suitable for production use by agents without explicit trust override.</td><td>DNSO identity verification of registrant. Schema validation passes. 6+ months active registration.</td></tr>
+            <tr><td>trusted</td><td>Demonstrated reliability and usage history. Endpoint tested and found stable over a meaningful period.</td><td>Minimum 14 days continuous registration. Consistent endpoint liveness. No revocation history.</td></tr>
+            <tr><td>verified</td><td>Identity confirmed, endpoint tested, DNSO review complete. Suitable for production use by agents without explicit trust override.</td><td>DNSO identity verification of registrant. Schema validation passes. 30+ days active registration (see DNSO Operations Charter §4.1).</td></tr>
             <tr><td>canonical</td><td>DNSO-designated preferred implementation for its category. Assigned sparingly and only by the DNSO.</td><td>DNSO determination only. Signals the reference implementation for a category.</td></tr>
           </tbody>
         </table>
@@ -866,7 +866,7 @@
 
 <footer>
   <div class="fb">Dillweed Registry Specification</div>
-  <div class="fm">v0.1.4 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm">v0.1.5 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
   <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:none; margin-top:0.25rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 
