@@ -707,15 +707,15 @@
       <h2 class="sub-title">10.2 Local Mac Mini Setup</h2>
       <div class="code-block">
         <div class="code-label">Running registry and resolver together on a Mac Mini</div>
-        <code><span class="c-comment"># Terminal 1 — start the registry on port 7475</span>
+        <code><span class="c-comment"># Terminal 1 — start the registry on port 9475</span>
 <span class="c-white">cd dillweed-registry &amp;&amp; ./start.sh</span>
 
 <span class="c-comment"># Terminal 2 — start DillClaw pointing at the live registry</span>
 <span class="c-white">cd dillclaw-resolver</span>
-<span class="c-white">DILLCLAW_REGISTRY_URL</span><span class="c-muted">=</span><span class="c-str">http://localhost:7475</span> <span class="c-white">node server.js</span>
+<span class="c-white">DILLCLAW_REGISTRY_URL</span><span class="c-muted">=</span><span class="c-str">http://localhost:9475</span> <span class="c-white">node server.js</span>
 
 <span class="c-comment"># Verify the full stack: namespace URI → registry → resolver → result</span>
-<span class="c-white">curl -s -X POST http://localhost:7474/resolve \</span>
+<span class="c-white">curl -s -X POST http://localhost:9474/resolve \</span>
 <span class="c-white">  -H "Content-Type: application/json" \</span>
 <span class="c-white">  -d '{"query":"dillweed://research.market.intel.vendors"}' | jq .</span></code>
       </div>
