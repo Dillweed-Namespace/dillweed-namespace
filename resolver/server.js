@@ -26,6 +26,8 @@ const path   = require('path');
 const crypto = require('crypto');
 const url    = require('url');
 const https  = require('https');
+const dns    = require('dns').promises;
+const net    = require('net');
 
 const PORT                = parseInt(process.env.DILLCLAW_PORT || '9474', 10);
 const REGISTRY_PATH       = path.join(__dirname, 'registry.json');
@@ -48,6 +50,14 @@ const STALE_WINDOW_MS     = Math.min(
   1800000
 );
 const PUBLIC_KEY_PATH     = process.env.DILLCLAW_DNSO_PUBLIC_KEY || path.join(__dirname, 'dnso_public.pem');
+// Liveness probing is an outbound HEAD to a capability's registered endpoint —
+// an SSRF vector (trust-boundary F-8 / resolver S3): one inbound /resolve could
+// trigger probes to attacker-chosen internal/link-local/metadata addresses.
+// W0 hardening: OFF by default (operator must opt in), and even when enabled the
+// resolver refuses endpoints that resolve into internal ranges and pins the
+// connection to the validated IP. (Authenticated-caller requirement and per-
+// caller probe quota are W1 — they depend on Area 1 identity.)
+const PROBE_LIVENESS_ENABLED = process.env.DILLCLAW_PROBE_LIVENESS_ENABLED === '1';
 const TRACES_DIR          = path.join(__dirname, 'traces');
 const VERSION             = 'dillclaw/0.1.8';
 // DillClaw Resolver Spec §6.2: the default scoring profile is `dillclaw-default-v1`.
@@ -809,17 +819,90 @@ function trustSignals(record) {
 
 // ─── Liveness Probe (async, non-blocking) ─────────────────────────────────────
 
-function probeEndpoint(endpoint) {
+// SSRF deny-list (trust-boundary F-8). Returns true when an IP literal belongs to
+// a range a public capability endpoint must never resolve into: loopback, link-
+// local (incl. the 169.254.169.254 cloud-metadata address), private/RFC-1918,
+// CGNAT, unspecified, multicast, and reserved/broadcast — plus the IPv6
+// equivalents (::1, ::, fe80::/10, fc00::/7, ff00::/8, and ::ffff: mapped v4).
+// Self-contained (string arithmetic only, no imports) so resolver/unit-tests.js
+// can extract and exercise it directly. Unparseable input is treated as unsafe.
+function isInternalIp(ip) {
+  if (ip.indexOf(':') !== -1) {
+    const lower = ip.toLowerCase();
+    const mapped = lower.match(/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/);
+    if (mapped) return isInternalIp(mapped[1]);
+    if (lower === '::1' || lower === '::') return true;
+    if (/^fe[89ab]/.test(lower)) return true;   // fe80::/10 link-local
+    if (/^f[cd]/.test(lower))     return true;   // fc00::/7  unique-local
+    if (/^ff/.test(lower))        return true;   // ff00::/8  multicast
+    return false;
+  }
+  const parts = ip.split('.');
+  if (parts.length !== 4) return true;
+  const o = parts.map(Number);
+  if (o.some(x => !Number.isInteger(x) || x < 0 || x > 255)) return true;
+  const n = ((o[0] << 24) >>> 0) + (o[1] << 16) + (o[2] << 8) + o[3];
+  const inNet = (a, b, c, d, bits) => {
+    const base = ((a << 24) >>> 0) + (b << 16) + (c << 8) + d;
+    const mask = bits === 0 ? 0 : (0xFFFFFFFF << (32 - bits)) >>> 0;
+    return (n & mask) === (base & mask);
+  };
+  return inNet(0, 0, 0, 0, 8)        // 0.0.0.0/8   this-host
+      || inNet(10, 0, 0, 0, 8)       // 10/8        private
+      || inNet(100, 64, 0, 0, 10)    // 100.64/10   CGNAT
+      || inNet(127, 0, 0, 0, 8)      // 127/8       loopback
+      || inNet(169, 254, 0, 0, 16)   // 169.254/16  link-local (metadata)
+      || inNet(172, 16, 0, 0, 12)    // 172.16/12   private
+      || inNet(192, 0, 0, 0, 24)     // 192.0.0/24  IETF assignments
+      || inNet(192, 168, 0, 0, 16)   // 192.168/16  private
+      || inNet(224, 0, 0, 0, 4)      // 224/4       multicast
+      || inNet(240, 0, 0, 0, 4);     // 240/4       reserved + 255.255.255.255
+}
+
+// Resolve the endpoint host, refuse any that maps into internal space, and probe
+// the validated IP directly (host-pinned) so a rebind between check and connect
+// can't redirect the probe. async + fire-and-forget; never throws.
+async function probeEndpoint(endpoint) {
+  if (!PROBE_LIVENESS_ENABLED) return;   // disabled by default (SSRF hardening)
+  let parsed;
+  try { parsed = new url.URL(endpoint); } catch { return; }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return;
+
+  const hostname = parsed.hostname;
+  let addresses;
   try {
-    const mod    = endpoint.startsWith('https') ? https : http;
-    const parsed = new url.URL(endpoint);
-    const req    = mod.request({ hostname: parsed.hostname, port: parsed.port, path: parsed.pathname, method: 'HEAD', timeout: 3000 }, res => {
-      cache.setLiveness(endpoint, res.statusCode < 500);
-    });
+    addresses = net.isIP(hostname)
+      ? [{ address: hostname }]
+      : await dns.lookup(hostname, { all: true });
+  } catch {
+    return cache.setLiveness(endpoint, false);
+  }
+  // Refuse if the host resolves to ANY internal address (defends against a record
+  // that returns both a public and an internal A record). Otherwise pin to a
+  // validated public address.
+  if (addresses.length === 0 || addresses.some(a => isInternalIp(a.address))) {
+    console.warn(`  [probe] refused (resolves to internal range): ${endpoint}`);
+    return;  // leave liveness unchecked rather than probing internal space
+  }
+  const pinnedIp = addresses[0].address;
+
+  try {
+    const isHttps = parsed.protocol === 'https:';
+    const mod     = isHttps ? https : http;
+    const options = {
+      host:       pinnedIp,                                    // connect to the validated IP
+      servername: isHttps ? hostname : undefined,              // SNI / cert validation
+      port:       parsed.port || (isHttps ? 443 : 80),
+      path:       parsed.pathname || '/',
+      method:     'HEAD',
+      timeout:    3000,
+      headers:    { Host: parsed.host },                       // preserve virtual-host routing
+    };
+    const req = mod.request(options, res => cache.setLiveness(endpoint, res.statusCode < 500));
     req.on('error',   () => cache.setLiveness(endpoint, false));
     req.on('timeout', () => { req.destroy(); cache.setLiveness(endpoint, false); });
     req.end();
-  } catch (_) {
+  } catch {
     cache.setLiveness(endpoint, false);
   }
 }
@@ -907,8 +990,10 @@ async function resolveQuery(query, opts = {}) {
     return { status: 'no_match', error_code: 'NO_MATCH', message: 'No registered capabilities match this query.' };
   }
 
-  // 4 — Optionally kick off async liveness probes
-  if (probe_liveness) {
+  // 4 — Optionally kick off async liveness probes. Requires both the caller's
+  // per-request opt-in and the operator's global enable (off by default); each
+  // probe is SSRF-guarded and host-pinned inside probeEndpoint().
+  if (probe_liveness && PROBE_LIVENESS_ENABLED) {
     candidates.forEach(r => { if (r.endpoint) probeEndpoint(r.endpoint); });
   }
 
@@ -1321,6 +1406,7 @@ function handleHealth(req, res) {
     uptime_seconds:   Math.floor(process.uptime()),
     timestamp:        rfc3339UTC(),
     rate_limit:       rateLimitConfig(),
+    probe_liveness:   { enabled: PROBE_LIVENESS_ENABLED },
   });
 }
 

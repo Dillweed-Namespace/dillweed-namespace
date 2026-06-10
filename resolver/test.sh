@@ -579,6 +579,28 @@ run "Valid version suffix ':3.1.0' still parses" "200" \
   "$BASE/resolve" \
   --grep '"status"[[:space:]]*:[[:space:]]*"resolved"'
 
+# ── probe_liveness SSRF guard (W0 / v2 design §4.2.2, F-8) ────────────────────
+# Liveness probing is an outbound HEAD to a capability's registered endpoint — an
+# SSRF vector. It is OFF by default; even enabled, endpoints resolving to internal
+# ranges are refused and the probe is host-pinned. The deny-list classifier is
+# exhaustively covered in unit-tests.js (F-8 isInternalIp). Here we assert the
+# default-off posture and that requesting a probe doesn't break resolution.
+header "probe_liveness SSRF guard (F-8)  [v2 §4.2.2]"
+
+PROBE_ENABLED=$(curl -s "$BASE/health" | grep -A2 '"probe_liveness"' | grep -o '"enabled"[[:space:]]*:[[:space:]]*\(true\|false\)' | grep -o 'true\|false' | head -1)
+if [ "$PROBE_ENABLED" = "false" ]; then
+  ok "probe_liveness disabled by default (/health reports enabled=false)"
+else
+  fail "probe_liveness should be disabled by default (got enabled=$PROBE_ENABLED)"
+fi
+
+# A resolve requesting probe_liveness=true still succeeds; probing is simply a no-op.
+run "resolve with probe_liveness=true still succeeds (probing off)" "200" \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"query":"dillweed://research.market.intel.vendors","probe_liveness":true}' \
+  "$BASE/resolve" \
+  --grep '"status"[[:space:]]*:[[:space:]]*"resolved"'
+
 # ── Per-IP rate limiting (W0 / v2 design §4.2.2) ──────────────────────────────
 # Reads (/capability, /trace) and expensive POSTs (/resolve, /batch) draw from
 # separate per-IP budgets; exceeding one yields 429 + Retry-After. /health is

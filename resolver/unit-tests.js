@@ -32,8 +32,9 @@ const src = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
 
 const bankersRoundSource = src.match(/function bankersRound3[\s\S]*?\n}\n/);
 const compareSemverSource = src.match(/function compareSemver[\s\S]*?\n}\n/);
+const isInternalIpSource  = src.match(/function isInternalIp[\s\S]*?\n}\n/);
 
-if (!bankersRoundSource || !compareSemverSource) {
+if (!bankersRoundSource || !compareSemverSource || !isInternalIpSource) {
   console.error('FATAL: could not extract helper functions from server.js');
   process.exit(2);
 }
@@ -43,12 +44,14 @@ if (!bankersRoundSource || !compareSemverSource) {
 // from the test cases below.
 (0, eval)(bankersRoundSource[0]);
 (0, eval)(compareSemverSource[0]);
+(0, eval)(isInternalIpSource[0]);
 
 // Re-bind to local scope for clarity in the tests
 const bankersRound3 = globalThis.bankersRound3;
 const compareSemver = globalThis.compareSemver;
+const isInternalIp  = globalThis.isInternalIp;
 
-if (typeof bankersRound3 !== 'function' || typeof compareSemver !== 'function') {
+if (typeof bankersRound3 !== 'function' || typeof compareSemver !== 'function' || typeof isInternalIp !== 'function') {
   console.error('FATAL: helper functions did not load into global scope');
   process.exit(2);
 }
@@ -150,6 +153,44 @@ for (let i = 0; i < expected.length; i++) {
     `${expName}@${expVer}`,
     `rank ${i + 1}: ${expName}@${expVer}`
   );
+}
+
+// ─── F-8: isInternalIp SSRF deny-list (probe_liveness host validation) ────────
+console.log('\n▶ F-8 — isInternalIp SSRF deny-list (probe_liveness host validation)');
+
+// Internal / reserved ranges a public capability endpoint must never reach.
+const INTERNAL_IPS = [
+  '127.0.0.1', '127.1.2.3',                 // loopback 127/8
+  '10.0.0.1', '10.255.255.255',             // private 10/8
+  '172.16.0.1', '172.31.255.255',           // private 172.16/12
+  '192.168.1.1',                            // private 192.168/16
+  '169.254.169.254',                        // link-local cloud metadata
+  '0.0.0.0', '0.1.2.3',                     // this-host 0/8
+  '100.64.0.1',                             // CGNAT 100.64/10
+  '224.0.0.1',                              // multicast
+  '240.0.0.1', '255.255.255.255',           // reserved / broadcast
+  '::1', '::',                              // IPv6 loopback / unspecified
+  'fe80::1', 'FE80::abcd',                  // IPv6 link-local (case-insensitive)
+  'fc00::1', 'fd12:3456::1',                // IPv6 unique-local fc00::/7
+  'ff02::1',                                // IPv6 multicast
+  '::ffff:127.0.0.1', '::ffff:10.0.0.1',    // IPv4-mapped internal
+  'not-an-ip', '10.0.0',                    // unparseable → unsafe (fail closed)
+];
+for (const ip of INTERNAL_IPS) {
+  assertEq(isInternalIp(ip), true, `internal/unsafe: ${ip} → blocked`);
+}
+
+// Public addresses that MUST remain probeable.
+const EXTERNAL_IPS = [
+  '8.8.8.8', '1.1.1.1', '93.184.216.34',    // public v4
+  '172.32.0.1', '172.15.255.255',           // just outside 172.16/12
+  '100.63.255.255', '100.128.0.1',          // just outside 100.64/10
+  '11.0.0.1', '126.255.255.255',            // boundaries around 10/8 and 127/8
+  '2606:4700:4700::1111',                   // public v6
+  '::ffff:8.8.8.8',                         // IPv4-mapped public
+];
+for (const ip of EXTERNAL_IPS) {
+  assertEq(isInternalIp(ip), false, `public: ${ip} → allowed`);
 }
 
 // ─── Summary ────────────────────────────────────────────────────────────────
