@@ -521,6 +521,85 @@ header "GET /list — invalid tier rejection (AUDIT-REG-020)"
 run "/list?tier=banana → 400 (invalid enum value rejected)" "400" "$BASE/list?tier=banana"
 run "/list?tier=verified → 200 (valid enum value accepted)" "200" "$BASE/list?tier=verified"
 
+# ── Conditional reads on /list (W0 / v2 design §2.2.1) ────────────────────────
+# /list gains a strong ETag (and Last-Modified) derived from a catalog-version
+# counter bumped on every register/revoke/promote. A caller that echoes a
+# current validator gets 304 Not Modified with no body — turning the steady-state
+# resolver poll from a full-snapshot transfer into a header exchange. Callers
+# that send no conditional header still get the full 200 (non-breaking).
+header "GET /list — conditional reads (ETag / 304)  [v2 §2.2.1]"
+
+# (1) ETag header is present on a normal /list response.
+ETAG=$(curl -s -o /dev/null -D - "$BASE/list" | grep -i '^etag:' | tr -d '\r' | awk '{print $2}')
+if [ -n "$ETAG" ]; then
+  ok "/list returns an ETag header  ($ETAG)"
+else
+  fail "/list missing ETag header"
+fi
+
+# (2) If-None-Match echoing the current ETag → 304 Not Modified with empty body.
+INM_OUT=$(curl -s -o /dev/null -w "%{http_code} %{size_download}" -H "If-None-Match: $ETAG" "$BASE/list")
+INM_STATUS=$(echo "$INM_OUT" | awk '{print $1}')
+INM_SIZE=$(echo "$INM_OUT" | awk '{print $2}')
+if [ "$INM_STATUS" = "304" ] && [ "$INM_SIZE" = "0" ]; then
+  ok "If-None-Match: <current ETag> → 304 with empty body"
+else
+  fail "If-None-Match: <current ETag> expected 304 + empty body (got HTTP $INM_STATUS, ${INM_SIZE}B)"
+fi
+
+# A non-matching validator must still return the full 200 (non-breaking path).
+STALE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H 'If-None-Match: "cat-deadbeef"' "$BASE/list")
+if [ "$STALE_STATUS" = "200" ]; then
+  ok "If-None-Match: <stale ETag> → 200 with full body"
+else
+  fail "If-None-Match: <stale ETag> expected 200 (got HTTP $STALE_STATUS)"
+fi
+
+# (3) A registration bumps the catalog version, so the ETag must change and the
+#     previously cached validator must no longer 304.
+ETAG_BEFORE="$ETAG"
+ETAG_NAME="test.capability.etag.$(date +%s)"
+ETAG_PAYLOAD="{
+    \"name\":        \"$ETAG_NAME\",
+    \"description\": \"ETag bump test (test.sh)\",
+    \"endpoint\":    \"https://test.example.com/etag\",
+    \"protocol\":    \"rest\",
+    \"trust_tier\":  \"experimental\",
+    \"permissions\": [\"query\"],
+    \"version\":     \"0.1.0\"
+  }"
+if [ -n "$TOKEN" ]; then
+  curl -s -o /dev/null -X POST -H "Authorization: Bearer $TOKEN" \
+       -H "Content-Type: application/json" -d "$ETAG_PAYLOAD" "$BASE/register"
+else
+  curl -s -o /dev/null -X POST -H "Content-Type: application/json" \
+       -d "$ETAG_PAYLOAD" "$BASE/register"
+fi
+ETAG_AFTER=$(curl -s -o /dev/null -D - "$BASE/list" | grep -i '^etag:' | tr -d '\r' | awk '{print $2}')
+if [ -n "$ETAG_AFTER" ] && [ "$ETAG_AFTER" != "$ETAG_BEFORE" ]; then
+  ok "ETag changes after a registration  ($ETAG_BEFORE → $ETAG_AFTER)"
+else
+  fail "ETag unchanged after registration (before=$ETAG_BEFORE after=$ETAG_AFTER)"
+fi
+
+# The validator cached before the registration must now force revalidation.
+OLD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "If-None-Match: $ETAG_BEFORE" "$BASE/list")
+if [ "$OLD_STATUS" = "200" ]; then
+  ok "Pre-registration ETag → 200 after catalog change (revalidation forced)"
+else
+  fail "Pre-registration ETag expected 200 after change (got HTTP $OLD_STATUS)"
+fi
+
+# (4) If-Modified-Since in the future → 304 (the validator spans the whole catalog).
+FUTURE_DATE=$(LC_ALL=C date -u -v+1H '+%a, %d %b %Y %H:%M:%S GMT' 2>/dev/null \
+              || LC_ALL=C date -u -d '+1 hour' '+%a, %d %b %Y %H:%M:%S GMT')
+IMS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "If-Modified-Since: $FUTURE_DATE" "$BASE/list")
+if [ "$IMS_STATUS" = "304" ]; then
+  ok "If-Modified-Since: <future> → 304"
+else
+  fail "If-Modified-Since: <future> expected 304 (got HTTP $IMS_STATUS)"
+fi
+
 # ── Unknown route ─────────────────────────────────────────────────────────────
 header "Unknown routes"
 run "Unknown route → 404" "404" "$BASE/unknown"

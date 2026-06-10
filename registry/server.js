@@ -98,6 +98,12 @@ const stmts = {
   // otherwise the next /verify call against this record will fail.
   updateTierAndSign: db.prepare(`UPDATE capabilities SET trust_tier=?, last_updated=?, signature=?, updated_at=datetime('now') WHERE name=? AND version=? AND revoked=0`),
   logAction:       db.prepare(`INSERT INTO registration_log (action, name, version, detail, caller) VALUES (@action, @name, @version, @detail, @caller)`),
+  // W0 / v2 design §2.2.1 (ETag conditional reads on /list). Seed the in-memory
+  // catalog version and last-modified time from the persistent registration log
+  // at startup so the /list ETag survives a process restart and never collides
+  // (a restart-reset counter could re-issue an old ETag for different content).
+  countCatalogOps:   db.prepare(`SELECT COUNT(*) AS n FROM registration_log WHERE action IN ('register','revoke','promote')`),
+  lastCatalogChange: db.prepare(`SELECT created_at FROM registration_log WHERE action IN ('register','revoke','promote') ORDER BY id DESC LIMIT 1`),
   // NS-004: GET /log endpoint queries (Registry Spec v0.1.4 §04).
   // Filtering is applied via dynamic SQL in handleLog because the combinations
   // are small (4 possibilities: no filter / name / action / name+action) and
@@ -429,12 +435,13 @@ function readBody(req) {
   });
 }
 
-function send(res, status, body) {
+function send(res, status, body, extraHeaders) {
   const json = JSON.stringify(body, null, 2);
   res.writeHead(status, {
     'Content-Type':   'application/json',
     'Content-Length': Buffer.byteLength(json),
     'X-Registry':     VERSION,
+    ...(extraHeaders || {}),
   });
   res.end(json);
 }
@@ -445,6 +452,63 @@ function err(res, status, code, message, detail) {
 
 function caller(req) {
   return req.headers['x-dillclaw-caller'] || req.headers['x-registry-caller'] || 'anonymous';
+}
+
+// ── Catalog version (v2 design §2.2.1: conditional reads on /list) ─────────────
+// The steady-state resolver poll re-fetches the whole catalog every refresh even
+// when nothing changed. Tagging /list with a strong ETag (and Last-Modified) lets
+// an unchanged catalog answer 304 Not Modified — a header exchange instead of a
+// full-snapshot transfer. Non-breaking: callers that send no conditional header
+// get the same 200 as before (v2 design §2.2.1, §2.3 step 1).
+//
+// `catalogVersion` is a monotonic counter bumped on every catalog-mutating
+// operation (register, revoke, promote). It is seeded at startup from the count
+// of those operations already in the registration log, so the ETag is stable
+// across restarts and an old ETag is never re-issued for different content.
+let catalogVersion   = stmts.countCatalogOps.get().n;
+let catalogModified  = (() => {
+  const row = stmts.lastCatalogChange.get();
+  // SQLite datetime('now') is 'YYYY-MM-DD HH:MM:SS' in UTC.
+  return row ? new Date(row.created_at.replace(' ', 'T') + 'Z') : new Date();
+})();
+
+function bumpCatalogVersion() {
+  catalogVersion++;
+  catalogModified = new Date();
+}
+
+// Strong validator, quoted per RFC 7232 §2.3.
+function catalogETag() {
+  return `"cat-${catalogVersion.toString(16)}"`;
+}
+
+// HTTP-date (RFC 7231) with 1-second granularity. Truncate the live timestamp to
+// whole seconds so an If-Modified-Since echo of our own Last-Modified compares
+// equal rather than appearing stale by sub-second drift.
+function catalogLastModified() {
+  return new Date(Math.floor(catalogModified.getTime() / 1000) * 1000).toUTCString();
+}
+
+// RFC 7232 §3.2: If-None-Match uses weak comparison and may carry a list and a
+// "*" wildcard. We emit strong tags; strip an optional weak prefix and accept a
+// comma-separated list so a well-behaved client always matches its own validator.
+function ifNoneMatchHits(headerValue, etag) {
+  if (!headerValue) return false;
+  if (headerValue.trim() === '*') return true;
+  return headerValue.split(',').some(t => {
+    t = t.trim();
+    if (t.startsWith('W/')) t = t.slice(2);
+    return t === etag;
+  });
+}
+
+// RFC 7232 §3.3: 304 if the catalog has not been modified after the supplied
+// HTTP-date. An unparseable date is ignored (treated as no precondition).
+function ifModifiedSinceHits(headerValue) {
+  if (!headerValue) return false;
+  const since = Date.parse(headerValue);
+  if (Number.isNaN(since)) return false;
+  return Math.floor(catalogModified.getTime() / 1000) * 1000 <= since;
 }
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
@@ -586,6 +650,19 @@ async function handleLookup(req, res, rawPath) {
 
 // GET /list   ?tier=verified &tag=search &limit=50 &offset=0
 function handleList(req, res) {
+  // v2 design §2.2.1 — conditional read. The validator covers the whole catalog
+  // (it is bumped by every register/revoke/promote), so a matching precondition
+  // lets us answer 304 before touching the DB or building the page, regardless of
+  // the tier/tag/pagination query. A 304 carries the validators but no body
+  // (RFC 7232 §4.1).
+  const etag         = catalogETag();
+  const lastModified = catalogLastModified();
+  if (ifNoneMatchHits(req.headers['if-none-match'], etag) ||
+      ifModifiedSinceHits(req.headers['if-modified-since'])) {
+    res.writeHead(304, { 'ETag': etag, 'Last-Modified': lastModified, 'X-Registry': VERSION });
+    return res.end();
+  }
+
   const q      = url.parse(req.url, true).query;
   const tier   = q.tier  || null;
   const tag    = q.tag   || null;
@@ -623,7 +700,8 @@ function handleList(req, res) {
   const paged   = rows.slice(offset, offset + limit);
   const records = paged.map(toAPI);
 
-  send(res, 200, { status:'ok', total, count: records.length, offset, limit, records });
+  send(res, 200, { status:'ok', total, count: records.length, offset, limit, records },
+       { 'ETag': etag, 'Last-Modified': lastModified });
 }
 
 // GET /log — Registry Spec v0.1.4 §04.
@@ -775,6 +853,7 @@ async function handleRegister(req, res) {
     }
     throw e;
   }
+  bumpCatalogVersion();   // catalog changed — invalidate /list ETag (v2 §2.2.1)
 
   const saved = stmts.lookupExact.get(record.name, record.version);
   console.log(`  [register] ${record.name}:${record.version} (${record.trust_tier})`);
@@ -850,6 +929,7 @@ async function handleRevoke(req, res) {
   }
 
   stmts.logAction.run({ action:'revoke', name, version: version||'all', detail:reason, caller:caller(req) });
+  bumpCatalogVersion();   // catalog changed — invalidate /list ETag (v2 §2.2.1)
   console.log(`  [revoke]   ${name}${version ? ':'+version : ' (all versions)'} — ${reason}`);
 
   send(res, 200, { status:'revoked', name, version: version||'all', revoked_count: result.changes });
@@ -915,6 +995,7 @@ async function handlePromote(req, res) {
   }
 
   stmts.logAction.run({ action:'promote', name, version:body.version, detail:`→ ${body.trust_tier}`, caller:caller(req) });
+  bumpCatalogVersion();   // catalog changed — invalidate /list ETag (v2 §2.2.1)
   console.log(`  [promote]  ${name}:${body.version} → ${body.trust_tier} (re-signed)`);
 
   const updated = stmts.lookupExact.get(name, body.version);
