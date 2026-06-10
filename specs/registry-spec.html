@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Dillweed Registry Specification v0.1.5 — Dillweed Namespace Project">
+  <meta property="og:title" content="Dillweed Registry Specification v0.1.6 — Dillweed Namespace Project">
 <meta property="og:description" content="The authoritative data layer for the Dillweed Namespace. Capability records, cryptographic signing, trust tier governance, and revocation semantics.">
 <meta property="og:url" content="https://dillweed.com/registry-spec.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dillweed Namespace Project">
-  <title>Dillweed Registry Specification v0.1.5</title>
+  <title>Dillweed Registry Specification v0.1.6</title>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -179,7 +179,7 @@
   <div class="sb-brand">
     <div class="sb-wordmark">Dillweed<br>Namespace Project</div>
     <div class="sb-sub">Registry Specification</div>
-    <span class="sb-version">v0.1.5</span>
+    <span class="sb-version">v0.1.6</span>
   </div>
   <nav>
     <div class="sb-nav-label">Contents</div>
@@ -221,7 +221,7 @@
     <div class="cover-grid"></div>
     <div class="cover-glow"></div>
     <div class="cover-inner">
-      <div class="cover-eyebrow">Dillweed Registry &nbsp;·&nbsp; Specification &nbsp;·&nbsp; Published Specification v0.1.5</div>
+      <div class="cover-eyebrow">Dillweed Registry &nbsp;·&nbsp; Specification &nbsp;·&nbsp; Published Specification v0.1.6</div>
       <h1 class="cover-title">Dillweed Registry <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
       <p class="cover-tagline">The authoritative data layer for the Dillweed Namespace — storing, signing, and serving Capability Records.</p>
 
@@ -235,7 +235,7 @@
       </div>
 
       <div class="cover-meta">
-        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.5</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.6</span></div>
         <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
         <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">NS Standard v0.4</a></span></div>
         <div class="cover-meta-item"><span class="label">Resolver Ref</span><span class="value"><a href="https://dillweed.com/dillclaw-spec.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">DillClaw Spec v0.1</a></span></div>
@@ -272,6 +272,10 @@
       <div class="callout">
         <div class="callout-label">Revision 0.1.5 (June 2026)</div>
         <p>§07 Trust Tiers: provisional-tier penalty language downgraded from a resolver SHOULD requirement to future-work disclosure, reflecting that no resolver specification or implementation currently defines the detection mechanism. §09 Tier Criteria: verified-tier history requirement corrected from "6+ months" to "30+ days" with cross-reference to DNSO Operations Charter §4.1; trusted-tier adjusted from "3 months" to "14 days" to maintain tier progression. §10.2 example port numbers normalized to 9474/9475. §10.3 mirror-field definitions aligned with §2.2 (RFC 3339 timestamps, bare SHA-256 digest without signature-over-digest implication).</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.6 (June 2026)</div>
+        <p>W0 hardening pass. §04 /list: ETag and Last-Modified headers on every response; conditional fetch via If-None-Match and If-Modified-Since returning 304 Not Modified when the catalog has not changed; SQL-level LIMIT/OFFSET pagination replacing in-memory array slicing; default limit documented as 100 (maximum 500); total count computed independently of page size; tag filter backed by a dedicated index. §04 error table: added 429 RATE_LIMITED with Retry-After header. §11.3 Rate Limiting: updated to document the reference implementation's per-IP rate limiting with separate read (300/60s) and write (100/60s) budgets, replacing the previous statement that the implementation does not enforce rate limits.</p>
       </div>
     </section>
 
@@ -450,7 +454,8 @@
         <div class="endpoint-card">
           <div class="endpoint-header"><span class="method-badge method-get">GET</span><span class="endpoint-path">/list</span></div>
           <div class="endpoint-body">
-            <p>Returns all active Capability Records with optional filtering. Supports <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tier=</code> (filter by trust tier), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tag=</code> (filter by tag), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?limit=</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?offset=</code> for pagination. Maximum 500 records per response. This is the primary endpoint used by DillClaw Resolvers to warm their local capability cache on startup and refresh it periodically.</p>
+            <p>Returns active Capability Records with optional filtering. Supports <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tier=</code> (filter by trust tier), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?tag=</code> (filter by tag, indexed), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?limit=</code> (default 100, maximum 500) and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">?offset=</code> for pagination. Pagination is SQL-level — only the requested page is loaded from the database. The response envelope includes <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">total</code> (count of all matching records, independent of the current page), <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">count</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">limit</code>, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">offset</code>. Callers (including DillClaw Resolvers) MUST paginate to completion when <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">total</code> exceeds the page size. This is the primary endpoint used by DillClaw Resolvers to warm their local capability cache on startup and refresh it periodically.</p>
+            <p>Every <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code> response includes an <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">ETag</code> header (a strong validator derived from the catalog version counter, which increments on every register, revoke, or promote operation) and a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">Last-Modified</code> header. Callers MAY send <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">If-None-Match</code> with a previously received ETag or <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">If-Modified-Since</code> with a previously received timestamp; if the catalog has not changed since the supplied value, the Registry returns <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">304 Not Modified</code> with no body. This eliminates redundant full-catalog transfers at steady state.</p>
             <div class="code-block">
               <div class="code-label">Examples</div>
               <code><span class="c-white">GET</span> <span class="c-muted">/list</span>
@@ -521,6 +526,7 @@
             <tr><td>404</td><td>NOT_FOUND</td><td>No active record at the specified path or version.</td></tr>
             <tr><td>409</td><td>ALREADY_EXISTS</td><td>A record with this <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">name:version</code> is already active.</td></tr>
             <tr><td>422</td><td>VALIDATION_FAILED</td><td>Record fields fail validation. Includes a structured <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">errors</code> array.</td></tr>
+            <tr><td>429</td><td>RATE_LIMITED</td><td>Per-IP rate limit exceeded. Includes a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">Retry-After</code> header indicating seconds until the window resets. See §11.3.</td></tr>
             <tr><td>500</td><td>SERVER_FAULT</td><td>Internal registry error. Includes a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">detail</code> field for diagnostics.</td></tr>
           </tbody>
         </table>
@@ -761,7 +767,7 @@
       </ul>
 
       <h2 class="sub-title">11.3 Rate Limiting and Abuse Prevention</h2>
-      <p>Public read endpoints — <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/list</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/lookup</code>, and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/verify</code> — SHOULD enforce per-IP rate controls to prevent registry scraping and availability degradation. The reference implementation does not itself enforce rate limits, as the primary deployment context is a controlled network. Production deployments serving public internet traffic SHOULD place the registry behind a reverse proxy (such as nginx or Caddy) configured with appropriate rate limiting rules. Write endpoints (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/register</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/revoke</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/promote</code>) are protected by bearer token authentication and SHOULD additionally be restricted by IP allowlist in production environments where the set of authorized callers is known and fixed.</p>
+      <p>The reference implementation enforces per-IP rate limiting on all endpoints except <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/health</code>. Two separate budgets apply: a read budget (default 300 requests per 60-second window) covering <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">GET</code> endpoints, and a write budget (default 100 requests per 60-second window) covering <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">POST</code> endpoints and <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/verify</code>. When a budget is exhausted, the Registry MUST return <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">429 RATE_LIMITED</code> with a <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">Retry-After</code> header indicating the number of seconds until the window resets. All rate-limit parameters are operator-configurable via environment variables. Rate limiting may be disabled entirely for controlled-network deployments by setting <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">REGISTRY_RL_DISABLED=1</code>. Production deployments serving public internet traffic MAY additionally place the registry behind a reverse proxy (such as nginx or Caddy) for connection-level controls. Write endpoints (<code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/register</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/revoke</code>, <code style="font-family:var(--mono);font-size:0.85em;color:var(--rg-accent)">/promote</code>) are additionally protected by bearer token authentication and SHOULD be restricted by IP allowlist in production environments where the set of authorized callers is known and fixed.</p>
     </section>
 
     <section class="section" id="s12">
@@ -870,7 +876,7 @@
 
 <footer>
   <div class="fb">Dillweed Registry Specification</div>
-  <div class="fm">v0.1.5 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm">v0.1.6 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
   <div style="width:100%; font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:none; margin-top:0.25rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 

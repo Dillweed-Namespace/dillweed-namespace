@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.7 — Dillweed Namespace Project">
+  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.8 — Dillweed Namespace Project">
 <meta property="og:description" content="The resolution protocol, trust scoring algorithm, and API contract for the Dillweed Namespace. How agents find and evaluate capabilities.">
 <meta property="og:url" content="https://dillweed.com/dillclaw-spec.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dillweed Namespace Project">
-  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.7</title>
+  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.8</title>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -173,7 +173,7 @@
   <div class="sb-brand">
     <div class="sb-wordmark">DillClaw&#x2122;<br>Resolver</div>
     <div class="sb-sub">Technical Specification</div>
-    <span class="sb-version">v0.1.7</span>
+    <span class="sb-version">v0.1.8</span>
   </div>
   <div class="sb-nav-label">Sections</div>
   <nav>
@@ -214,7 +214,7 @@
     <div class="cover-grid"></div>
     <div class="cover-glow"></div>
     <div class="cover-inner">
-      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.7 Published</div>
+      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.8 Published</div>
      <h1 class="cover-title">DillClaw Resolver <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
       <p class="cover-tagline">The resolution layer for the Dillweed Namespace — turning stable names into trusted, invocable capabilities.</p>
 
@@ -228,7 +228,7 @@
       </div>
 
       <div class="cover-meta">
-        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.7</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.8</span></div>
         <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
         <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dillweed NS Standard v0.4</a></span></div>
         <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
@@ -273,6 +273,10 @@
       <div class="callout">
         <div class="callout-label">Revision 0.1.7 (June 2026)</div>
         <p>Fable 5 review round 3 fixes: H-3 max_results semantics changed from "clamp to 50" to "reject with QUERY_MALFORMED" (matching code). M-2 months_registered formula pinned (floor(days/30.44)). SIGNATURE_FILTERED and VERSION_CONSTRAINT_FAILED added to §8.2 error table. allow_unsigned request field documented. max_results range (1–50) specified. DILLCLAW_DIAGNOSTIC_MODE documented as requiring value "1". Example resolver_version updated to 0.1.8. §7.5 revocation propagation clarified: 60-second registry refresh interval is normative, not 300-second record cache TTL.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.8 (June 2026)</div>
+        <p>W0 hardening pass. §6.1 step 4: probe_liveness documented as off by default with internal-range deny-list (RFC 1918, loopback, link-local), resolved-IP pinning, and cache-TTL guard preventing re-probes within the 60-second window (DillClaw §7 MUST). §7.1: added registry snapshot cache layer documenting resolver pagination-to-completion via /list with ETag conditional fetch. §7.5: refresh interval updated to document ±20% random jitter and exponential backoff on failure (doubling, capped at 15 minutes). §8.2 error table: added 429 RATE_LIMITED with Retry-After header. Per-IP rate limiting with separate read/write budgets documented across all three services.</p>
       </div>
     </section>
 
@@ -578,7 +582,7 @@ Content-Type: application/json
         <div class="step"><div class="step-dot">1</div><div class="step-body"><h4>Tier Gate</h4><p>Any candidate with a trust tier below the caller's <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">trust_minimum</code> MUST be rejected immediately. This is a hard filter — no scoring applied to eliminated candidates.</p></div></div>
         <div class="step"><div class="step-dot">2</div><div class="step-body"><h4>Permission Check</h4><p>Any candidate lacking a required permission from the caller's <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">permissions</code> array MUST be rejected. Permission checking is exact-match only; richer permission semantics are anticipated in a future revision (see Appendix A).</p></div></div>
         <div class="step"><div class="step-dot">3</div><div class="step-body"><h4>Signature Verification</h4><p>DNSO cryptographic signatures MUST be verified against the DNSO public key published at <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">https://dillweed.com/dnso_public.pem</code> (per <a href="https://dillweed.com/registry-spec.html" style="color:var(--oc-accent);">Registry Specification §5.4</a>). Candidates with <strong>invalid signatures</strong> MUST be rejected unless the resolver is operating in an explicitly declared diagnostic mode. Candidates with <strong>missing signatures</strong> MAY be returned only if caller policy permits unsigned records, and MUST be marked <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">sig_unverified</code>. The distinction is architectural: an invalid signature is evidence of tampering or key mismatch and warrants rejection; a missing signature reflects record-state incompleteness (legacy records, mirror gaps) and remains a caller-policy decision.</p></div></div>
-        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Endpoint Liveness</h4><p>Endpoint liveness probing is OPTIONAL; the default is that no probe is performed. The caller MAY request probing by setting <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness: true</code> in the resolution request (§3.1). When enabled, the resolver attempts to contact the candidate's endpoint and reflects the result in the liveness signal (live = 1.0, unreachable = 0.0, unchecked = 0.5). Probe results are cached per TTL to avoid probe overhead on every request.</p></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><h4>Endpoint Liveness</h4><p>Endpoint liveness probing is OPTIONAL and <strong>off by default</strong>. The caller MAY request probing by setting <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness: true</code> in the resolution request (§3.1). When enabled, the resolver attempts to contact the candidate's endpoint via HEAD request and reflects the result in the liveness signal (live = 1.0, unreachable = 0.0, unchecked = 0.5). The resolver MUST enforce an internal-range deny-list rejecting probes to RFC 1918 private addresses, loopback (127.0.0.0/8, ::1), and link-local ranges to prevent SSRF amplification. The resolver MUST pin the resolved IP address and verify it does not fall within the deny-list, regardless of the hostname used in the endpoint URL. Probe results are cached per TTL (default 60 seconds); probes MUST NOT be repeated for the same endpoint within the cache window (§7.1).</p></div></div>
         <div class="step"><div class="step-dot">5</div><div class="step-body"><h4>Trust Scoring</h4><p>Surviving candidates are scored on a 0–1 scale using the pinned formula specified in §6.2.</p></div></div>
       </div>
 
@@ -677,6 +681,7 @@ Content-Type: application/json
 
       <h2 class="sub-title">7.1 Cache Architecture</h2>
       <ul class="props">
+        <li><strong>Registry snapshot cache</strong> — The resolver maintains a complete local snapshot of the Registry's active record set, refreshed periodically via the Registry's <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">/list</code> endpoint. On each refresh, the resolver MUST paginate to completion: fetching successive pages (using <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">limit</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">offset</code>) until all records indicated by the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">total</code> envelope field have been retrieved. The resolver SHOULD send <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">If-None-Match</code> with the previously received ETag on each refresh; a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">304 Not Modified</code> response indicates the catalog has not changed and no records need to be re-fetched.</li>
         <li><strong>Local record cache</strong> — Capability Records retrieved from the registry are cached locally. Cache key is the fully qualified namespace path. TTL is resolver-configured (default 300 seconds).</li>
         <li><strong>Liveness probe cache</strong> — Endpoint liveness results are cached independently with a shorter TTL (default: 60 seconds). Probes MUST NOT be repeated on every resolution request.</li>
         <li><strong>Negative cache</strong> — Not-found responses from the registry are cached with a short TTL (default: 30 seconds) to prevent thundering-herd behavior on repeated queries for nonexistent paths.</li>
@@ -764,7 +769,7 @@ Content-Type: application/json
       <p>The freshness guarantee is therefore <strong>bounded, not absolute</strong>. The TTL defines the maximum acceptable age of a resolution result. Operators who require absolute freshness (zero cache window) MAY configure the TTL to zero, but SHOULD understand that this eliminates the availability benefit of caching and creates a hard dependency on Registry uptime.</p>
 
       <h3>Revocation Propagation Guarantee</h3>
-      <p>A conformant Resolver MUST guarantee that a revoked capability record is no longer returned as valid within <strong>one registry refresh interval</strong> after the revocation is committed at the Registry. The reference implementation refreshes its registry snapshot every 60 seconds (configurable via <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">DILLCLAW_REGISTRY_REFRESH_MS</code>); revocation propagation occurs within this window, not the longer record-level cache TTL defined in §7.2. Implementations that use a different refresh mechanism — for example, per-record TTL-driven cache invalidation rather than snapshot refresh — MUST document their revocation propagation bound and ensure it does not exceed the operator-configured refresh interval. Implementations with cascading caches or asynchronous replication that introduce additional propagation delay MUST document that delay.</p>
+      <p>A conformant Resolver MUST guarantee that a revoked capability record is no longer returned as valid within <strong>one registry refresh interval</strong> after the revocation is committed at the Registry. The reference implementation refreshes its registry snapshot at a base interval of 60 seconds (configurable via <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">DILLCLAW_REGISTRY_REFRESH_MS</code>), with ±20% random jitter applied to each cycle to prevent synchronized polling across resolver fleets. On registry fetch failure, the resolver applies exponential backoff (doubling the interval on each consecutive failure, capped at 15 minutes) and resumes the base interval on the first successful fetch. Under failure backoff, the effective revocation propagation bound may exceed the base interval; operators SHOULD monitor resolver health endpoints to detect extended stale windows. Implementations that use a different refresh mechanism — for example, per-record TTL-driven cache invalidation rather than snapshot refresh — MUST document their revocation propagation bound and ensure it does not exceed the operator-configured refresh interval. Implementations with cascading caches or asynchronous replication that introduce additional propagation delay MUST document that delay.</p>
 
     </section>
 
@@ -799,6 +804,7 @@ Content-Type: application/json
             <tr><td>404</td><td>SIGNATURE_FILTERED</td><td>Candidates exist but all were eliminated by signature eligibility. All candidates had missing or invalid signatures and the request did not permit unsigned records.</td></tr>
             <tr><td>404</td><td>VERSION_CONSTRAINT_FAILED</td><td>Candidates exist but none satisfy the caller's <code style="font-family:var(--mono);font-size:0.8em;color:var(--oc-accent)">version_pref</code> constraint.</td></tr>
             <tr><td>503</td><td>REGISTRY_UNAVAILABLE</td><td>Resolver could not contact the authoritative registry and has no valid cached data.</td></tr>
+            <tr><td>429</td><td>RATE_LIMITED</td><td>Per-IP rate limit exceeded. Includes a <code style="font-family:var(--mono);font-size:0.8em;color:var(--oc-accent)">Retry-After</code> header indicating seconds until the window resets.</td></tr>
             <tr><td>500</td><td>RESOLVER_FAULT</td><td>Internal resolver error. Includes trace ID for diagnostics. Should be reported.</td></tr>
           </tbody>
         </table>
@@ -1051,7 +1057,7 @@ validate(request_body, result.capability.input_schema)
       <p>The current specification treats the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">Authorization</code> header as optional with no prescribed format, and does not authenticate the agent making a resolution request. A future revision is expected to define: (a) a bearer-token format and validation contract for resolver authentication, (b) a caller-identity attestation model that allows a resolver to verify the agent making each request, and (c) the resolver identity certificate model referenced in §11.1 for mitigating resolver-impersonation threats. These changes will affect §5.2, §11.1, and §11.2.</p>
 
       <h2 class="sub-title">A.2 Caller-Controlled Endpoint Liveness Probing</h2>
-      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> request field has been promoted to §3.1 and §6.1 as of v0.1.7. Future work may extend this to support enumerated probe modes (e.g., shallow HTTP HEAD vs. deep health-check) and per-endpoint probe configuration.</p>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> request field has been promoted to §3.1 and §6.1 as of v0.1.8. Future work may extend this to support enumerated probe modes (e.g., shallow HTTP HEAD vs. deep health-check) and per-endpoint probe configuration.</p>
 
       <h2 class="sub-title">A.3 Richer Permission Semantics</h2>
       <p>The current specification performs exact-string matching on permissions declared by the caller against permissions declared by the capability. A future revision is expected to introduce structured permission scopes, hierarchical permissions (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read</code> implying <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read.metadata</code>), and permission negotiation where a capability may declare that it conditionally supports permissions depending on caller identity. This change will affect §6.1.</p>
@@ -1096,7 +1102,7 @@ validate(request_body, result.capability.input_schema)
 
 <footer>
   <div class="fb">DillClaw Resolver — Technical Specification</div>
-  <div class="fm">v0.1.7 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm">v0.1.8 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
     <div class="fm" style="margin-top:0.5rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 
