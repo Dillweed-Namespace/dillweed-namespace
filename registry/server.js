@@ -163,6 +163,17 @@ function toAPI(row) {
 
 function tryParse(s, fallback) { try { return JSON.parse(s); } catch { return fallback; } }
 
+/* ── M-2: Semver-aware version comparison ─────────────────────────────────── */
+function compareSemver(a, b) {
+  const pa = (a || '0.0.0').split('.').map(Number);
+  const pb = (b || '0.0.0').split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0, nb = pb[i] || 0;
+    if (na !== nb) return nb - na;          // descending: higher version first
+  }
+  return 0;
+}
+
 // Validates a string against RFC 3339 second-precision UTC date-time format
 // (YYYY-MM-DDTHH:MM:SSZ) with calendar/clock-component validity. Used by both
 // the last_updated validator and the mirror-freshness env-var validator
@@ -514,6 +525,7 @@ async function handleLookup(req, res, rawPath) {
     rows = row ? [row] : [];
   } else {
     rows = stmts.lookupByName.all(name);
+    rows.sort((a, b) => compareSemver(a.version, b.version));
   }
 
   if (!rows.length) {
@@ -877,6 +889,7 @@ async function handleVerify(req, res, rawPath) {
     row = stmts.lookupExact.get(name, version);
   } else {
     const rows = stmts.lookupByName.all(name);
+    rows.sort((a, b) => compareSemver(a.version, b.version));
     row = rows[0] || null;
   }
 

@@ -129,7 +129,8 @@ REGISTER_BODY=$(cat <<ENDJSON
   "endpoint": "http://localhost/integration-test/$RUN_ID",
   "protocol": "rest",
   "permissions": ["query"],
-  "schemas": {},
+  "input_schema": {},
+  "output_schema": {},
   "trust_tier": "experimental"
 }
 ENDJSON
@@ -278,7 +279,7 @@ fi
 
 header "Step 6: Verify revocation propagation to Resolver"
 
-echo "      Waiting for cache TTL expiry (documented in DillClaw spec §7.5)..."
+echo "      Waiting for registry refresh interval expiry (documented in DillClaw spec §7.5)..."
 echo "      (Default fetch interval: 60s — waiting 70s to ensure refresh)"
 sleep 70
 

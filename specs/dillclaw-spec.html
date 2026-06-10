@@ -369,11 +369,14 @@
     <span class="c-key">"caller_id"</span><span class="c-white">:    </span><span class="c-str">"agent:procurement-v2"</span><span class="c-muted">,</span>
     <span class="c-key">"session_id"</span><span class="c-white">:   </span><span class="c-str">"sess_abc123"</span>
   <span class="c-muted">},</span>
-  <span class="c-key">"max_results"</span><span class="c-white">:    </span><span class="c-teal">3</span>                                    <span class="c-comment">// optional, default: 1</span>
+  <span class="c-key">"max_results"</span><span class="c-white">:    </span><span class="c-teal">3</span><span class="c-muted">,</span>                                   <span class="c-comment">// optional, default: 1, max: 50</span>
+  <span class="c-key">"allow_unsigned"</span><span class="c-white">: </span><span class="c-teal">false</span>                                  <span class="c-comment">// optional, default: false</span>
 <span class="c-muted">}</span></code>
       </div>
 
       <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">version_pref</code> field accepts three forms. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"stable"</code> selects the highest semver version (per <a href="https://semver.org" style="color:var(--oc-accent);">semver.org</a>) without a pre-release identifier and without a build-metadata tag, from among candidates surviving the trust filter. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"latest"</code> selects the highest semver version including pre-release identifiers. An explicit semver string or semver range (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">1.2.0</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">^1.2</code>) selects the highest version satisfying that constraint.</p>
+
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">max_results</code> field is capped at 50. Requests specifying a value above this limit MUST be clamped to 50 without error. The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">allow_unsigned</code> field controls whether candidates with missing or unverifiable signatures are eligible for inclusion in the result set. When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">false</code> (the default), unsigned candidates are eliminated during signature filtering (§6.1). When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">true</code>, unsigned candidates are retained and marked with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">sig_unverified</code> trust signal. This field implements the §6.1 provision that missing-signature candidates "MAY be returned only if caller policy permits unsigned records." A resolver MAY also support a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">DILLCLAW_DIAGNOSTIC_MODE</code> environment variable that, when set, enables unsigned-record inclusion globally for debugging and development contexts.</p>
 
       <h2 class="sub-title">3.2 Response Structure</h2>
 
@@ -393,7 +396,7 @@
       <span class="c-key">"cache_hit"</span><span class="c-white">:      </span><span class="c-teal">false</span>
     <span class="c-muted">}</span>
   <span class="c-muted">],</span>
-  <span class="c-key">"resolver_version"</span><span class="c-white">: </span><span class="c-str">"dillclaw/0.1.2"</span><span class="c-muted">,</span>
+  <span class="c-key">"resolver_version"</span><span class="c-white">: </span><span class="c-str">"dillclaw/0.1.8"</span><span class="c-muted">,</span>
   <span class="c-key">"scoring_profile"</span><span class="c-white">: </span><span class="c-str">"dillclaw-default-v1"</span>
 <span class="c-muted">}</span></code>
       </div>
@@ -775,6 +778,8 @@ Content-Type: application/json
             <tr><td>404</td><td>NO_MATCH</td><td>Query is valid but no registered capabilities match it.</td></tr>
             <tr><td>404</td><td>TRUST_FILTERED</td><td>Candidates exist but all were eliminated by the caller's trust policy.</td></tr>
             <tr><td>422</td><td>PERMISSION_MISMATCH</td><td>Candidates exist and meet trust tier, but none carry all required permissions.</td></tr>
+            <tr><td>404</td><td>SIGNATURE_FILTERED</td><td>Candidates exist but all were eliminated by signature eligibility. All candidates had missing or invalid signatures and the request did not permit unsigned records.</td></tr>
+            <tr><td>404</td><td>VERSION_CONSTRAINT_FAILED</td><td>Candidates exist but none satisfy the caller's <code style="font-family:var(--mono);font-size:0.8em;color:var(--oc-accent)">version_pref</code> constraint.</td></tr>
             <tr><td>503</td><td>REGISTRY_UNAVAILABLE</td><td>Resolver could not contact the authoritative registry and has no valid cached data.</td></tr>
             <tr><td>500</td><td>RESOLVER_FAULT</td><td>Internal resolver error. Includes trace ID for diagnostics. Should be reported.</td></tr>
           </tbody>
@@ -927,7 +932,7 @@ validate(request_body, result.capability.input_schema)
             <tr><td>Cache poisoning</td><td>TTLs enforced strictly. Cached records include the DNSO signature, verified at scoring time regardless of cache source.</td></tr>
             <tr><td>Resolver impersonation</td><td>Resolvers SHOULD be identified by DNS + TLS. A resolver identity certificate model is anticipated in a future revision; see Appendix A.</td></tr>
             <tr><td>Stale trust signals</td><td>Stale responses are disclosed explicitly. Agents MAY reject stale results by policy. Trust score does not degrade on staleness alone.</td></tr>
-            <tr><td>Query enumeration</td><td>Wildcard queries return a maximum of 200 results. Production deployments SHOULD enforce per-IP or per-token rate limits on wildcard and batch queries.</td></tr>
+            <tr><td>Query enumeration</td><td>Wildcard queries matching more than 200 candidates are rejected with <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">QUERY_TOO_BROAD</code>. Production deployments SHOULD enforce per-IP or per-token rate limits on wildcard and batch queries.</td></tr>
           </tbody>
         </table>
       </div>

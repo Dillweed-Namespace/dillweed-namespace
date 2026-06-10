@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:title" content="Dillweed Namespace Stack — Standards-Facing Overview v1.0.10">
-  <meta property="og:description" content="A proposed trust and coordination layer for portable agentic systems. Five core governance-and-resolution specifications supported by cross-cutting observability and continuity documents.">
+  <meta property="og:description" content="A proposed trust and coordination layer for portable agentic systems. Five core governance-and-resolution specifications supported by cross-cutting observability and a governance support protocol.">
   <meta property="og:url" content="https://dillweed.com/standards-overview.html">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dillweed Namespace Project">
@@ -198,7 +198,7 @@
       <div class="section-header"><span class="sec-num">§ 01</span><h1 class="sec-title">Executive Summary</h1></div>
       
       <p>The Dillweed Namespace Stack is a proposed trust and coordination layer for portable agentic systems. As agents become persistent software entities capable of moving across runtimes, providers, and administrative domains, the underdeveloped infrastructure layer is no longer primarily model capability — it is stable naming authority, trust-aware resolution, durable registry truth, and neutral governance continuity. As agent token economics tighten, the cost of selecting the wrong capability on the first try becomes structural; a resolution layer that gives agents a stable, attested means of finding the right capability reduces that cost. Without such a layer, agent trust is rebuilt from scratch at every provider boundary — fragmenting cross-domain reliability and recreating the same fragility with every new deployment.</p>
-      <p>The stack is organized around five core governance-and-resolution specifications covering multi-party trust management, cross-domain agent interoperability, cryptographic attestation, revocation, and operational accountability — supported by two cross-cutting documents (Anthill for observability and the Continuity Protocol for stewardship continuity), and intentionally aligned, by architectural analogy, with the PKI trust-root model underlying existing international identity standards including X.509.</p>
+      <p>The stack is organized around five core governance-and-resolution specifications covering multi-party trust management, cross-domain agent interoperability, cryptographic attestation, revocation, and operational accountability — supported by one cross-cutting observability document (Anthill) and one governance support protocol (the Continuity Protocol for stewardship continuity), and intentionally aligned, by architectural analogy, with the PKI trust-root model underlying existing international identity standards including X.509.</p>
       <p>Its neutrality thesis is structural: a namespace operated by a major platform participant would face an unavoidable neutrality challenge, because the operator would simultaneously occupy two roles — provider of competing services and arbiter of discovery and trust policy among them — that the namespace's coordination function is structured to keep separate. The domain <strong>dillweed.com</strong> has been under continuous independent single-owner stewardship since 1997, providing an unusual independent provenance basis for a neutral naming authority layer, while leaving formal multi-party governance evolution to the Governance Framework and Operations Charter.</p>
 
       <div class="callout">
@@ -212,7 +212,7 @@
 
     <section class="section" id="architecture">
       <div class="section-header"><span class="sec-num">§ 02</span><h1 class="sec-title">Specification Architecture</h1></div>
-      <p>The stack is organized around five core governance-and-resolution specifications, each with a distinct authority boundary and a defined standards-relevant question it answers, supported by two cross-cutting documents (Anthill for observability, the Continuity Protocol for stewardship continuity). Technical semantics are separated from governance authority; operational practice is separated from specification contracts; founding-phase stewardship is designed to evolve toward multi-party institutional models. The five core specifications are listed below; the supporting documents are listed in §05.</p>
+      <p>The stack is organized around five core governance-and-resolution specifications, each with a distinct authority boundary and a defined standards-relevant question it answers, supported by one cross-cutting observability document (Anthill) and one governance support protocol (the Continuity Protocol for stewardship continuity). Technical semantics are separated from governance authority; operational practice is separated from specification contracts; founding-phase stewardship is designed to evolve toward multi-party institutional models. The five core specifications are listed below; the supporting documents are listed in §05.</p>
 
       <div class="spec-stack">
 
@@ -372,7 +372,6 @@
             <tr><td>DNSO Operations Charter v1.0.3</td><td>Published — canonical release</td><td>dillweed.com/dnso-operations-charter.html</td></tr>
             <tr><td>Anthill&#8482; Observability Plane Spec v0.1.3</td><td>Published specification; Node.js reference implementation deployed locally</td><td>dillweed.com/anthill-spec.html</td></tr>
             <tr><td>Continuity Protocol GSP-01 v1.0.3</td><td>Published — Founding Phase</td><td>dillweed.com/continuity-protocol.html</td></tr>
-            <tr><td>Glossary v1.0.2</td><td>Published — source-grounded reference companion (86 entries)</td><td>dillweed.com/glossary.html</td></tr>
           </tbody>
         </table>
       </div>
@@ -386,7 +385,6 @@
         <a href="/dnso-operations-charter.html">dillweed.com/dnso-operations-charter.html — DNSO Operations Charter v1.0.3</a>
         <a href="/anthill-spec.html">dillweed.com/anthill-spec.html — Anthill&#8482; Observability Plane Specification v0.1.3</a>
         <a href="/continuity-protocol.html">dillweed.com/continuity-protocol.html — Continuity Protocol GSP-01 v1.0.3</a>
-        <a href="/glossary.html">dillweed.com/glossary.html — Glossary v1.0.2</a>
       </div>
 
       <p>The immediate standards objective is dialogue around trust management, governance neutrality, trust tier attestation models, and cross-domain naming authority for portable agent ecosystems. The founding-phase governance structure is explicitly designed to evolve toward multi-stakeholder institutional models as adoption develops — the transition trigger is ecosystem participation rather than a fixed date.</p>
