@@ -934,6 +934,12 @@ function isInternalIp(ip) {
 // can't redirect the probe. async + fire-and-forget; never throws.
 async function probeEndpoint(endpoint) {
   if (!PROBE_LIVENESS_ENABLED) return;   // disabled by default (SSRF hardening)
+  // Post-review fix (steward report 2026-06-10-r3 M-1): DillClaw Spec §7 —
+  // "Probes MUST NOT be repeated on every resolution request." A fresh liveness
+  // verdict (60s TTL, alive OR dead) short-circuits the probe; we only go
+  // outbound when the cache entry is missing or expired — getLiveness() returns
+  // null in exactly those two cases.
+  if (cache.getLiveness(endpoint) !== null) return;
   let parsed;
   try { parsed = new url.URL(endpoint); } catch { return; }
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return;
