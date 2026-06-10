@@ -579,6 +579,56 @@ run "Valid version suffix ':3.1.0' still parses" "200" \
   "$BASE/resolve" \
   --grep '"status"[[:space:]]*:[[:space:]]*"resolved"'
 
+# ── Per-IP rate limiting (W0 / v2 design §4.2.2) ──────────────────────────────
+# Reads (/capability, /trace) and expensive POSTs (/resolve, /batch) draw from
+# separate per-IP budgets; exceeding one yields 429 + Retry-After. /health is
+# exempt. Burst sizes self-calibrate from the limits advertised in /health.
+header "Per-IP rate limiting (429 + Retry-After)  [v2 §4.2.2]"
+rl_num() { grep -o "\"$1\"[[:space:]]*:[[:space:]]*[0-9]*" | grep -o '[0-9]*$' | head -1; }
+
+RL_ENABLED=$(curl -s "$BASE/health" | grep -o '"enabled"[[:space:]]*:[[:space:]]*\(true\|false\)' | grep -o 'true\|false' | head -1)
+READ_MAX=$(curl -s "$BASE/health" | rl_num read_max)
+WRITE_MAX=$(curl -s "$BASE/health" | rl_num write_max)
+
+if [ "$RL_ENABLED" != "true" ]; then
+  ok "rate limiting reported disabled — 429 assertions skipped"
+else
+  # Read budget. Use /trace (a purely local lookup) rather than /capability: a
+  # /capability miss cascades to a registry lookup, so a large burst would also
+  # throttle the resolver's own registry sync (same localhost IP in this test).
+  R429=$(seq 1 $((READ_MAX + 15)) | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" "$BASE/trace/does-not-exist" | grep -c '^429$')
+  if [ "$R429" -ge 1 ]; then
+    ok "read burst over budget → ${R429}×429 (read_max=$READ_MAX)"
+  else
+    fail "read burst should produce ≥1 429 (read_max=$READ_MAX, got $R429)"
+  fi
+
+  RA_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/trace/does-not-exist")
+  RA=$(curl -s -o /dev/null -D - "$BASE/trace/does-not-exist" | grep -i '^retry-after:' | tr -d '\r' | awk '{print $2}')
+  if [ "$RA_STATUS" = "429" ] && [ -n "$RA" ]; then
+    ok "429 response carries Retry-After (${RA}s)"
+  else
+    fail "saturated read expected 429 + Retry-After (status=$RA_STATUS, retry-after=$RA)"
+  fi
+
+  # Write/expensive budget (POST /batch — the 50× fan-out op; invalid body still
+  # counts because the limiter runs before validation). Plain /resolve is a read.
+  W429=$(seq 1 $((WRITE_MAX + 15)) | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" \
+           -X POST -H "Content-Type: application/json" -d '{"bad":"body"}' "$BASE/batch" | grep -c '^429$')
+  if [ "$W429" -ge 1 ]; then
+    ok "write burst over budget → ${W429}×429 (write_max=$WRITE_MAX)"
+  else
+    fail "write burst should produce ≥1 429 (write_max=$WRITE_MAX, got $W429)"
+  fi
+
+  H429=$(seq 1 30 | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" "$BASE/health" | grep -c '^429$')
+  if [ "$H429" = "0" ]; then
+    ok "/health exempt from rate limiting (0×429 over 30 calls)"
+  else
+    fail "/health should be exempt (got ${H429}×429)"
+  fi
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo "─────────────────────────────────────────"

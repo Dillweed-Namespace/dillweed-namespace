@@ -543,6 +543,7 @@ function handleHealth(req, res) {
     public_key_url:   'https://dillweed.com/dnso_public.pem',
     uptime_seconds:   Math.floor(process.uptime()),
     timestamp:        new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    rate_limit:       rateLimitConfig(),
   };
 
   // Key rotation overlap status (Registry Spec v0.1.4 §5.6). When a previous
@@ -1060,6 +1061,73 @@ async function handleVerify(req, res, rawPath) {
   });
 }
 
+// ── Rate limiting (W0 / v2 design §4.2.2, static per-IP guard) ────────────────
+// In-application backstop to the edge-proxy volumetric tier (§4.2.1): a per-IP
+// fixed-window limiter with separate budgets for cheap reads and expensive
+// writes (register/revoke/promote, /verify). Returns 429 + Retry-After (§4.2.2),
+// a status the v1 error tables never defined. Per-identity cost-weighted quotas
+// are W1 (they depend on Area 1 authenticated identity) and are out of scope here.
+// /health is exempt so liveness monitors are never throttled.
+//
+// Defaults are generous (a normal resolver polls /list once per refresh); tune
+// down per deployment via env. Set REGISTRY_RL_DISABLED=1 to turn the guard off.
+const RL_DISABLED  = process.env.REGISTRY_RL_DISABLED === '1';
+const RL_WINDOW_MS = parseInt(process.env.REGISTRY_RL_WINDOW_MS || '60000', 10);
+const RL_READ_MAX  = parseInt(process.env.REGISTRY_RL_READ_MAX  || '300', 10);
+const RL_WRITE_MAX = parseInt(process.env.REGISTRY_RL_WRITE_MAX || '100', 10);
+
+// key `${ip}|${cls}` -> { count, windowStart }. Bounded by a periodic sweep below.
+const rlBuckets = new Map();
+
+function rlClientIp(req) {
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+// Expensive/state-changing requests draw from the smaller write budget.
+function rlIsWrite(req, pathname) {
+  return req.method === 'POST' || pathname.startsWith('/verify/');
+}
+
+// Returns null when allowed, or { retryAfter } (whole seconds) when the budget
+// for this (ip, class) window is exceeded.
+function rlCheck(ip, cls, max) {
+  const now = Date.now();
+  const key = `${ip}|${cls}`;
+  let b = rlBuckets.get(key);
+  if (!b || now - b.windowStart >= RL_WINDOW_MS) {
+    b = { count: 0, windowStart: now };
+    rlBuckets.set(key, b);
+  }
+  b.count++;
+  if (b.count > max) {
+    return { retryAfter: Math.max(1, Math.ceil((b.windowStart + RL_WINDOW_MS - now) / 1000)) };
+  }
+  return null;
+}
+
+// Drop stale windows so the map can't grow unbounded with distinct IPs.
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, b] of rlBuckets) if (now - b.windowStart >= RL_WINDOW_MS) rlBuckets.delete(k);
+}, RL_WINDOW_MS).unref();
+
+// Operational visibility (and lets the test suite self-calibrate its burst size).
+function rateLimitConfig() {
+  return { enabled: !RL_DISABLED, window_ms: RL_WINDOW_MS, read_max: RL_READ_MAX, write_max: RL_WRITE_MAX };
+}
+
+// Enforce the per-IP budget. Returns true if the request was rejected (429).
+function rlEnforce(req, res, pathname) {
+  if (RL_DISABLED || pathname === '/health') return false;
+  const cls = rlIsWrite(req, pathname) ? 'write' : 'read';
+  const hit = rlCheck(rlClientIp(req), cls, cls === 'write' ? RL_WRITE_MAX : RL_READ_MAX);
+  if (!hit) return false;
+  res.setHeader('Retry-After', String(hit.retryAfter));
+  err(res, 429, 'RATE_LIMITED',
+      `Rate limit exceeded for ${cls} requests. Retry after ${hit.retryAfter}s.`);
+  return true;
+}
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 const server = http.createServer(async (req, res) => {
@@ -1069,6 +1137,10 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
   const { pathname } = url.parse(req.url);
+
+  // Per-IP rate limit (W0 §4.2.2). Runs before routing so even rejected/invalid
+  // requests count against the budget and can't be used to bypass the guard.
+  if (rlEnforce(req, res, pathname)) return;
 
   // Mirror mode: reject all write operations
   if (REGISTRY_MODE === 'mirror' && req.method === 'POST') {

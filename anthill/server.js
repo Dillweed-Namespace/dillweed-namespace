@@ -415,6 +415,7 @@ function handleHealth(req, res) {
     signals_received: n,
     auth,
     spec:             'https://dillweed.com/anthill-spec.html',
+    rate_limit:       rateLimitConfig(),
   });
 }
 
@@ -812,6 +813,62 @@ const ROUTES = {
   '/summary':   ['GET'],
 };
 
+// ── Rate limiting (W0 / v2 design §4.2.2, static per-IP guard) ────────────────
+// In-application backstop to the edge-proxy volumetric tier (§4.2.1): a per-IP
+// fixed-window limiter with separate budgets for cheap reads (/signals,
+// /aggregate, /summary) and the ingestion write (POST /signal). Returns 429 +
+// Retry-After (§4.2.2) so a flooding node can't overwhelm the plane that exists
+// to *detect* abuse (Anthill review S8). Per-enrolled-node ingestion quotas with
+// a tolerant replay window are W1 (depend on Area 3). /health is exempt. Tune via
+// env; ANTHILL_RL_DISABLED=1 disables.
+const RL_DISABLED  = process.env.ANTHILL_RL_DISABLED === '1';
+const RL_WINDOW_MS = parseInt(process.env.ANTHILL_RL_WINDOW_MS || '60000', 10);
+const RL_READ_MAX  = parseInt(process.env.ANTHILL_RL_READ_MAX  || '300', 10);
+const RL_WRITE_MAX = parseInt(process.env.ANTHILL_RL_WRITE_MAX || '100', 10);
+
+const rlBuckets = new Map();  // `${ip}|${cls}` -> { count, windowStart }
+
+function rlClientIp(req) {
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+function rlCheck(ip, cls, max) {
+  const now = Date.now();
+  const key = `${ip}|${cls}`;
+  let b = rlBuckets.get(key);
+  if (!b || now - b.windowStart >= RL_WINDOW_MS) {
+    b = { count: 0, windowStart: now };
+    rlBuckets.set(key, b);
+  }
+  b.count++;
+  if (b.count > max) {
+    return { retryAfter: Math.max(1, Math.ceil((b.windowStart + RL_WINDOW_MS - now) / 1000)) };
+  }
+  return null;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, b] of rlBuckets) if (now - b.windowStart >= RL_WINDOW_MS) rlBuckets.delete(k);
+}, RL_WINDOW_MS).unref();
+
+function rateLimitConfig() {
+  return { enabled: !RL_DISABLED, window_ms: RL_WINDOW_MS, read_max: RL_READ_MAX, write_max: RL_WRITE_MAX };
+}
+
+// Enforce before routing/auth so even rejected requests count. Returns true if
+// the request was answered with 429.
+function rlEnforce(req, res, pathname) {
+  if (RL_DISABLED || pathname === '/health') return false;
+  const cls = (req.method === 'POST' && pathname === '/signal') ? 'write' : 'read';
+  const hit = rlCheck(rlClientIp(req), cls, cls === 'write' ? RL_WRITE_MAX : RL_READ_MAX);
+  if (!hit) return false;
+  res.setHeader('Retry-After', String(hit.retryAfter));
+  err(res, 429, 'RATE_LIMITED',
+      `Rate limit exceeded for ${cls} requests. Retry after ${hit.retryAfter}s.`);
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -820,6 +877,9 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
   const pathname = url.parse(req.url).pathname;
+
+  // Per-IP rate limit (W0 §4.2.2) — runs before routing.
+  if (rlEnforce(req, res, pathname)) return;
 
   try {
     if (req.method === 'GET'  && pathname === '/health')    return handleHealth(req, res);

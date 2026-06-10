@@ -694,6 +694,55 @@ run "Unknown route → 404" "404" "$BASE/unknown"
 #   6. Try with one valid one missing:
 #      → status should be "degraded".
 
+# ── Per-IP rate limiting (W0 / v2 design §4.2.2) ──────────────────────────────
+# /list and writes draw from separate per-IP budgets; exceeding one yields
+# 429 + Retry-After. /health is exempt. The test self-calibrates its burst size
+# from the limits advertised in /health, so it works at any configured budget.
+header "Per-IP rate limiting (429 + Retry-After)  [v2 §4.2.2]"
+
+RL_ENABLED=$(curl -s "$BASE/health" | grep -o '"enabled"[[:space:]]*:[[:space:]]*\(true\|false\)' | grep -o 'true\|false' | head -1)
+READ_MAX=$(curl -s "$BASE/health" | jnum read_max)
+WRITE_MAX=$(curl -s "$BASE/health" | jnum write_max)
+
+if [ "$RL_ENABLED" != "true" ]; then
+  ok "rate limiting reported disabled — 429 assertions skipped"
+else
+  # Read budget: fire READ_MAX + 15 concurrent reads; at least one must be 429.
+  R429=$(seq 1 $((READ_MAX + 15)) | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" "$BASE/list" | grep -c '^429$')
+  if [ "$R429" -ge 1 ]; then
+    ok "read burst over budget → ${R429}×429 (read_max=$READ_MAX)"
+  else
+    fail "read burst should produce ≥1 429 (read_max=$READ_MAX, got $R429)"
+  fi
+
+  # The window is now saturated, so a further read must 429 *and* carry Retry-After.
+  RA_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/list")
+  RA=$(curl -s -o /dev/null -D - "$BASE/list" | grep -i '^retry-after:' | tr -d '\r' | awk '{print $2}')
+  if [ "$RA_STATUS" = "429" ] && [ -n "$RA" ]; then
+    ok "429 response carries Retry-After (${RA}s)"
+  else
+    fail "saturated read expected 429 + Retry-After (status=$RA_STATUS, retry-after=$RA)"
+  fi
+
+  # Write budget is independent: invalid POSTs still count (limiter runs before
+  # validation), so this exercises the limiter without mutating state.
+  W429=$(seq 1 $((WRITE_MAX + 15)) | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" \
+           -X POST -H "Content-Type: application/json" -d '{"bad":"body"}' "$BASE/register" | grep -c '^429$')
+  if [ "$W429" -ge 1 ]; then
+    ok "write burst over budget → ${W429}×429 (write_max=$WRITE_MAX)"
+  else
+    fail "write burst should produce ≥1 429 (write_max=$WRITE_MAX, got $W429)"
+  fi
+
+  # /health must never be throttled (liveness monitors depend on it).
+  H429=$(seq 1 30 | xargs -P 50 -I{} curl -s -o /dev/null -w "%{http_code}\n" "$BASE/health" | grep -c '^429$')
+  if [ "$H429" = "0" ]; then
+    ok "/health exempt from rate limiting (0×429 over 30 calls)"
+  else
+    fail "/health should be exempt (got ${H429}×429)"
+  fi
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo "─────────────────────────────────────────"

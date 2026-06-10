@@ -1320,6 +1320,7 @@ function handleHealth(req, res) {
     resolver_version: VERSION,
     uptime_seconds:   Math.floor(process.uptime()),
     timestamp:        rfc3339UTC(),
+    rate_limit:       rateLimitConfig(),
   });
 }
 
@@ -1446,6 +1447,65 @@ async function handleBatch(req, res) {
 
 // ─── Server ───────────────────────────────────────────────────────────────────
 
+// ── Rate limiting (W0 / v2 design §4.2.2, static per-IP guard) ────────────────
+// In-application backstop to the edge-proxy volumetric tier (§4.2.1): a per-IP
+// fixed-window limiter with separate budgets for cheap reads (/capability,
+// /trace) and expensive POSTs (/resolve wildcard expansion, /batch). Returns
+// 429 + Retry-After (§4.2.2). The probe-liveness SSRF deny-list and per-identity
+// cost-weighted quotas are tracked separately (probe allowlist task; W1). /health
+// is exempt. Defaults are generous; tune via env. DILLCLAW_RL_DISABLED=1 disables.
+const RL_DISABLED  = process.env.DILLCLAW_RL_DISABLED === '1';
+const RL_WINDOW_MS = parseInt(process.env.DILLCLAW_RL_WINDOW_MS || '60000', 10);
+const RL_READ_MAX  = parseInt(process.env.DILLCLAW_RL_READ_MAX  || '300', 10);
+const RL_WRITE_MAX = parseInt(process.env.DILLCLAW_RL_WRITE_MAX || '100', 10);
+
+const rlBuckets = new Map();  // `${ip}|${cls}` -> { count, windowStart }
+
+function rlClientIp(req) {
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+function rlCheck(ip, cls, max) {
+  const now = Date.now();
+  const key = `${ip}|${cls}`;
+  let b = rlBuckets.get(key);
+  if (!b || now - b.windowStart >= RL_WINDOW_MS) {
+    b = { count: 0, windowStart: now };
+    rlBuckets.set(key, b);
+  }
+  b.count++;
+  if (b.count > max) {
+    return { retryAfter: Math.max(1, Math.ceil((b.windowStart + RL_WINDOW_MS - now) / 1000)) };
+  }
+  return null;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, b] of rlBuckets) if (now - b.windowStart >= RL_WINDOW_MS) rlBuckets.delete(k);
+}, RL_WINDOW_MS).unref();
+
+function rateLimitConfig() {
+  return { enabled: !RL_DISABLED, window_ms: RL_WINDOW_MS, read_max: RL_READ_MAX, write_max: RL_WRITE_MAX };
+}
+
+// Enforce before routing so invalid/rejected requests still count. Returns true
+// if the request was answered with 429.
+function rlEnforce(req, res, pathname) {
+  if (RL_DISABLED || pathname === '/health') return false;
+  // Only /batch (a 50× fan-out) draws from the smaller "expensive" budget; a
+  // plain /resolve is a single cheap lookup and uses the read budget (§4.2.2
+  // lists batch — not exact resolve — as the expensive op). Cost-weighting the
+  // wildcard fan-out per candidate is W1 (depends on Area 1 identity).
+  const cls = (req.method === 'POST' && pathname === '/batch') ? 'write' : 'read';
+  const hit = rlCheck(rlClientIp(req), cls, cls === 'write' ? RL_WRITE_MAX : RL_READ_MAX);
+  if (!hit) return false;
+  res.setHeader('Retry-After', String(hit.retryAfter));
+  send(res, 429, { status: 'error', error_code: 'RATE_LIMITED',
+                   message: `Rate limit exceeded for ${cls} requests. Retry after ${hit.retryAfter}s.` });
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -1453,6 +1513,9 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
   const { pathname } = url.parse(req.url);
+
+  // Per-IP rate limit (W0 §4.2.2) — runs before routing.
+  if (rlEnforce(req, res, pathname)) return;
 
   try {
     if (req.method === 'POST' && pathname === '/resolve')              return await handleResolve(req, res);
