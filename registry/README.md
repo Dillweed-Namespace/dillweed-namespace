@@ -1,4 +1,4 @@
-# Dillweed Registry — v0.2.7
+# Dillweed Registry — v0.2.8
 
 Authoritative Capability Record store for the [Dillweed Namespace](https://dillweed.com/registry-spec.html).
 

@@ -1,7 +1,7 @@
 'use strict';
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  Dillweed Anthill™  v0.1.5
+//  Dillweed Anthill™  v0.1.6
 //  https://dillweed.com/anthill-spec.html
 //
 //  Implements the Dillweed Anthill Observability Plane Specification v0.1.

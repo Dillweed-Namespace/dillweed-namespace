@@ -371,7 +371,7 @@
         <li>A component MUST NOT begin or end with a hyphen.</li>
         <li>The root schemes <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dillweed://</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://</code> are reserved and governed solely by the DNSO.</li>
         <li>The combination of <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">name</code> and <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">version</code> MUST be globally unique among non-revoked capability records. A revoked <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">(name, version)</code> MAY be re-registered; the revoked record remains in the registration log for auditability. Implementations enforce this uniqueness rule at registration time and return an appropriate error when a duplicate is submitted.</li>
-        <li>Version suffixes may be appended using a colon: <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://tools.search.web-retrieval:v2</code>.</li>
+        <li>Version suffixes may be appended using a colon: <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">dllwd://tools.search.web-retrieval:1.2.0</code>.</li>
       </ul>
       <p>Internationalized namespace components are reserved for a future revision and are expected to follow IDNA 2008 (RFC 5891) punycode conventions. See Appendix A.</p>
 
@@ -609,12 +609,12 @@
         </div>
         <div class="stack-arrow">↕</div>
         <div class="stack-row">
-          <div class="stack-num">L5</div>
-          <div class="stack-content"><h4>Anthill Observability Plane</h4><p>An orthogonal governance telemetry layer spanning L2–L4. Anthill ingests neutral coordination signals from resolvers and registry operations, providing the DNSO with a verifiable, append-only record of namespace ecosystem health. It does not gate resolution or invocation; it observes them. Specified in the <a href="https://dillweed.com/anthill-spec.html" style="color:var(--accent);">Anthill Observability Plane Specification v0.1</a>.</p></div>
+          <div class="stack-num">—</div>
+          <div class="stack-content"><h4>Anthill Observability Plane (orthogonal)</h4><p>An orthogonal governance telemetry layer spanning L2–L4, deliberately given no layer number because it does not participate in the resolution chain. Anthill ingests neutral coordination signals from resolvers and registry operations, providing the DNSO with a verifiable, append-only record of namespace ecosystem health. It does not gate resolution or invocation; it observes them. Specified in the <a href="https://dillweed.com/anthill-spec.html" style="color:var(--accent);">Anthill Observability Plane Specification v0.1</a>.</p></div>
         </div>
       </div>
 
-      <p>This reflects a classical infrastructure pattern: the most durable layers are those that are neutral, independent, and provide coordination that competing parties can adopt without ceding ground to each other. The value of neutrality compounds over time. The observability plane (L5) is shown as orthogonal because it monitors the operational layers without participating in them — a structural prerequisite for credible governance, not an optional add-on.</p>
+      <p>This reflects a classical infrastructure pattern: the most durable layers are those that are neutral, independent, and provide coordination that competing parties can adopt without ceding ground to each other. The value of neutrality compounds over time. The observability plane is shown as orthogonal because it monitors the operational layers without participating in them — a structural prerequisite for credible governance, not an optional add-on. The Registry is similarly unnumbered: it is the authoritative substrate that all numbered layers depend on, but does not participate in query resolution or invocation routing.</p>
 
       <div class="callout">
         <div class="callout-label">The Full Stack</div>
@@ -740,7 +740,7 @@
 <footer>
   <div class="fb">Dillweed Namespace Standard</div>
   <div class="fm">v0.4.3 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; Draft for Comment &nbsp;·&nbsp; dillweed.com</div>
-  <div class="fm" style="width:100%; margin-top:0.5rem; opacity:0.7; text-transform:none; letter-spacing:0.05em;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion and research purposes. Commercial implementation, redistribution, or derivative works require written permission from the copyright holder.</div>
+  <div class="fm" style="width:100%; margin-top:0.5rem; opacity:0.7; text-transform:none; letter-spacing:0.05em;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 
 <script>

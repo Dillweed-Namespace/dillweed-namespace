@@ -76,7 +76,7 @@ function bankersRound3(x) {
   else                            rounded = (floor % 2 === 0) ? floor : floor + 1;  // round half to even
   return rounded / 1000;
 }
-// Namespace Standard v0.4.2 §3.4 defines two semantically equivalent scheme
+// Namespace Standard v0.4.3 §3.4 defines two semantically equivalent scheme
 // forms: the full form 'dillweed://' (human-readable contexts) and the
 // canonical short form 'dllwd://' (machine, protocol, and infrastructure
 // contexts, including resolver queries). The spec requires implementations
@@ -363,7 +363,7 @@ const dnsoKey = {
     if (!this.configured)               return 'unverifiable';
 
     // Expected format: "dnso_v1_<base64url>"
-    // Matches Registry v0.1.4 / v0.2.7 signing profile exactly. Prior to
+    // Matches Registry v0.1.5 / v0.2.8 signing profile exactly. Prior to
     // round-1 external review (RS-003), the resolver expected hex-encoded
     // signatures and used a recursive canonicalization that did not match
     // the Registry's top-level-only canonical JSON. Every Registry-signed
@@ -403,8 +403,8 @@ const dnsoKey = {
   }
 };
 
-// Canonical JSON for signature verification — matches Registry v0.1.4 /
-// v0.2.7 implementation exactly. Only the ten signed top-level fields are
+// Canonical JSON for signature verification — matches Registry v0.1.5 /
+// v0.2.8 implementation exactly. Only the ten signed top-level fields are
 // included; nested objects within input_schema and output_schema are
 // emitted as stored without recursive key sorting (per Registry Spec §5.2
 // scoping clarification). This must remain byte-identical to the Registry's
@@ -878,7 +878,8 @@ async function resolveQuery(query, opts = {}) {
   if (candidates.length === 0 &&
       registry.source === 'remote' &&
       parsed.components.length > 0 &&
-      parsed.components.every(c => !c.includes('*'))) {
+      parsed.components.every(c => !c.includes('*')) &&
+      !cache.isNegative(query)) {
     const lookupName = parsed.components.join('.');
     const fetched = await registry.fetchOneRemote(lookupName);
     if (fetched && fetched.length > 0) {
@@ -1122,7 +1123,7 @@ const HTTP_FOR = {
   VERSION_CONSTRAINT_FAILED: 404,
   SIGNATURE_FILTERED: 404,
   PERMISSION_MISMATCH: 422,
-  REGISTRY_UNAVAILABLE: 503, REGISTRY_STALE: 503,
+  REGISTRY_UNAVAILABLE: 503,
   RESOLVER_FAULT: 500,
 };
 

@@ -1,4 +1,4 @@
-# DillClaw Resolver — v0.1.7
+# DillClaw Resolver — v0.1.8
 
 Reference implementation of the [DillClaw Resolver Specification v0.1](https://dillweed.com/dillclaw-spec.html).
 

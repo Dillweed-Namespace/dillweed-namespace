@@ -320,10 +320,8 @@ if [ "$REREGISTER_HTTP" = "201" ]; then
     -H "Content-Type: application/json" \
     -d "{\"name\":\"$CAP_NAME\",\"version\":\"1.0.0\",\"reason\":\"Integration test final cleanup\"}" \
     > /dev/null 2>&1 || true
-elif [ "$REREGISTER_HTTP" = "409" ]; then
-  pass "Registry returns 409 (name still reserved after revocation — acceptable)"
 else
-  fail "Re-registration returned unexpected HTTP $REREGISTER_HTTP" "$(echo "$REREGISTER_RESPONSE" | sed '$d')"
+  fail "Re-registration after revocation returned HTTP $REREGISTER_HTTP (expected 201 per Registry Spec §3.3/§8.1)" "$(echo "$REREGISTER_RESPONSE" | sed '$d')"
 fi
 
 # ── Results ───────────────────────────────────────────────────────────────────

@@ -165,11 +165,21 @@ function tryParse(s, fallback) { try { return JSON.parse(s); } catch { return fa
 
 /* ── M-2: Semver-aware version comparison ─────────────────────────────────── */
 function compareSemver(a, b) {
-  const pa = (a || '0.0.0').split('.').map(Number);
-  const pb = (b || '0.0.0').split('.').map(Number);
-  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-    const na = pa[i] || 0, nb = pb[i] || 0;
+  const parse = (v) => {
+    const [core, pre] = (v || '0.0.0').split('-', 2);
+    return { parts: core.split('.').map(Number), pre: pre || null };
+  };
+  const pa = parse(a), pb = parse(b);
+  // Compare numeric components
+  for (let i = 0; i < Math.max(pa.parts.length, pb.parts.length); i++) {
+    const na = pa.parts[i] || 0, nb = pb.parts[i] || 0;
     if (na !== nb) return nb - na;          // descending: higher version first
+  }
+  // Per semver.org §11: release > pre-release (no pre = higher precedence)
+  if (!pa.pre && pb.pre) return -1;         // a is release, b is pre-release → a first
+  if (pa.pre && !pb.pre) return 1;          // a is pre-release, b is release → b first
+  if (pa.pre && pb.pre) {                   // both pre-release: lexicographic
+    return pa.pre < pb.pre ? 1 : pa.pre > pb.pre ? -1 : 0;
   }
   return 0;
 }
