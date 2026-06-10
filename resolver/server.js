@@ -734,7 +734,9 @@ function meetsMinimum(tier, min) {
 
 function usageScore(record) {
   if (!record.registration_date) return 0;
-  const months = (Date.now() - new Date(record.registration_date).getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const days = Math.floor((Date.now() - new Date(record.registration_date).getTime()) / msPerDay);
+  const months = Math.floor(days / 30.44);
   return Math.min(Math.max(months, 0) / 24, 1.0);
 }
 

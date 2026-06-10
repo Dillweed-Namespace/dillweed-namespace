@@ -21,6 +21,13 @@ The Dillweed® mark is registered in the United States; DillClaw™ and Dillweed
 
 ---
 
+## What's new in v0.2.8
+
+- **`install.sh` aborts cleanly if run from inside the install destination** — prevents accidental self-overwrite. Closes INST-001 (LOW).
+- **`test.sh` supports `REGISTRY_ADMIN_TOKEN` env var** — consistent with the Keychain fallback pattern used by `start.sh`. Closes INST-005 (MEDIUM).
+- **Semver-aware `/lookup` and `/verify` sorting** — version comparison now uses a full semver.org §11 comparator (ported from the resolver) with build-metadata stripping, pre-release precedence, and identifier-by-identifier numeric comparison. Previously used lexicographic SQL `ORDER BY version DESC`, which mis-ordered versions like `2.0.0` below `10.0.0`.
+- **Stale version references corrected** — README title bumped from v0.2.7 to v0.2.8.
+
 ## What's new in v0.2.7
 
 - **Round-5 polish — pagination regex pre-check and tier enum enforcement** — two items raised in external review round 5. (a) `/list` and `/log` pagination now apply a `^\d+$` regex pre-check before parseInt, rejecting malformed numeric-prefix values like `10abc` (previously parsed as 10), fractional values like `1.5` (previously parsed as 1), and alternative radixes like `0x10` (previously parsed as 0). The round-4 fix attempted this but used parseInt-only, which the round-5 reviewer correctly identified as still permissive despite the comments saying "strict." Implementation now matches its documentation. (b) `/list?tier=` now rejects invalid enum values (e.g. `?tier=banana`) with `400 BAD_REQUEST` rather than silently falling through to "all records," which was surprising behavior because a filter parameter is expected to filter. Both fixes apply via a new `parsePagination()` shared helper (14/14 unit tests pass).
@@ -69,7 +76,7 @@ The Dillweed® mark is registered in the United States; DillClaw™ and Dillweed
 
 ## What's New in v0.2.2
 
-This release brings the reference implementation into full conformance with the published Registry Specification v0.1.4 (May 2026, Stack Family 2026.04).
+This release brings the reference implementation into full conformance with the published Registry Specification v0.1.5 (May 2026, Stack Family 2026.04).
 
 - **Signing consistency fix (Spec §5.2)** — The `POST /register` handler now includes `input_schema` and `output_schema` in the signed canonical JSON whenever they are present in the request, matching the verification path. Records registered via the API without schemas now round-trip cleanly through `GET /verify`. In v0.2.1 a subtle mismatch between the sign-time and verify-time payloads caused API-registered records to fail verification; that is fixed.
 - **Absence preserved through storage** — When a registrant omits `input_schema` or `output_schema`, the registry now stores `NULL` in the database and omits the field from canonical JSON entirely, rather than storing `"{}"`. This preserves the distinction between *no schema provided* and *schema explicitly set to the empty object* that Spec §5.2 requires.
@@ -80,7 +87,7 @@ This release brings the reference implementation into full conformance with the 
 
 ## What's New in v0.2.1
 
-- Expanded signing model — `canonicalJSON` includes `input_schema` and `output_schema` in the signed field set (alphabetical order), aligning with Registry Specification v0.1.4. Signature verification in `/verify` passes these fields correctly.
+- Expanded signing model — `canonicalJSON` includes `input_schema` and `output_schema` in the signed field set (alphabetical order), aligning with Registry Specification v0.1.5. Signature verification in `/verify` passes these fields correctly.
 - Seed record signatures — Setup seeds sign `input_schema` and `output_schema` alongside all other fields.
 
 ## What's New in v0.2.0
@@ -379,7 +386,7 @@ Unauthenticated writes return 401 `UNAUTHORIZED`.
 
 ## Planned Key Rotation (v0.2.2)
 
-Per Registry Specification v0.1.4 §5.6, the DNSO Ed25519 keypair should be rotated periodically on a planned cadence, distinct from an emergency keypair reset. Planned rotation preserves the prior key through a defined overlap window so resolvers that cached the old key continue to verify existing records while they refresh.
+Per Registry Specification v0.1.5 §5.6, the DNSO Ed25519 keypair should be rotated periodically on a planned cadence, distinct from an emergency keypair reset. Planned rotation preserves the prior key through a defined overlap window so resolvers that cached the old key continue to verify existing records while they refresh.
 
 ### Rotation ceremony
 
@@ -532,4 +539,4 @@ The Apache 2.0 license does not grant trademark rights. "Dillweed" is a register
 
 ---
 
-*Dillweed Registry v0.2.7 — Registry Specification v0.1.4 — dillweed.com — 2026*
+*Dillweed Registry v0.2.8 — Registry Specification v0.1.5 — dillweed.com — 2026*

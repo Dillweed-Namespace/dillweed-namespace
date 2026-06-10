@@ -23,6 +23,14 @@ See the [implementation guide §08](https://dillweed.com/implementing-dillweed.h
 
 ---
 
+## What's new in v0.1.8
+
+- **Automatic DNSO public key fetch at install** — `install.sh` now fetches the canonical DNSO public key from `https://dillweed.com/dnso_public.pem` at install time, validates the response as PEM, and displays both the fetched SHA and expected canonical SHA for operator comparison. No manual key placement required. Closes INST-004 (HIGH).
+- **`usageScore()` formula aligned with DillClaw spec §6.2** — trust score usage-history component now computes integer UTC days and `Math.floor(days / 30.44)`, matching the pinned formula for cross-implementation determinism.
+- **Negative cache consulted before `/lookup`-on-miss** — avoids redundant Registry fetch for recently failed queries.
+- **`REGISTRY_STALE` removed from error code map** — stale data is served as a disclosed success per §7.3, not as a 503 error.
+- **Stale version references in code comments corrected** — Namespace Standard v0.4.3→v0.4.4, Registry v0.2.7→v0.2.8.
+
 ## What's new in v0.1.7
 
 - **Pass 2 conformance audit fixes** — eight defects against the DillClaw Resolver Specification v0.1.3 corrected. All eight changes are implementation-side; no spec amendments were required.
@@ -147,7 +155,7 @@ This creates three things in the resolver directory:
 
 Records with `signature: null` are intentionally left unsigned — they exist to exercise the resolver's `allow_unsigned` request policy. The bundled `tools.search.web-retrieval@4.0.0-beta` record is one such test fixture.
 
-Restart the resolver. The startup banner will say `DNSO key  configured (dnso_public.pem, ed25519)` and every resolution will perform real cryptographic verification using the canonical JSON format that matches the Registry v0.1.4 / v0.2.7 signing profile (top-level fields only, base64url-encoded Ed25519, IEEE P1363).
+Restart the resolver. The startup banner will say `DNSO key  configured (dnso_public.pem, ed25519)` and every resolution will perform real cryptographic verification using the canonical JSON format that matches the Registry v0.1.5 / v0.2.8 signing profile (top-level fields only, base64url-encoded Ed25519, IEEE P1363).
 
 > **Security note.** The bundled sample keypair is for development and demonstration only. **It is not a real DNSO trust root.** In a production DNSO deployment, the signing key lives in an HSM or equivalent. This reference implementation uses a local PEM file because its purpose is to demonstrate the protocol contract end-to-end, not to replace the operational DNSO.
 

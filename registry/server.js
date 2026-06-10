@@ -163,23 +163,56 @@ function toAPI(row) {
 
 function tryParse(s, fallback) { try { return JSON.parse(s); } catch { return fallback; } }
 
-/* ── M-2: Semver-aware version comparison ─────────────────────────────────── */
+/* ── Semver-aware version comparison (ported from resolver) ────────────────── */
+/* Returns negative if a < b, positive if a > b, zero if equal.               */
+/* Handles build metadata (stripped), pre-release identifiers (§11 rules),    */
+/* and numeric-vs-string identifier comparison per semver.org.                */
 function compareSemver(a, b) {
-  const parse = (v) => {
-    const [core, pre] = (v || '0.0.0').split('-', 2);
-    return { parts: core.split('.').map(Number), pre: pre || null };
+  if (a === b) return 0;
+  if (!a) return -1;
+  if (!b) return 1;
+
+  const stripBuild = v => v.split('+')[0];
+  const va = stripBuild(a);
+  const vb = stripBuild(b);
+
+  const splitPre = v => {
+    const idx = v.indexOf('-');
+    return idx === -1 ? [v, null] : [v.slice(0, idx), v.slice(idx + 1)];
   };
-  const pa = parse(a), pb = parse(b);
-  // Compare numeric components
-  for (let i = 0; i < Math.max(pa.parts.length, pb.parts.length); i++) {
-    const na = pa.parts[i] || 0, nb = pb.parts[i] || 0;
-    if (na !== nb) return nb - na;          // descending: higher version first
+  const [mainA, preA] = splitPre(va);
+  const [mainB, preB] = splitPre(vb);
+
+  const partsA = mainA.split('.').map(n => parseInt(n, 10) || 0);
+  const partsB = mainB.split('.').map(n => parseInt(n, 10) || 0);
+  const len = Math.max(partsA.length, partsB.length);
+  for (let i = 0; i < len; i++) {
+    const ai = partsA[i] || 0;
+    const bi = partsB[i] || 0;
+    if (ai !== bi) return ai - bi;
   }
-  // Per semver.org §11: release > pre-release (no pre = higher precedence)
-  if (!pa.pre && pb.pre) return -1;         // a is release, b is pre-release → a first
-  if (pa.pre && !pb.pre) return 1;          // a is pre-release, b is release → b first
-  if (pa.pre && pb.pre) {                   // both pre-release: lexicographic
-    return pa.pre < pb.pre ? 1 : pa.pre > pb.pre ? -1 : 0;
+
+  if (preA === null && preB === null) return 0;
+  if (preA === null) return 1;
+  if (preB === null) return -1;
+
+  const idsA = preA.split('.');
+  const idsB = preB.split('.');
+  const ilen = Math.max(idsA.length, idsB.length);
+  for (let i = 0; i < ilen; i++) {
+    if (idsA[i] === undefined) return -1;
+    if (idsB[i] === undefined) return 1;
+    const numA = /^\d+$/.test(idsA[i]) ? parseInt(idsA[i], 10) : null;
+    const numB = /^\d+$/.test(idsB[i]) ? parseInt(idsB[i], 10) : null;
+    if (numA !== null && numB !== null) {
+      if (numA !== numB) return numA - numB;
+    } else if (numA !== null) {
+      return -1;
+    } else if (numB !== null) {
+      return 1;
+    } else if (idsA[i] !== idsB[i]) {
+      return idsA[i] < idsB[i] ? -1 : 1;
+    }
   }
   return 0;
 }
@@ -535,7 +568,7 @@ async function handleLookup(req, res, rawPath) {
     rows = row ? [row] : [];
   } else {
     rows = stmts.lookupByName.all(name);
-    rows.sort((a, b) => compareSemver(a.version, b.version));
+    rows.sort((a, b) => -compareSemver(a.version, b.version));
   }
 
   if (!rows.length) {
@@ -899,7 +932,7 @@ async function handleVerify(req, res, rawPath) {
     row = stmts.lookupExact.get(name, version);
   } else {
     const rows = stmts.lookupByName.all(name);
-    rows.sort((a, b) => compareSemver(a.version, b.version));
+    rows.sort((a, b) => -compareSemver(a.version, b.version));
     row = rows[0] || null;
   }
 

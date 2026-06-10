@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.6 — Dillweed Namespace Project">
+  <meta property="og:title" content="DillClaw&#x2122; Resolver Specification v0.1.7 — Dillweed Namespace Project">
 <meta property="og:description" content="The resolution protocol, trust scoring algorithm, and API contract for the Dillweed Namespace. How agents find and evaluate capabilities.">
 <meta property="og:url" content="https://dillweed.com/dillclaw-spec.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dillweed Namespace Project">
-  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.6</title>
+  <title>DillClaw&#x2122; Resolver — Technical Specification v0.1.7</title>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -173,7 +173,7 @@
   <div class="sb-brand">
     <div class="sb-wordmark">DillClaw&#x2122;<br>Resolver</div>
     <div class="sb-sub">Technical Specification</div>
-    <span class="sb-version">v0.1.6</span>
+    <span class="sb-version">v0.1.7</span>
   </div>
   <div class="sb-nav-label">Sections</div>
   <nav>
@@ -214,7 +214,7 @@
     <div class="cover-grid"></div>
     <div class="cover-glow"></div>
     <div class="cover-inner">
-      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.6 Published</div>
+      <div class="cover-eyebrow">DillClaw · Technical Specification · v0.1.7 Published</div>
      <h1 class="cover-title">DillClaw Resolver <span style="font-size:0.55em;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:0.04em;">(Published Specification)</span></h1>
       <p class="cover-tagline">The resolution layer for the Dillweed Namespace — turning stable names into trusted, invocable capabilities.</p>
 
@@ -228,7 +228,7 @@
       </div>
 
       <div class="cover-meta">
-        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.6</span></div>
+        <div class="cover-meta-item"><span class="label">Version</span><span class="value">0.1.7</span></div>
         <div class="cover-meta-item"><span class="label">Published</span><span class="value">May 2026</span></div>
         <div class="cover-meta-item"><span class="label">Namespace Ref</span><span class="value"><a href="https://dillweed.com/namespace-standard.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dillweed NS Standard v0.4</a></span></div>
         <div class="cover-meta-item"><span class="label">Stack Family</span><span class="value">2026.04</span></div>
@@ -377,7 +377,7 @@
 
       <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">version_pref</code> field accepts three forms. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"stable"</code> selects the highest semver version (per <a href="https://semver.org" style="color:var(--oc-accent);">semver.org</a>) without a pre-release identifier and without a build-metadata tag, from among candidates surviving the trust filter. <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">"latest"</code> selects the highest semver version including pre-release identifiers. An explicit semver string or semver range (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">1.2.0</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">^1.2</code>) selects the highest version satisfying that constraint.</p>
 
-      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">max_results</code> field accepts integers between 1 and 50. Requests specifying a value outside this range MUST be rejected with <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">QUERY_MALFORMED</code>. The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">allow_unsigned</code> field controls whether candidates with missing or unverifiable signatures are eligible for inclusion in the result set. When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">false</code> (the default), unsigned candidates are eliminated during signature filtering (§6.1). When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">true</code>, unsigned candidates are retained and marked with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">sig_unverified</code> trust signal. This field implements the §6.1 provision that missing-signature candidates "MAY be returned only if caller policy permits unsigned records." A resolver MAY also support a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">DILLCLAW_DIAGNOSTIC_MODE</code> environment variable that, when set, enables unsigned-record inclusion globally for debugging and development contexts.</p>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">max_results</code> field accepts integers between 1 and 50. Requests specifying a value outside this range MUST be rejected with <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">QUERY_MALFORMED</code>. The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">allow_unsigned</code> field controls whether candidates with missing or unverifiable signatures are eligible for inclusion in the result set. When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">false</code> (the default), unsigned candidates are eliminated during signature filtering (§6.1). When <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">true</code>, unsigned candidates are retained and marked with the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">sig_unverified</code> trust signal. This field implements the §6.1 provision that missing-signature candidates "MAY be returned only if caller policy permits unsigned records." A resolver MAY also support a <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">DILLCLAW_DIAGNOSTIC_MODE</code> environment variable that, when set to <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">1</code>, enables unsigned-record inclusion globally for debugging and development contexts.</p>
 
       <h2 class="sub-title">3.2 Response Structure</h2>
 
@@ -1034,7 +1034,7 @@ validate(request_body, result.capability.input_schema)
       <p>The current specification treats the <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">Authorization</code> header as optional with no prescribed format, and does not authenticate the agent making a resolution request. A future revision is expected to define: (a) a bearer-token format and validation contract for resolver authentication, (b) a caller-identity attestation model that allows a resolver to verify the agent making each request, and (c) the resolver identity certificate model referenced in §11.1 for mitigating resolver-impersonation threats. These changes will affect §5.2, §11.1, and §11.2.</p>
 
       <h2 class="sub-title">A.2 Caller-Controlled Endpoint Liveness Probing</h2>
-      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> request field has been promoted to §3.1 and §6.1 as of v0.1.6. Future work may extend this to support enumerated probe modes (e.g., shallow HTTP HEAD vs. deep health-check) and per-endpoint probe configuration.</p>
+      <p>The <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">probe_liveness</code> request field has been promoted to §3.1 and §6.1 as of v0.1.7. Future work may extend this to support enumerated probe modes (e.g., shallow HTTP HEAD vs. deep health-check) and per-endpoint probe configuration.</p>
 
       <h2 class="sub-title">A.3 Richer Permission Semantics</h2>
       <p>The current specification performs exact-string matching on permissions declared by the caller against permissions declared by the capability. A future revision is expected to introduce structured permission scopes, hierarchical permissions (for example <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read</code> implying <code style="font-family:var(--mono);font-size:0.85em;color:var(--oc-accent)">data.read.metadata</code>), and permission negotiation where a capability may declare that it conditionally supports permissions depending on caller identity. This change will affect §6.1.</p>
@@ -1079,7 +1079,7 @@ validate(request_body, result.capability.input_schema)
 
 <footer>
   <div class="fb">DillClaw Resolver — Technical Specification</div>
-  <div class="fm">v0.1.6 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
+  <div class="fm">v0.1.7 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Stack Family 2026.04 &nbsp;·&nbsp; dillweed.com</div>
     <div class="fm" style="margin-top:0.5rem; opacity:0.7;">© 2026 Richard McClelland. All rights reserved. Dillweed® is a registered trademark in the United States (Classes 35, 41, and 42). Specifications may be referenced for standards discussion, research, and interoperable implementation. The official specification text and Dillweed marks remain under the stewardship of the Dillweed Namespace Project.</div>
 </footer>
 
