@@ -11,7 +11,7 @@
 //    3. Seeds the database with sample Capability Records
 //    4. Signs each seeded record with the DNSO private key
 //
-//  Signing follows Registry Specification v0.1.4 §5.2: input_schema and
+//  Signing follows Registry Specification v0.1.5 §5.2: input_schema and
 //  output_schema are included in the canonical JSON when present and
 //  omitted entirely when absent. All seed records below include both
 //  schemas, so the signed payload always contains them.

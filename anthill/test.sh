@@ -1,6 +1,6 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────────────────────
-#  Dillweed Anthill™ — Test Suite (v0..6)
+#  Dillweed Anthill™ — Test Suite (v0.1.6)
 #  Run while the server is running:  bash test.sh
 #
 #  Covers Spec v0.1 conformance:

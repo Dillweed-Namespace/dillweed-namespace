@@ -146,7 +146,7 @@ const stmts = {
   // (a restart-reset counter could re-issue an old ETag for different content).
   countCatalogOps:   db.prepare(`SELECT COUNT(*) AS n FROM registration_log WHERE action IN ('register','revoke','promote')`),
   lastCatalogChange: db.prepare(`SELECT created_at FROM registration_log WHERE action IN ('register','revoke','promote') ORDER BY id DESC LIMIT 1`),
-  // NS-004: GET /log endpoint queries (Registry Spec v0.1.4 §04).
+  // NS-004: GET /log endpoint queries (Registry Spec v0.1.5 §04).
   // Filtering is applied via dynamic SQL in handleLog because the combinations
   // are small (4 possibilities: no filter / name / action / name+action) and
   // composing them in code is clearer than four separate prepared statements.
@@ -187,7 +187,7 @@ function verify(record) {
 
 function toAPI(row) {
   if (!row) return null;
-  // Per Registry Spec v0.1.4 §5.2: absent schemas are omitted, not null/empty.
+  // Per Registry Spec v0.1.5 §5.2: absent schemas are omitted, not null/empty.
   // Preserve the distinction between "schema provided (possibly empty object)"
   // and "no schema provided" by returning undefined when the DB column is NULL.
   // Callers that need a JSON-shaped response should JSON.stringify — undefined
@@ -317,7 +317,7 @@ function parsePagination(q) {
 
 // ── Validation ────────────────────────────────────────────────────────────────
 //
-// Per Registry Spec v0.1.4 §7: "A submission that fails any rule is rejected
+// Per Registry Spec v0.1.5 §7: "A submission that fails any rule is rejected
 // with 422 VALIDATION_FAILED and a structured errors array listing every
 // failure simultaneously — callers receive all problems in a single response."
 // This function MUST collect every failure rather than short-circuiting.
@@ -579,7 +579,7 @@ function handleHealth(req, res) {
     rate_limit:       rateLimitConfig(),
   };
 
-  // Key rotation overlap status (Registry Spec v0.1.4 §5.6). When a previous
+  // Key rotation overlap status (Registry Spec v0.1.5 §5.6). When a previous
   // public key is present on disk, the registry is inside a rotation overlap
   // window and both keys are verifiable. Resolvers that cached the old key
   // can continue verifying old-signed records against the previous key while
@@ -594,7 +594,7 @@ function handleHealth(req, res) {
     };
   }
 
-  // Mirror mode: expose freshness fields required by Registry Spec v0.1.4 §10.3
+  // Mirror mode: expose freshness fields required by Registry Spec v0.1.5 §10.3
   // These allow resolvers to detect stale, split-brain, or tampered mirrors.
   // Set AUTHORITATIVE_SNAPSHOT_TIMESTAMP and AUTHORITATIVE_SIGNATURE_HASH
   // env vars when running as a mirror, updated by your sync process.
@@ -638,7 +638,7 @@ function handleHealth(req, res) {
 }
 
 // GET /pubkey  — optional ?previous=true returns the prior key during a
-// planned rotation overlap window (Registry Spec v0.1.4 §5.6). The prior key
+// planned rotation overlap window (Registry Spec v0.1.5 §5.6). The prior key
 // must remain verifiable for a minimum 30-day overlap so resolvers that
 // cached the old key can continue verifying old-signed records while they
 // refresh to the new key on their next scheduled update cycle.
@@ -751,7 +751,7 @@ function handleList(req, res) {
        { 'ETag': etag, 'Last-Modified': lastModified });
 }
 
-// GET /log — Registry Spec v0.1.4 §04.
+// GET /log — Registry Spec v0.1.5 §04.
 // Public read of the append-only registration log. Returns entries in ascending
 // id order (== chronological). Supports limit/offset pagination and optional
 // filtering by name and action. Per spec: unknown query parameters MUST be
@@ -841,7 +841,7 @@ async function handleRegister(req, res) {
   // Non-UTC offsets and fractional seconds MUST NOT be used. ISO string is
   // YYYY-MM-DDTHH:MM:SS.sssZ — strip the milliseconds to comply.
   const now_utc = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
-  // Per Registry Spec v0.1.4 §5.2: absent input_schema/output_schema must be
+  // Per Registry Spec v0.1.5 §5.2: absent input_schema/output_schema must be
   // omitted from the canonical JSON entirely (not represented as null or {}).
   // Store NULL in the DB when the registrant did not supply a schema, so the
   // "absent" state round-trips through storage and verify correctly.
@@ -860,7 +860,7 @@ async function handleRegister(req, res) {
     tags:              JSON.stringify(body.tags || []),
   };
 
-  // Sign — per Registry Spec v0.1.4 §5.2, include input_schema and output_schema
+  // Sign — per Registry Spec v0.1.5 §5.2, include input_schema and output_schema
   // when present so the signature covers executable behavior definitions.
   // When absent, they are omitted from canonical JSON entirely (not null).
   // This MUST match handleVerify's reconstruction exactly.

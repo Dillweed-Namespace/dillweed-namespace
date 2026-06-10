@@ -3,7 +3,7 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Dillweed Registry — Planned Key Rotation Tool
-//  Registry Specification v0.1.4 §5.6 — Planned Key Rotation
+//  Registry Specification v0.1.5 §5.6 — Planned Key Rotation
 //
 //  This tool performs a DNSO Ed25519 keypair rotation with an overlap window,
 //  as specified in §5.6. It is DISTINCT from emergency keypair reset:
@@ -100,7 +100,7 @@ if (hasFlag('--finalize')) return cmdFinalize();
 
 // No recognized command
 console.log('');
-console.log('  Dillweed Registry — Key Rotation Tool (Spec v0.1.4 §5.6)');
+console.log('  Dillweed Registry — Key Rotation Tool (Spec v0.1.5 §5.6)');
 console.log('');
 console.log('  Commands:');
 console.log('    node rotate-key.js --status');
