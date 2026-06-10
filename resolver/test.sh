@@ -579,6 +579,39 @@ run "Valid version suffix ':3.1.0' still parses" "200" \
   "$BASE/resolve" \
   --grep '"status"[[:space:]]*:[[:space:]]*"resolved"'
 
+# ── Registry refresh jitter + backoff (W0 / v2 design §2.3 step 5) ────────────
+# The refresh loop now self-schedules with ±jitter (de-syncs the fleet, S1) and
+# exponential backoff on failure (stops hammering a down registry, S7). The exact
+# delay math is covered in unit-tests.js (S1/S7 refreshDelay); here we assert the
+# config is exposed and that a healthy registry shows no backoff.
+header "Registry refresh jitter + backoff  [v2 §2.3 step 5]"
+REFRESH_BLOCK=$(curl -s "$BASE/health" | grep -A6 '"refresh"')
+rnum() { grep -o "\"$1\"[[:space:]]*:[[:space:]]*[0-9.]*" | grep -o '[0-9.]*$' | head -1; }
+BASE_MS=$(echo "$REFRESH_BLOCK" | rnum base_interval_ms)
+JIT=$(echo "$REFRESH_BLOCK"     | rnum jitter)
+CFAIL=$(echo "$REFRESH_BLOCK"   | rnum consecutive_failures)
+NEXT_MS=$(echo "$REFRESH_BLOCK" | rnum next_refresh_ms)
+
+if [ -n "$BASE_MS" ] && [ "$BASE_MS" -gt 0 ] && [ -n "$JIT" ]; then
+  ok "refresh config exposed in /health (base_interval_ms=$BASE_MS, jitter=$JIT)"
+else
+  fail "refresh config missing from /health (base=$BASE_MS jitter=$JIT)"
+fi
+
+if [ "$CFAIL" = "0" ]; then
+  ok "no backoff while registry healthy (consecutive_failures=0)"
+else
+  fail "expected consecutive_failures=0 while healthy (got $CFAIL)"
+fi
+
+# Healthy → next refresh is a positive value near the base interval (jittered),
+# not inflated by backoff.
+if [ -n "$NEXT_MS" ] && [ "$NEXT_MS" -gt 0 ] && [ "$NEXT_MS" -le $((BASE_MS * 2)) ]; then
+  ok "next refresh scheduled with jitter, no backoff (next_refresh_ms=$NEXT_MS)"
+else
+  fail "next_refresh_ms should be positive and near base while healthy (got $NEXT_MS, base $BASE_MS)"
+fi
+
 # ── probe_liveness SSRF guard (W0 / v2 design §4.2.2, F-8) ────────────────────
 # Liveness probing is an outbound HEAD to a capability's registered endpoint — an
 # SSRF vector. It is OFF by default; even enabled, endpoints resolving to internal

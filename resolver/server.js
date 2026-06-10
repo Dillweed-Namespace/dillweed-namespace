@@ -40,6 +40,13 @@ const REGISTRY_PATH       = path.join(__dirname, 'registry.json');
 // back to the local registry.json file (development mode).
 const REGISTRY_BASE_URL   = (process.env.DILLCLAW_REGISTRY_BASE_URL || process.env.DILLCLAW_REGISTRY_URL || '').replace(/\/+$/, '') || null;
 const REGISTRY_REFRESH_MS = parseInt(process.env.DILLCLAW_REGISTRY_REFRESH_MS || '60000', 10);
+// Refresh-loop hygiene (resolver review S1/S7, v2 design §2.3 step 5). Jitter
+// de-synchronizes a resolver fleet so they don't all poll the registry on the
+// same tick (thundering herd); exponential backoff stops the fleet from hammering
+// a down registry every interval. Jitter is a ±fraction of the interval; the
+// backoff doubles per consecutive failure up to a cap.
+const REFRESH_JITTER         = Math.min(Math.max(parseFloat(process.env.DILLCLAW_REGISTRY_REFRESH_JITTER || '0.2'), 0), 0.9);
+const REFRESH_BACKOFF_MAX_MS = parseInt(process.env.DILLCLAW_REGISTRY_BACKOFF_MAX_MS || String(15 * 60 * 1000), 10);
 // DillClaw Resolver Spec §7.2 defines the stale-while-revalidate window:
 // default 900s, max 1800s. §7.3 + REQ-35 require that once this window
 // expires, subsequent requests MUST return REGISTRY_UNAVAILABLE rather than
@@ -169,6 +176,17 @@ const cache = {
 //   RS-012 — switched from single-URL-feed convention to Registry base-URL
 //            convention with /list and /lookup integration.
 
+// Compute the next refresh delay (ms): exponential backoff by consecutive
+// failure count, capped at capMs, then full-jittered by ±jitterFrac. `rnd` is a
+// [0,1) sample, injected so unit tests can exercise this deterministically. The
+// failure exponent is clamped so a long outage can't overflow Math.pow.
+function refreshDelay(baseMs, failures, capMs, jitterFrac, rnd) {
+  const exp     = Math.min(Math.max(failures, 0), 20);
+  const backoff = Math.min(baseMs * Math.pow(2, exp), capMs);
+  const range   = backoff * jitterFrac;
+  return Math.max(0, Math.round(backoff - range + rnd * 2 * range));
+}
+
 const registry = {
   source:        'local',       // 'local' | 'remote'
   mode:          'ok',          // 'ok' | 'stale' | 'unavailable'
@@ -183,13 +201,15 @@ const registry = {
   staleSince:    null,
   refreshTimer:  null,
   refreshing:    false,
+  consecutiveFailures: 0,   // drives exponential backoff between refreshes
+  nextDelayMs:   null,      // last scheduled delay, surfaced in /health
 
   async init() {
     if (REGISTRY_BASE_URL) {
       this.source = 'remote';
-      await this.refreshList();
-      this.refreshTimer = setInterval(() => this.refreshList(), REGISTRY_REFRESH_MS);
-      this.refreshTimer.unref();   // allow clean shutdown
+      const ok = await this.refreshList();
+      this.consecutiveFailures = ok ? 0 : 1;
+      this.scheduleRefresh();
     } else {
       this.source = 'local';
       this.loadLocal();
@@ -232,6 +252,7 @@ const registry = {
       this.mode       = 'ok';
       this.lastError  = null;
       this.staleSince = null;
+      return true;
     } catch (e) {
       this.lastError = e.message;
       if (this.data.length > 0) {
@@ -248,9 +269,30 @@ const registry = {
         this.mode = 'unavailable';
         console.error(`[registry] /list refresh failed (no cached data): ${e.message}`);
       }
+      return false;
     } finally {
       this.refreshing = false;
     }
+  },
+
+  // Self-scheduling refresh with jitter + exponential backoff (review S1/S7).
+  // Replaces the old fixed setInterval: each cycle reschedules itself after a
+  // jittered delay that backs off while the registry is failing and resets to
+  // the base interval on the next success.
+  _nextDelay() {
+    this.nextDelayMs = refreshDelay(
+      REGISTRY_REFRESH_MS, this.consecutiveFailures, REFRESH_BACKOFF_MAX_MS, REFRESH_JITTER, Math.random());
+    return this.nextDelayMs;
+  },
+
+  scheduleRefresh() {
+    this.refreshTimer = setTimeout(async () => {
+      const ok = await this.refreshList();
+      if (ok === true)       this.consecutiveFailures = 0;
+      else if (ok === false) this.consecutiveFailures++;
+      this.scheduleRefresh();
+    }, this._nextDelay());
+    this.refreshTimer.unref();   // allow clean shutdown
   },
 
   // /lookup-on-miss: fetch a single record by name from <base>/lookup/<name>.
@@ -327,6 +369,13 @@ const registry = {
       last_fetch: this.lastFetch ? rfc3339UTC(this.lastFetch) : null,
       last_error: this.lastError,
       url:        REGISTRY_BASE_URL || null,
+      refresh:    {
+        base_interval_ms:     REGISTRY_REFRESH_MS,
+        jitter:               REFRESH_JITTER,
+        backoff_max_ms:       REFRESH_BACKOFF_MAX_MS,
+        consecutive_failures: this.consecutiveFailures,
+        next_refresh_ms:      this.nextDelayMs,
+      },
     };
   }
 };

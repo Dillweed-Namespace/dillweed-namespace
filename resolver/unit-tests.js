@@ -33,8 +33,9 @@ const src = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
 const bankersRoundSource = src.match(/function bankersRound3[\s\S]*?\n}\n/);
 const compareSemverSource = src.match(/function compareSemver[\s\S]*?\n}\n/);
 const isInternalIpSource  = src.match(/function isInternalIp[\s\S]*?\n}\n/);
+const refreshDelaySource  = src.match(/function refreshDelay[\s\S]*?\n}\n/);
 
-if (!bankersRoundSource || !compareSemverSource || !isInternalIpSource) {
+if (!bankersRoundSource || !compareSemverSource || !isInternalIpSource || !refreshDelaySource) {
   console.error('FATAL: could not extract helper functions from server.js');
   process.exit(2);
 }
@@ -45,13 +46,15 @@ if (!bankersRoundSource || !compareSemverSource || !isInternalIpSource) {
 (0, eval)(bankersRoundSource[0]);
 (0, eval)(compareSemverSource[0]);
 (0, eval)(isInternalIpSource[0]);
+(0, eval)(refreshDelaySource[0]);
 
 // Re-bind to local scope for clarity in the tests
 const bankersRound3 = globalThis.bankersRound3;
 const compareSemver = globalThis.compareSemver;
 const isInternalIp  = globalThis.isInternalIp;
+const refreshDelay  = globalThis.refreshDelay;
 
-if (typeof bankersRound3 !== 'function' || typeof compareSemver !== 'function' || typeof isInternalIp !== 'function') {
+if (typeof bankersRound3 !== 'function' || typeof compareSemver !== 'function' || typeof isInternalIp !== 'function' || typeof refreshDelay !== 'function') {
   console.error('FATAL: helper functions did not load into global scope');
   process.exit(2);
 }
@@ -192,6 +195,32 @@ const EXTERNAL_IPS = [
 for (const ip of EXTERNAL_IPS) {
   assertEq(isInternalIp(ip), false, `public: ${ip} → allowed`);
 }
+
+// ─── S1/S7: refreshDelay jitter + exponential backoff ─────────────────────────
+console.log('\n▶ S1/S7 — refreshDelay (registry-refresh jitter + exponential backoff)');
+
+const BASE = 60000, CAP = 900000;
+// Backoff doubles per consecutive failure (no jitter, rnd=0.5 → exact midpoint).
+assertEq(refreshDelay(BASE, 0, CAP, 0, 0.5), 60000,  '0 failures → base interval');
+assertEq(refreshDelay(BASE, 1, CAP, 0, 0.5), 120000, '1 failure → 2× base');
+assertEq(refreshDelay(BASE, 2, CAP, 0, 0.5), 240000, '2 failures → 4× base');
+assertEq(refreshDelay(BASE, 3, CAP, 0, 0.5), 480000, '3 failures → 8× base');
+// Capped — and a long outage must not overflow Math.pow into Infinity.
+assertEq(refreshDelay(BASE, 4, CAP, 0, 0.5),   CAP, '4 failures → capped at backoff_max');
+assertEq(refreshDelay(BASE, 100, CAP, 0, 0.5), CAP, '100 failures → still capped (exponent clamped)');
+// Jitter is ±fraction of the (possibly backed-off) interval.
+assertEq(refreshDelay(BASE, 0, CAP, 0.2, 0),   48000, 'jitter rnd=0 → interval − 20%');
+assertEq(refreshDelay(BASE, 0, CAP, 0.2, 1),   72000, 'jitter rnd=1 → interval + 20%');
+assertEq(refreshDelay(BASE, 0, CAP, 0.2, 0.5), 60000, 'jitter rnd=0.5 → interval midpoint');
+assertEq(refreshDelay(BASE, 1, CAP, 0.2, 0),   96000, 'jitter applies on top of backoff (2× − 20%)');
+// Jitter stays within the band across the random range, and is never negative.
+let jitterInBand = true;
+for (let i = 0; i < 200; i++) {
+  const d = refreshDelay(BASE, 0, CAP, 0.2, Math.random());
+  if (d < 48000 || d > 72000) jitterInBand = false;
+}
+assertEq(jitterInBand, true, 'jittered delay always within ±20% band over 200 samples');
+assertEq(refreshDelay(BASE, 0, CAP, 0.9, 0) >= 0, true, 'delay never negative even with large jitter');
 
 // ─── Summary ────────────────────────────────────────────────────────────────
 console.log('');
