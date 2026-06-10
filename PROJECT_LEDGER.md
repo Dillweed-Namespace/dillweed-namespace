@@ -3261,3 +3261,47 @@ F4 (ledger EOF) — all closed across the 2026-06-02 through 2026-06-06 sweep se
 
 
   
+
+### Spec-consistency review series — 2026-06-09 → 2026-06-10
+
+- **Type:** Full specification-stack and reference-implementation consistency review, six rounds (initial review + re-review + four fix-verification passes)
+- **Agent:** dillweed.protocol-steward (review-and-recommend mode), Fable 5
+- **Scope:** All 8 specs in `specs/`, `registry/server.js`, `resolver/server.js`, `anthill/server.js`, `integration-test.sh`, component READMEs
+- **Result:** 4 HIGH, 19 MEDIUM, ~25 LOW/INFO findings raised across the series; **all HIGH and MEDIUM resolved and verified closed**; 1 cosmetic LOW (R6-1) and a small INFO list left open by accepted disposition
+
+**Round structure and fix commits:**
+- Round 1 (full review): 4 HIGH / 9 MEDIUM / 6 LOW — notable: Charter-vs-Registry verified-tier
+  history conflict (30 days vs 6 months), phantom ANT-AB/ANT-RD signal classes, unsigned
+  `registration_date` driving 30% of trust score, REGISTRY_STALE self-contradiction.
+- Round 2 (full re-review of revised specs): 3 HIGH / 10 MEDIUM / 9 LOW — notable: L5 layer-number
+  contradiction across four documents, provisional-tier weighting penalty required by Registry §7 +
+  Charter §4 but undefined in DillClaw spec and unimplemented, max_results clamp-vs-reject conflict.
+- Round 3 (verification): caught one fix-introduced HIGH (usageScore() not implementing the newly
+  pinned floor(days/30.44) formula), incomplete semver comparator, and silent normative edits
+  without version bumps. Fixed with DillClaw → v0.1.7, Namespace Standard → v0.4.4.
+- Round 4 (verification): residual dangling references after the H-2 downgrade (Charter §4,
+  registry message strings), Registry §1 still labeled L5.
+- Round 5 (verification): A.1 citation overcorrection, registry strings claimed-but-not-fixed,
+  previous_key_url hardcoding.
+- Round 6 (closure): all prior findings verified closed. One cosmetic LOW remains
+  (previous_key_url relative default vs Registry Spec §5.6 "Absolute URL"), at steward's discretion.
+
+**Spec versions advanced during the series:** Namespace Standard v0.4.2 → v0.4.4; DillClaw
+v0.1.5 → v0.1.7; Registry Spec v0.1.4 → v0.1.5; Anthill v0.1.2 → v0.1.3.
+
+**Material outcomes beyond editorial fixes:**
+- Trust-score determinism is now achievable cross-implementation: months_registered formula
+  pinned in DillClaw §6.2 and implemented to match.
+- The provisional-tier weighting penalty is no longer asserted anywhere as an existing control.
+  Registry §7, Charter §4, and the registry's own messages all disclose it as future work.
+- All four stack diagrams now agree: L1–L4 numbered; Registry = unnumbered authoritative
+  substrate; Anthill = unnumbered orthogonal plane.
+- Registry and Resolver semver comparators unified (pre-release and build-metadata correct).
+- Integration test no longer masks a §3.3 conformance failure (409-after-revocation now fails).
+
+**Process lesson:** three of five fix cycles introduced at least one new defect or overclaimed
+a fix in the commit message. Each was caught only by the post-fix verification pass.
+Verify-after-fix is retained as standard practice for any multi-document sweep.
+
+**Reports:** docs/spec-consistency-review-2026-06-09.md (r1), -r2.md, -r3.md, -r4.md,
+spec-consistency-review-2026-06-09-r5.md, spec-consistency-review-2026-06-10-r6.md (closure).
