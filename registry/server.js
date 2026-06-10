@@ -478,9 +478,10 @@ function handleHealth(req, res) {
   // can continue verifying old-signed records against the previous key while
   // they refresh to the current key.
   if (fs.existsSync(PUBKEY_PREVIOUS_PATH)) {
+    const prevKeyUrl = process.env.PREVIOUS_KEY_URL || '/pubkey?previous=true';
     response.key_rotation = {
       overlap_active:       true,
-      previous_key_url:     'https://dillweed.com/dnso_public.pem?previous=true',
+      previous_key_url:     prevKeyUrl,
       rotation_started_at:  process.env.ROTATION_STARTED_AT  || null,
       rotation_ends_at:     process.env.ROTATION_ENDS_AT     || null,
     };
@@ -763,7 +764,7 @@ async function handleRegister(req, res) {
           name:    record.name,
           version: record.version,
           detail:  `Self-assigned tier '${record.trust_tier}' is provisional pending DNSO attestation. ` +
-                   `Resolvers SHOULD apply weighting penalty until /promote confirms attestation.`,
+                   `Declared tier accepted as provisional. A future resolver revision may apply weighting adjustments for unattested tiers; use /promote to record DNSO attestation.`,
           caller:  caller(req),
         });
       }
@@ -791,7 +792,7 @@ async function handleRegister(req, res) {
     response.provisional_tier_notice =
       `Trust tier '${record.trust_tier}' is a provisional self-declaration. ` +
       `Use POST /promote after DNSO attestation to confirm. ` +
-      `Resolvers will apply a weighting penalty until attestation is recorded.`;
+      `Declared tier accepted as provisional. A future resolver revision may apply weighting adjustments for unattested tiers.`;
   }
 
   send(res, 201, response);
