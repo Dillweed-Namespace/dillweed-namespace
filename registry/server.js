@@ -72,6 +72,36 @@ const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
+// ── Tag-index migration (W0 / v2 design §2.2.7) ───────────────────────────────
+// The /list tag filter previously ran `tags LIKE '%"<tag>"%'` — a leading-wildcard
+// scan no index can serve. Maintain a normalized capability_tags(tag) side table,
+// indexed on tag, so tag lookups are indexed rather than full scans. Created and
+// backfilled here (once per DB, meta-flagged) so a live production database is
+// upgraded on next start without re-running setup.js. Must run before the tag
+// prepared statements below, which reference capability_tags.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS capability_tags (
+    capability_id INTEGER NOT NULL,
+    tag           TEXT    NOT NULL,
+    UNIQUE(capability_id, tag)
+  );
+  CREATE INDEX IF NOT EXISTS idx_capability_tags_tag ON capability_tags(tag);
+`);
+const TAG_MIGRATION_KEY = 'tag_index_backfill_v1';
+if (!db.prepare(`SELECT value FROM meta WHERE key = ?`).get(TAG_MIGRATION_KEY)) {
+  const insTag = db.prepare(`INSERT OR IGNORE INTO capability_tags (capability_id, tag) VALUES (?, ?)`);
+  db.transaction(() => {
+    for (const row of db.prepare(`SELECT id, tags FROM capabilities`).all()) {
+      let tags = [];
+      try { tags = JSON.parse(row.tags || '[]'); } catch { tags = []; }
+      if (Array.isArray(tags)) {
+        for (const t of tags) if (typeof t === 'string' && t.length) insTag.run(row.id, t);
+      }
+    }
+    db.prepare(`INSERT OR REPLACE INTO meta (key, value) VALUES (?, datetime('now'))`).run(TAG_MIGRATION_KEY);
+  })();
+}
+
 // Prepared statements — compiled once at startup
 const stmts = {
   lookupByName:    db.prepare(`SELECT * FROM capabilities WHERE name=? AND revoked=0 ORDER BY version DESC`),
@@ -83,13 +113,16 @@ const stmts = {
   // requests when a name carries multiple versions.
   listAll:         db.prepare(`SELECT * FROM capabilities WHERE revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
   listByTier:      db.prepare(`SELECT * FROM capabilities WHERE trust_tier=? AND revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
-  listByTag:       db.prepare(`SELECT * FROM capabilities WHERE tags LIKE ? AND revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
+  // Tag filter is now an indexed JOIN on capability_tags (idx_capability_tags_tag)
+  // instead of a leading-wildcard LIKE scan (v2 design §2.2.7).
+  listByTag:       db.prepare(`SELECT c.* FROM capabilities c JOIN capability_tags t ON t.capability_id = c.id WHERE t.tag = ? AND c.revoked = 0 ORDER BY c.name, c.version LIMIT ? OFFSET ?`),
+  insertTag:       db.prepare(`INSERT OR IGNORE INTO capability_tags (capability_id, tag) VALUES (?, ?)`),
   countActive:     db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE revoked=0`),
   countByTier:     db.prepare(`SELECT trust_tier, COUNT(*) as n FROM capabilities WHERE revoked=0 GROUP BY trust_tier`),
   // Per-filter totals for the /list `total` field: the returned page is bounded
   // by LIMIT, so `total` must be a separate COUNT over the full filtered set.
   countByTierOne:  db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE trust_tier=? AND revoked=0`),
-  countByTag:      db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE tags LIKE ? AND revoked=0`),
+  countByTag:      db.prepare(`SELECT COUNT(*) as n FROM capabilities c JOIN capability_tags t ON t.capability_id = c.id WHERE t.tag = ? AND c.revoked = 0`),
   insert:          db.prepare(`
     INSERT INTO capabilities
       (name, description, endpoint, protocol, input_schema, output_schema,
@@ -705,9 +738,8 @@ function handleList(req, res) {
     total = stmts.countByTierOne.get(tier).n;
     rows  = stmts.listByTier.all(tier, limit, offset);
   } else if (tag) {
-    const pattern = `%"${tag}"%`;
-    total = stmts.countByTag.get(pattern).n;
-    rows  = stmts.listByTag.all(pattern, limit, offset);
+    total = stmts.countByTag.get(tag).n;
+    rows  = stmts.listByTag.all(tag, limit, offset);
   } else {
     total = stmts.countActive.get().n;
     rows  = stmts.listAll.all(limit, offset);
@@ -848,7 +880,12 @@ async function handleRegister(req, res) {
 
   try {
     db.transaction(() => {
-      stmts.insert.run(record);
+      const info = stmts.insert.run(record);
+      // Maintain the tag index (W0 §2.2.7). tags is validated as a string array;
+      // INSERT OR IGNORE de-dupes within a record via the UNIQUE constraint.
+      for (const t of (body.tags || [])) {
+        if (typeof t === 'string' && t.length) stmts.insertTag.run(info.lastInsertRowid, t);
+      }
       stmts.logAction.run({ action:'register', name:record.name, version:record.version, detail:'API registration', caller:caller(req) });
       // v0.2: log provisional tier declaration for verified/canonical self-assignments
       if (PROVISIONAL_TIERS.has(record.trust_tier)) {

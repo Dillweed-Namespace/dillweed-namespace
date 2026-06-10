@@ -587,6 +587,46 @@ else
   fail "tier-filtered pagination wrong (count=$TIER_COUNT, total=$TIER_TOTAL)"
 fi
 
+# ── Indexed tag filter (W0 / v2 design §2.2.7) ────────────────────────────────
+# /list?tag= is served by an indexed capability_tags JOIN (not a LIKE scan).
+# Register tagged records and confirm tag lookups return the right sets.
+header "GET /list — indexed tag filter (v2 §2.2.7)"
+
+reg_tagged() {  # $1 = name, $2 = tags JSON array
+  local body="{\"name\":\"$1\",\"description\":\"tag index test\",\"endpoint\":\"https://test.example.com/ti\",\"protocol\":\"rest\",\"trust_tier\":\"experimental\",\"permissions\":[\"query\"],\"tags\":$2,\"version\":\"0.1.0\"}"
+  if [ -n "$TOKEN" ]; then
+    curl -s -o /dev/null -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "$body" "$BASE/register"
+  else
+    curl -s -o /dev/null -X POST -H "Content-Type: application/json" -d "$body" "$BASE/register"
+  fi
+}
+
+TS=$(date +%s)
+UNIQ="uniq-$TS"; SHARED="shared-$TS"
+reg_tagged "test.capability.tag-a.$TS" "[\"$UNIQ\",\"$SHARED\"]"
+reg_tagged "test.capability.tag-b.$TS" "[\"$SHARED\"]"
+
+UNIQ_TOTAL=$(curl -s "$BASE/list?tag=$UNIQ" | jnum total)
+if [ "$UNIQ_TOTAL" = "1" ]; then
+  ok "unique tag → its single record (?tag=$UNIQ → total=1)"
+else
+  fail "unique tag expected total=1 (got $UNIQ_TOTAL)"
+fi
+
+SHARED_TOTAL=$(curl -s "$BASE/list?tag=$SHARED" | jnum total)
+if [ "$SHARED_TOTAL" = "2" ]; then
+  ok "shared tag → both records (?tag=$SHARED → total=2)"
+else
+  fail "shared tag expected total=2 (got $SHARED_TOTAL)"
+fi
+
+UNK_TOTAL=$(curl -s "$BASE/list?tag=nope-$TS" | jnum total)
+if [ "$UNK_TOTAL" = "0" ]; then
+  ok "unknown tag → total=0 (no error)"
+else
+  fail "unknown tag expected total=0 (got $UNK_TOTAL)"
+fi
+
 # ── Conditional reads on /list (W0 / v2 design §2.2.1) ────────────────────────
 # /list gains a strong ETag (and Last-Modified) derived from a catalog-version
 # counter bumped on every register/revoke/promote. A caller that echoes a
