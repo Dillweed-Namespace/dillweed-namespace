@@ -255,7 +255,7 @@
 
     <section class="section" id="s4">
       <div class="section-header"><span class="sec-num">§ 04</span><h1 class="sec-title">Trust Tier Attestation</h1></div>
-      <p>Trust tier attestation is the process by which the DNSO confirms that a self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> tier declaration is substantiated. Until the DNSO issues attestation, such declarations are provisional and resolvers apply weighting penalties as specified in the Registry Specification §7.</p>
+      <p>Trust tier attestation is the process by which the DNSO confirms that a self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> tier declaration is substantiated. Until the DNSO issues attestation, such declarations are provisional. A future revision of the DillClaw Resolver Specification is expected to define a mechanism by which resolvers detect provisional tiers and apply weighting adjustments (see Registry Specification §7). Until that mechanism is defined, resolvers score the declared tier at face value.</p>
 
       <h2 class="sub-title">4.1 Attestation Process — Verified Tier</h2>
       <div class="steps">
@@ -273,7 +273,7 @@
 
       <div class="callout">
         <div class="callout-label">Provisional Tier Behavior</div>
-        <p>A self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> record is signed by the DNSO at registration time — the signature attests that the DNSO wrote the record, not that the tier is confirmed. Resolvers distinguish attested from provisional tiers via the presence of a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">provisional_tier</code> audit log entry without a corresponding <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">promote</code> entry.</p>
+        <p>A self-declared <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">verified</code> or <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">canonical</code> record is signed by the DNSO at registration time — the signature attests that the DNSO wrote the record, not that the tier is confirmed. Resolvers may detect provisional tiers via the presence of a <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">provisional_tier</code> audit log entry without a corresponding <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent)">promote</code> entry; this detection mechanism is defined as future work in the DillClaw Resolver Specification.</p>
       </div>
     </section>
 

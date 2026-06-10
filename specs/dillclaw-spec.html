@@ -257,6 +257,23 @@
 
       <h2 class="sub-title">Conformance Terminology</h2>
       <p>The key words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>REQUIRED</strong>, <strong>SHALL</strong>, <strong>SHALL NOT</strong>, <strong>SHOULD</strong>, <strong>SHOULD NOT</strong>, <strong>RECOMMENDED</strong>, <strong>MAY</strong>, and <strong>OPTIONAL</strong> in this document are to be interpreted as described in BCP 14 [<a href="https://www.rfc-editor.org/info/rfc2119" style="color:var(--oc-accent);">RFC 2119</a>] [<a href="https://www.rfc-editor.org/info/rfc8174" style="color:var(--oc-accent);">RFC 8174</a>] when, and only when, they appear in all capitals, as shown here.</p>
+
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.4 (June 2026)</div>
+        <p>Added §7.5 Cache Freshness and Revocation Propagation: documents the cache TTL tradeoff, operator guidance table, force-refresh semantics, and the revocation propagation guarantee (one registry refresh interval).</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.5 (June 2026)</div>
+        <p>Added §6.4 Score Semantics and Consumer Guidance: defines the trust score as a deterministic composite resolution index, documents what the score is and is not, provides consumer guidance ranges, and establishes the "Resolution vs. Authorization" boundary statement. Fixed example trust_score from 0.940 to 0.765 (consistent with published formula). Softened §6 intro wording from "what should be used" to "strongest verified standing."</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.6 (June 2026)</div>
+        <p>Fable 5 review round 1/2 fixes: H-2 phantom signal classes (ANT-AB/ANT-RD → ANT-RC/ANT-RA in A.7), H-3 unsigned registration_date disclosure in §6.2, H-4 REGISTRY_STALE removed from §8.2, M-1 TTL source corrected to "resolver-configured," M-3 §11.1 invalid-signature mitigation aligned with §6.1, M-4 probe_liveness promoted from Appendix A to §3.1/§6.1, L-5 wildcard 200-rule: rejection not truncation.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Revision 0.1.7 (June 2026)</div>
+        <p>Fable 5 review round 3 fixes: H-3 max_results semantics changed from "clamp to 50" to "reject with QUERY_MALFORMED" (matching code). M-2 months_registered formula pinned (floor(days/30.44)). SIGNATURE_FILTERED and VERSION_CONSTRAINT_FAILED added to §8.2 error table. allow_unsigned request field documented. max_results range (1–50) specified. DILLCLAW_DIAGNOSTIC_MODE documented as requiring value "1". Example resolver_version updated to 0.1.8. §7.5 revocation propagation clarified: 60-second registry refresh interval is normative, not 300-second record cache TTL.</p>
+      </div>
     </section>
 
     <section class="section" id="s1">
