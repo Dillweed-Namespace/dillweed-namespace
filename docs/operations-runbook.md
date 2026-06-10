@@ -533,8 +533,8 @@ shasum -a 256 dillweed-registry-v0.2.8.tar.gz
 shasum -a 256 dillweed-resolver-v0.1.8.tar.gz
 # Expected: 2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a
 
-shasum -a 256 dillweed-anthill-v0.1.5.tar.gz
-# Expected: dda1430bc76247f7ad895448d0805451c246707876539145c8736f5e6a79675b
+shasum -a 256 dillweed-anthill-v0.1.6.tar.gz
+# Expected: 3bda022d2213240cfbc4355e6c07e85b8f8b997a7ae398ad626f5cb58f574f36
 ```
 
 Do not proceed if any SHA does not match. A mismatch indicates either a corrupt download or a tampered file. Re-download from the GitHub Release and re-verify before extracting.
@@ -544,7 +544,7 @@ Tarballs follow the `dillweed-` prefix convention (see Section 2). Substitute th
 ```bash
 tar -xzf dillweed-registry-v0.2.8.tar.gz
 tar -xzf dillweed-resolver-v0.1.8.tar.gz
-tar -xzf dillweed-anthill-v0.1.5.tar.gz
+tar -xzf dillweed-anthill-v0.1.6.tar.gz
 ```
 
 **Important:** Run the installer from the *parent* directory of the extracted directory, not from inside it. Running `bash install.sh` from inside `dillweed-registry/` will trigger the cwd-trap check and abort (see INST-001 in Section 8).
@@ -930,7 +930,7 @@ Note: this is application-level append-only practice. The Markdown file itself i
 **Operator:** <name>
 **Procedure executed:** <Section reference>
 **Pre-condition versions:** <e.g., Registry v0.2.7, Resolver v0.1.7, Anthill v0.1.4>
-**Post-condition versions:** <e.g., Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.5>
+**Post-condition versions:** <e.g., Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.6>
 **Backup location:** <path>
 **Trust-root strategy (for reinstalls):** <A or B>
 **Anomalies encountered:** <description, or "none">
@@ -960,7 +960,7 @@ experience surfaces additional scenarios.
 **Procedure executed:** Sections 6 (Clean Reinstall) and 7 (In-Place Upgrade),
 multiple passes; Option B trust-root migration (Section 6.7)
 **Pre-condition versions:** Registry v0.2.7, Resolver v0.1.7, Anthill v0.1.4
-**Post-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.5
+**Post-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.6
 **Backup location:** On-disk backup taken prior to clean-install pass
 **Trust-root strategy:** Option B — backed-up keypair restored after clean
 install to preserve signature continuity; canonical public key SHA confirmed:
@@ -980,7 +980,7 @@ not a server defect — tracked as INST-013, deferred to v0.1.6).
 
 **Operator:** Richard McClelland
 **Procedure executed:** N/A (publication event; runbook update)
-**Pre-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.5
+**Pre-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.6
 **Post-condition versions:** unchanged
 **Notes:** v1.0.0 published to https://github.com/Dillweed-Namespace/dillweed-namespace.
 Commit 52069ac. CONV-003 tarball-publication gate satisfied and closed.
@@ -994,7 +994,7 @@ Option B trust-root migration procedure (Section 6.7), Keychain token documentat
 
 **Operator:** Richard McClelland
 **Procedure executed:** Resolver plist updated (Section 2), capability registration
-**Pre-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.5
+**Pre-condition versions:** Registry v0.2.8, Resolver v0.1.8, Anthill v0.1.6
 **Post-condition versions:** unchanged (configuration change only)
 **Anomalies encountered:** Resolver .env file not loaded by launchd; environment
 variable added directly to launchd plist EnvironmentVariables block instead.
