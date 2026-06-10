@@ -280,8 +280,12 @@ fi
 header "Step 6: Verify revocation propagation to Resolver"
 
 echo "      Waiting for registry refresh interval expiry (documented in DillClaw spec §7.5)..."
-echo "      (Default fetch interval: 60s — waiting 70s to ensure refresh)"
-sleep 70
+# Post-review fix (steward report 2026-06-10-r3 M-3): the refresh interval is
+# jittered ±20% (W0), so the worst-case healthy refresh is 72s after the prior
+# one. 90s covers the jittered bound with margin; 70s could race it and fail
+# the revocation assertion spuriously.
+echo "      (Default fetch interval: 60s ±20% jitter — waiting 90s to ensure refresh)"
+sleep 90
 
 RESOLVE_AFTER_REVOKE=$(curl -s -X POST "$RESOLVER/resolve" \
   -H "Content-Type: application/json" \

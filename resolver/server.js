@@ -235,18 +235,39 @@ const registry = {
   },
 
   // Fetch the warm-cache snapshot from the Registry's /list endpoint.
+  // Post-review fix (steward report 2026-06-10-r3 H-3): /list is paginated
+  // (default page 100, max 500), so a single bare fetch silently truncated the
+  // snapshot once the catalog grew past one page — valid records would NO_MATCH
+  // with no error. Page to completion using limit/offset, honoring the response
+  // envelope's `total`. Records are de-duplicated by name:version because a
+  // register/revoke landing mid-pagination can shift offsets between pages.
   async refreshList() {
     if (this.refreshing) return;
     this.refreshing = true;
     try {
       // /list returns { status, total, count, offset, limit, records }
-      const parsed = await fetchJson(REGISTRY_BASE_URL + '/list');
-      const records = Array.isArray(parsed)
-        ? parsed
-        : (parsed.records || parsed.capabilities || []);
-      if (!Array.isArray(records)) {
-        throw new Error('Registry /list response did not contain a records array.');
+      const PAGE = 500;             // registry's maximum page size
+      const byKey = new Map();      // name:version → record (dedupe across pages)
+      let offset = 0;
+      for (;;) {
+        const parsed = await fetchJson(`${REGISTRY_BASE_URL}/list?limit=${PAGE}&offset=${offset}`);
+        const page = Array.isArray(parsed)
+          ? parsed
+          : (parsed.records || parsed.capabilities || []);
+        if (!Array.isArray(page)) {
+          throw new Error('Registry /list response did not contain a records array.');
+        }
+        for (const r of page) byKey.set(`${r.name}:${r.version}`, r);
+        // Legacy responses (bare array, no paging envelope) are complete in one fetch.
+        if (Array.isArray(parsed)) break;
+        const total = Number.isFinite(parsed.total) ? parsed.total : byKey.size;
+        if (page.length === 0 || byKey.size >= total) break;
+        offset += page.length;
+        if (offset > 1000000) {
+          throw new Error('Registry /list pagination exceeded sanity bound (1M records)');
+        }
       }
+      const records = [...byKey.values()];
       this._absorb(records);
       this.lastFetch  = new Date();
       this.mode       = 'ok';
