@@ -521,6 +521,72 @@ header "GET /list — invalid tier rejection (AUDIT-REG-020)"
 run "/list?tier=banana → 400 (invalid enum value rejected)" "400" "$BASE/list?tier=banana"
 run "/list?tier=verified → 200 (valid enum value accepted)" "200" "$BASE/list?tier=verified"
 
+# ── SQL-level pagination on /list (W0 / v2 design §2.2.7) ─────────────────────
+# /list now bounds the page with SQL LIMIT/OFFSET instead of fetching the whole
+# result set and slicing in JS. `total` is a separate COUNT over the full filtered
+# set, so it stays accurate regardless of the page size; `count` is the page size.
+header "GET /list — SQL-level pagination (v2 §2.2.7)"
+
+# A small helper to pull a numeric JSON field value from a /list body.
+jnum() { grep -o "\"$1\"[[:space:]]*:[[:space:]]*[0-9]*" | grep -o '[0-9]*$' | head -1; }
+
+FULL_TOTAL=$(curl -s "$BASE/list?limit=500" | jnum total)
+PAGE_BODY=$(curl -s "$BASE/list?limit=2&offset=0")
+PAGE_TOTAL=$(echo "$PAGE_BODY" | jnum total)
+PAGE_COUNT=$(echo "$PAGE_BODY" | jnum count)
+
+# (1) total reflects the full filtered set, independent of the requested limit.
+if [ -n "$FULL_TOTAL" ] && [ "$PAGE_TOTAL" = "$FULL_TOTAL" ]; then
+  ok "total reflects full set regardless of limit (total=$PAGE_TOTAL)"
+else
+  fail "total should equal full count (full=$FULL_TOTAL, page=$PAGE_TOTAL)"
+fi
+
+# (2) the returned page is bounded by limit.
+if [ -n "$PAGE_COUNT" ] && [ "$PAGE_COUNT" -le 2 ]; then
+  ok "page count bounded by limit (count=$PAGE_COUNT ≤ 2)"
+else
+  fail "page count should be ≤ limit (count=$PAGE_COUNT)"
+fi
+
+# (3) when total ≥ limit, the page is full (count == limit) — proves LIMIT applies.
+if [ -n "$FULL_TOTAL" ] && [ "$FULL_TOTAL" -ge 2 ]; then
+  if [ "$PAGE_COUNT" = "2" ]; then
+    ok "count == limit when total ≥ limit (count=2)"
+  else
+    fail "count should == 2 when total ≥ 2 (count=$PAGE_COUNT)"
+  fi
+fi
+
+# (4) OFFSET advances the window: the first record at offset 0 differs from offset 1.
+NAME0=$(curl -s "$BASE/list?limit=1&offset=0" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1)
+NAME1=$(curl -s "$BASE/list?limit=1&offset=1" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1)
+if [ -n "$NAME0" ] && [ "$NAME0" != "$NAME1" ]; then
+  ok "OFFSET advances the page (offset 0 ≠ offset 1)"
+else
+  fail "OFFSET should change the returned record (0=$NAME0 1=$NAME1)"
+fi
+
+# (5) OFFSET past the end → empty page, but total still reports the full set.
+OOB_BODY=$(curl -s "$BASE/list?limit=5&offset=$((FULL_TOTAL + 10))")
+OOB_COUNT=$(echo "$OOB_BODY" | jnum count)
+OOB_TOTAL=$(echo "$OOB_BODY" | jnum total)
+if [ "$OOB_COUNT" = "0" ] && [ "$OOB_TOTAL" = "$FULL_TOTAL" ]; then
+  ok "OFFSET past end → empty page, total unchanged (count=0, total=$OOB_TOTAL)"
+else
+  fail "OFFSET past end should give count=0 + full total (count=$OOB_COUNT, total=$OOB_TOTAL)"
+fi
+
+# (6) a tier filter paginates too: count bounded by limit, total ≥ count.
+TIER_BODY=$(curl -s "$BASE/list?tier=verified&limit=1")
+TIER_COUNT=$(echo "$TIER_BODY" | jnum count)
+TIER_TOTAL=$(echo "$TIER_BODY" | jnum total)
+if [ -n "$TIER_TOTAL" ] && [ "$TIER_COUNT" -le 1 ] && [ "$TIER_TOTAL" -ge "$TIER_COUNT" ]; then
+  ok "tier filter paginates (verified: count=$TIER_COUNT ≤ 1, total=$TIER_TOTAL)"
+else
+  fail "tier-filtered pagination wrong (count=$TIER_COUNT, total=$TIER_TOTAL)"
+fi
+
 # ── Conditional reads on /list (W0 / v2 design §2.2.1) ────────────────────────
 # /list gains a strong ETag (and Last-Modified) derived from a catalog-version
 # counter bumped on every register/revoke/promote. A caller that echoes a

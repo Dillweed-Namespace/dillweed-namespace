@@ -76,11 +76,20 @@ db.pragma('foreign_keys = ON');
 const stmts = {
   lookupByName:    db.prepare(`SELECT * FROM capabilities WHERE name=? AND revoked=0 ORDER BY version DESC`),
   lookupExact:     db.prepare(`SELECT * FROM capabilities WHERE name=? AND version=? AND revoked=0 LIMIT 1`),
-  listAll:         db.prepare(`SELECT * FROM capabilities WHERE revoked=0 ORDER BY name, version`),
-  listByTier:      db.prepare(`SELECT * FROM capabilities WHERE trust_tier=? AND revoked=0 ORDER BY name`),
-  listByTag:       db.prepare(`SELECT * FROM capabilities WHERE tags LIKE ? AND revoked=0 ORDER BY name`),
+  // /list pagination is pushed into SQL via LIMIT/OFFSET rather than fetching the
+  // full result set and slicing it in JS — this closes the in-memory full-scan
+  // and the 500-record truncation cliff (v2 design §2.2.7; F-10 / Registry review
+  // S3). A deterministic ORDER BY (name, version) keeps paging stable across
+  // requests when a name carries multiple versions.
+  listAll:         db.prepare(`SELECT * FROM capabilities WHERE revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
+  listByTier:      db.prepare(`SELECT * FROM capabilities WHERE trust_tier=? AND revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
+  listByTag:       db.prepare(`SELECT * FROM capabilities WHERE tags LIKE ? AND revoked=0 ORDER BY name, version LIMIT ? OFFSET ?`),
   countActive:     db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE revoked=0`),
   countByTier:     db.prepare(`SELECT trust_tier, COUNT(*) as n FROM capabilities WHERE revoked=0 GROUP BY trust_tier`),
+  // Per-filter totals for the /list `total` field: the returned page is bounded
+  // by LIMIT, so `total` must be a separate COUNT over the full filtered set.
+  countByTierOne:  db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE trust_tier=? AND revoked=0`),
+  countByTag:      db.prepare(`SELECT COUNT(*) as n FROM capabilities WHERE tags LIKE ? AND revoked=0`),
   insert:          db.prepare(`
     INSERT INTO capabilities
       (name, description, endpoint, protocol, input_schema, output_schema,
@@ -687,18 +696,23 @@ function handleList(req, res) {
     return err(res, 400, 'BAD_REQUEST', `tier must be one of: ${[...VALID_TIERS].join(', ')}`);
   }
 
-  let rows;
+  // SQL-level pagination (v2 design §2.2.7): the page is bounded by LIMIT/OFFSET
+  // in SQL, and `total` is a separate COUNT over the full filtered set, so a
+  // single page never materializes the entire catalog in memory.
+  let total, rows;
   if (tier) {
-    rows = stmts.listByTier.all(tier);
+    total = stmts.countByTierOne.get(tier).n;
+    rows  = stmts.listByTier.all(tier, limit, offset);
   } else if (tag) {
-    rows = stmts.listByTag.all(`%"${tag}"%`);
+    const pattern = `%"${tag}"%`;
+    total = stmts.countByTag.get(pattern).n;
+    rows  = stmts.listByTag.all(pattern, limit, offset);
   } else {
-    rows = stmts.listAll.all();
+    total = stmts.countActive.get().n;
+    rows  = stmts.listAll.all(limit, offset);
   }
 
-  const total   = rows.length;
-  const paged   = rows.slice(offset, offset + limit);
-  const records = paged.map(toAPI);
+  const records = rows.map(toAPI);
 
   send(res, 200, { status:'ok', total, count: records.length, offset, limit, records },
        { 'ETag': etag, 'Last-Modified': lastModified });
