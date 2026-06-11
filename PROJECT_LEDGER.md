@@ -21,6 +21,28 @@ from being re-litigated every time it resurfaces.
 
 ## OPEN ITEMS
 
+### STEWARD-SWEEP-2026-06-11 — Tri-surface consistency sweep (PASS, 3 low-severity findings)
+
+- **Status:** COMPLETE 2026-06-11. Review-and-recommend sweep; no integrity failures.
+- **Scope:** Specs @ dillweed.com vs ~/dillweed-namespace-repo vs live deployment (dill-p-001).
+- **Result:** Steps 1–6 all PASS.
+  - 8/8 spec versions match repo (anthill 0.1.3, dillclaw 0.1.8, registry 0.1.6,
+    namespace 0.4.4, governance 1.1.3, continuity 1.0.3, charter 1.0.3, overview 1.0.10).
+  - Current versions agree: Registry v0.2.8 / Resolver v0.1.8 / Anthill v0.1.6.
+  - 3/3 tarball SHA256s verify against GitHub release **asset digests** (not just body text).
+  - Trust-root PEM SHA256 `909891e92cfa7362ee88fd75e85f379a317680a2c987fc4d88ecae150deb6f33`
+    matches all docs.
+  - 3/3 services healthy; Resolver `registry.source: remote` + `dnso_key.configured: true`.
+  - 9/9 steward capabilities resolve `sig_valid` + `sig_verified` via DillClaw.
+- **Findings (low severity):**
+  1. Anthill v0.1.6 release asset ~9.9 MB vs ~50 KB peers (v0.1.5 was 35.79 KiB) —
+     packaging audit recommended; SHA matches docs so integrity is intact.
+  2. Stale dillweed.com nav frame `fr_conten.htm` serves unrelated placeholder links.
+  3. Trailing whitespace in release-body Anthill SHA256 cell.
+- **Report:** reports/steward-report-2026-06-11.md
+
+---
+
 ### AI-006 — External review round 2: pending must-fix items
 
 - **Status:** COMPLETE 2026-05-16. See COMPLETED ITEMS for the full record
