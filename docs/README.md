@@ -11,6 +11,10 @@ This directory contains operational documentation, review reports, and design do
 
 - **dillweed-v2-design-2026-06-10.md** — v2 architecture design: authenticated identity, scalable sync, OTel re-layering, rate limiting, key isolation, tamper-evident logging. Five-wave release plan.
 
+## Strategic Evaluation
+
+- **strategic-evaluation-2026-06-12.md** — Independent strategic evaluation (Fable 5): problem relevance, five-scenario future analysis, architectural fitness, existing-infrastructure comparison, Identity Digital institutional fit, hosting alternatives, evidence/traction assessment, strategic options, six-month plan. Verdict: technically credible but early; narrowing required.
+
 ## Documentation-Set Review
 
 - **documentation-set-review-2026-06-11.md** — Independent review of this entire docs corpus (Fable 5): inventory, cross-document contradictions, post-W0 finding dispositions, v2 traceability matrix, institutional-readiness assessment, prioritized remediation. Note: identifies which findings in the reviews below were closed by W0 after their publication.
