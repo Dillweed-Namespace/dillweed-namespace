@@ -181,7 +181,7 @@ See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. 
 - Cache freshness and revocation propagation tradeoff documented (DillClaw spec §7.5)
 - Trust score semantics and consumer guidance documented (DillClaw spec §6.4)
 
-No HIGH-severity or MEDIUM-severity issues are open.
+The v1 release-audit cycle (the six-round spec-consistency review series) has no open HIGH- or MEDIUM-severity findings. However, the subsequent [cross-service trust-boundary analysis](docs/cross-service-trust-boundary-analysis-2026-06-10.md) (2026-06-10) raised findings that remain open at v1, including **one CRITICAL — F-3: Anthill stores but does not verify `node_signature`, so signals are unauthenticated** — and several HIGH findings rooted in the shared-token identity model (F-1, F-2, F-4, F-6). The W0 hardening wave closed F-8 (probe SSRF) and F-10 (pagination truncation); the remainder are scheduled for v2 waves W1–W2 ([Issue #4](https://github.com/Dillweed-Namespace/dillweed-namespace/issues/4), [v2 design](docs/dillweed-v2-design-2026-06-10.md)). Evaluators should read the trust-boundary analysis before relying on Anthill signals or granting multi-party write access.
 
 ## For researchers
 
