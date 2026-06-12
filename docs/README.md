@@ -2,6 +2,10 @@
 
 This directory contains operational documentation, review reports, and design documents for the Dillweed Namespace Project. Formal specifications are in `specs/` and mirrored at [dillweed.com](https://dillweed.com).
 
+## Finding Disposition (start here)
+
+- **finding-disposition-index-2026-06.md** — Authoritative index of all 69 canonical findings across the review corpus, independently verified against repo HEAD `c999fdd` (2026-06-12): current disposition (open / partially closed / closed / accepted for v1 / deferred to v2), evidence, deployment gates, contradiction table, hardening-wave assessment, and claim-safety review. **The review documents below are historical snapshots; consult the index for current finding status.**
+
 ## Operations
 
 - **operations-runbook.md** — Deployment, recovery, upgrade, and troubleshooting procedures
