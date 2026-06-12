@@ -20,6 +20,32 @@ Intended audiences include researchers in distributed systems, cybersecurity, ap
 
 ---
 
+## Suggested Starting Points
+
+Drawn from the full project table in §4. Pick one bounded question; record the commit hash and component versions you study.
+
+**Undergraduate (6–8 weeks):**
+
+- **Independent v1 deployment and reproducibility study** (Project 1) — install the stack from the release tarballs, run every test suite plus `integration-test.sh`, and report any divergence from the published pass counts. Low difficulty, immediately useful, no prior exposure required.
+- **Revocation propagation measurement, single-host slice** (Project 3, scoped down) — measure revocation-to-resolver latency across a handful of TTL and stale-window configurations on one machine; produce a small tradeoff table.
+- **Continuity-protocol fire drill** (Project 21, compressed) — execute the planned key-transfer procedure from `specs/continuity-protocol.html` on a disposable deployment, timing each step and logging every ambiguity in the protocol text.
+
+**Master's (one to two semesters):**
+
+- **Formal verification of revocation propagation** (Project 4) — a self-contained TLA+/Alloy thesis with a clear success criterion: prove or refute a maximum-staleness bound.
+- **Alternative trust-score design** (Project 6) and/or **trust-score gaming study** (Project 7) — fork the resolver's §6 scoring, attack it, or replace it; pairs naturally with a user study (Project 19).
+- **Sigstore/Rekor transparency-log integration** (Project 11) or **SPIFFE/SPIRE integration prototype** (Project 10) — standards-reuse prototypes that directly inform the v2 retain/replace decisions.
+- **Isolated-deployment red-team exercise** (Project 14) — supervised offensive work against the F-1…F-11 catalog on lab-owned instances.
+
+**PhD / faculty-led (multi-semester to multi-year):**
+
+- **Capability-standing incident taxonomy** (Project 16) and **MCP-ecosystem tool-churn study** (Project 17) — the empirical-necessity program (Theme R); the most valuable work an outside group could do, whatever it shows.
+- **Verifiable mirror prototype** (Project 9) and **delta-sync protocol implementation** (Project 8) — co-designing the unbuilt v2 sync layer, with the fleet benchmark suite (Project 26) as the evaluation vehicle.
+- **"Minimal Dillweed" from existing standards** (Project 25) — the strongest test of whether the project should exist as more than a profile document.
+- **Second-implementer study** (Project 23), **institutional governance comparison** (Project 20), and the **adoption game-theory model** (Project 22) — for systems, STS/policy, and economics groups respectively.
+
+---
+
 ## 1. Research Context
 
 ### 1.1 The problem the project attempts to address

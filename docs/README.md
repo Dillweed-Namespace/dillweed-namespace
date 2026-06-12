@@ -14,6 +14,7 @@ This directory contains operational documentation, review reports, and design do
 ## Research
 
 - **potential-research-areas.md** — Invitation to independent research: 18 research themes (capability standing as a concept, registry/resolver architecture, cryptographic trust, trust-score semantics, adversarial observability, formal methods, governance, adoption economics, empirical necessity), 26 concrete project ideas, 18 falsifiable hypotheses, testbed designs, onboarding path, and publication principles. Written for university faculty, students, and security labs; negative findings explicitly invited.
+- **research-opportunities-summary.md** — One-page companion to the above: overview, 8 highlighted research questions, 10 project ideas by level and duration, current limitations.
 
 ## Strategic Evaluation
 
