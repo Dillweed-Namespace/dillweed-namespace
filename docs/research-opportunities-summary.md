@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Dillweed Namespace Project is an open research artifact testing one hypothesis: that agentic AI systems invoking capabilities across organizational boundaries may need a neutral **capability-standing layer** — infrastructure answering what a named capability is, who governs it, whether its signed record is current or revoked, and whether the resolution decision can be reproduced and audited later. The project provides a specification stack, a working single-host reference implementation (Registry, DillClaw Resolver, Anthill) with passing conformance and integration suites, and a candid corpus of self-critical architecture reviews. It does not claim the problem is solved, or even that a new layer is the right answer; external adoption and independent validation are currently essentially zero. Researchers are invited to deploy, reproduce, attack, formally model, compare, and — where the evidence points that way — falsify the project's premise. Negative findings are explicitly valuable.
+The Dillweed Namespace Project is an open research artifact testing one hypothesis: that agentic AI systems invoking capabilities across organizational boundaries may need a neutral **capability-standing layer** — infrastructure answering what a named capability is, who governs it, whether its signed record is current or revoked, and whether the resolution decision can be reproduced and audited later. The project provides a specification stack, a working single-host reference implementation (Registry, DillClaw Resolver, Anthill) with passing conformance and integration suites, and a candid corpus of self-critical architecture reviews. It does not claim the problem is solved, or even that a new layer is the right answer; no independent implementation, specialist review, or third-party deployment has yet been demonstrated. Researchers are invited to deploy, reproduce, attack, formally model, compare, and — where the evidence points that way — falsify the project's premise. Negative findings are explicitly valuable.
 
 ## Eight Highlighted Research Questions
 
@@ -39,7 +39,7 @@ Full table of 26 projects with methods and expected outputs: [potential-research
 - v1 is a single-host reference implementation (SQLite, macOS installers), not production infrastructure; public deployment is gated on GitHub Issue #2.
 - Mirror synchronization is unimplemented; multi-organization identity is a v2 design (Issue #4), not code; Anthill stores but never verifies node signatures (open CRITICAL finding F-3).
 - Append-only logs are conventions, not cryptographic proofs; the resolver's determinism guarantee is not achievable as specified.
-- External adoption and independent validation are essentially zero; the project's review corpus is self-authored and should be treated as hypotheses to re-derive, not settled findings.
+- No independent implementation, specialist review, or third-party deployment has yet been demonstrated; the project's review corpus is self-authored and should be treated as hypotheses to re-derive, not settled findings.
 - The project owner is not an independent evaluator, and studying the artifact implies no endorsement in either direction.
 
 ## Where to Start
