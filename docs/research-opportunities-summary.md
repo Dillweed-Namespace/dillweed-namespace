@@ -19,18 +19,18 @@ The Dillweed Namespace Project is an open research artifact testing one hypothes
 
 ## Ten Project Ideas
 
-| Project | Level | Duration |
-|---|---|---|
-| Independent v1 deployment and reproducibility study | Undergraduate | 4–8 weeks |
-| Continuity-protocol fire drill (execute key-transfer procedures as written) | UG/Master's | 8–12 weeks |
-| Trust-score gaming study (adversarial score inflation) | UG/Master's | 1 semester |
-| Formal verification of revocation propagation (TLA+/Alloy) | Master's/PhD | 6–12 months |
-| Alternative trust-score design + user study of trust-signal interpretation | Master's/PhD | 1–2 semesters |
-| Sigstore/Rekor or SPIFFE/SPIRE integration prototype | Master's | 1–2 semesters |
-| Isolated-deployment red-team exercise against the published threat catalog | UG (supervised)/Master's | 1 semester |
-| Verifiable mirror prototype + delta-sync protocol implementation | Master's/PhD/faculty | 6–12 months |
-| Capability-standing incident taxonomy + MCP tool-churn longitudinal study | Master's/PhD/faculty | 6–12 months |
-| "Minimal Dillweed" built solely from existing standards (CT+TUF+OIDC) | PhD/faculty | 1–3 years |
+| Project                                                                      | Level                    | Duration      |
+| ---------------------------------------------------------------------------- | ------------------------ | ------------- |
+| Independent v1 deployment and reproducibility study                          | Undergraduate            | 4–8 weeks     |
+| Continuity-protocol fire drill (execute key-transfer procedures as written)  | UG/Master's              | 8–12 weeks    |
+| Trust-score gaming study (adversarial score inflation)                       | UG/Master's              | 1 semester    |
+| Formal verification of revocation propagation (TLA+/Alloy)                   | Master's/PhD             | 6–12 months   |
+| Alternative trust-score design + user study of trust-signal interpretation   | Master's/PhD             | 1–2 semesters |
+| Sigstore/Rekor or SPIFFE/SPIRE integration prototype                         | Master's                 | 1–2 semesters |
+| Isolated-deployment red-team exercise against the published threat catalog   | UG (supervised)/Master's | 1 semester    |
+| Verifiable mirror prototype + delta-sync protocol implementation             | Master's/PhD/faculty     | 6–12 months   |
+| Capability-standing incident taxonomy + MCP tool-churn longitudinal study    | Master's/PhD/faculty     | 6–12 months   |
+| "Minimal Dillweed" built solely from existing standards (CT+TUF+OIDC)        | PhD/faculty              | 1–3 years     |
 
 Full table of 26 projects with methods and expected outputs: [potential-research-areas.md §4](potential-research-areas.md#4-suggested-research-projects).
 
@@ -45,3 +45,5 @@ Full table of 26 projects with methods and expected outputs: [potential-research
 ## Where to Start
 
 Read [potential-research-areas.md](potential-research-areas.md) — especially "Suggested Starting Points," the researcher onboarding path (§10), and the 18 falsifiable hypotheses (§6). All adversarial work belongs on deployments you own; security findings go through responsible disclosure.
+
+**Contact:** General questions and non-sensitive findings via [GitHub Issues](https://github.com/Dillweed-Namespace/dillweed-namespace/issues). Security findings via responsible disclosure: email the steward through the DNSO contact channel published at [dillweed.com](https://dillweed.com) (DNSO Operations Charter §11; disclosures are acknowledged within 7 days) — not via public issues.

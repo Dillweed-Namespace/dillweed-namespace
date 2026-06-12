@@ -183,6 +183,15 @@ See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. 
 
 No HIGH-severity or MEDIUM-severity issues are open.
 
+## For researchers
+
+The project is an open research artifact: critique, replication, comparison, and falsification are invited, and negative findings are valuable.
+
+- [`docs/research-opportunities-summary.md`](docs/research-opportunities-summary.md) — one-page overview: highlighted research questions, project ideas by level, current limitations
+- [`docs/potential-research-areas.md`](docs/potential-research-areas.md) — full research guide: 18 themes, 26 project ideas, 18 falsifiable hypotheses, testbeds, onboarding path
+- [`docs/strategic-evaluation-2026-06-12.md`](docs/strategic-evaluation-2026-06-12.md) — independent strategic evaluation: problem relevance, scenarios, architectural fitness
+- Architecture reviews: [Registry](docs/architecture-review-registry-2026-06-10.md) · [Resolver](docs/architecture-review-resolver-2026-06-10.md) · [Anthill](docs/architecture-review-anthill-2026-06-10.md) · [trust-boundary analysis](docs/cross-service-trust-boundary-analysis-2026-06-10.md) — see the [docs index](docs/README.md) for the full review corpus
+
 ## License
 
 Apache License, Version 2.0. See [LICENSE](LICENSE).
