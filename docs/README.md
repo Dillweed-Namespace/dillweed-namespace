@@ -11,6 +11,10 @@ This directory contains operational documentation, review reports, and design do
 
 - **dillweed-v2-design-2026-06-10.md** — v2 architecture design: authenticated identity, scalable sync, OTel re-layering, rate limiting, key isolation, tamper-evident logging. Five-wave release plan.
 
+## Documentation-Set Review
+
+- **documentation-set-review-2026-06-11.md** — Independent review of this entire docs corpus (Fable 5): inventory, cross-document contradictions, post-W0 finding dispositions, v2 traceability matrix, institutional-readiness assessment, prioritized remediation. Note: identifies which findings in the reviews below were closed by W0 after their publication.
+
 ## Architecture Reviews
 
 Production-readiness assessments for a 100-resolver, multi-organization deployment target.
