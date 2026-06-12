@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Dillweed Namespace Project is an open research artifact testing one hypothesis: that agentic AI systems invoking capabilities across organizational boundaries may need a neutral **capability-standing layer** — infrastructure answering what a named capability is, who governs it, whether its signed record is current or revoked, and whether the resolution decision can be reproduced and audited later. The project provides a specification stack, a working single-host reference implementation (Registry, DillClaw Resolver, Anthill) with passing conformance and integration suites, and a candid corpus of self-critical architecture reviews. It does not claim the problem is solved, or even that a new layer is the right answer; no independent implementation, specialist review, or third-party deployment has yet been demonstrated. Researchers are invited to deploy, reproduce, attack, formally model, compare, and — where the evidence points that way — falsify the project's premise. Negative findings are explicitly valuable.
+The Dillweed Namespace Project is an open research artifact testing one hypothesis: that agentic AI systems invoking capabilities across organizational boundaries may need a neutral **capability-standing layer** — infrastructure answering what a named capability is, who governs it, whether its signed record is current or revoked, and whether the resolution decision can be reproduced and audited later. The project provides a specification stack, a working single-host reference implementation (Registry, DillClaw Resolver, Anthill) with passing conformance and integration suites, and a candid corpus of self-critical architecture reviews. It does not claim the problem is solved, or even that a new layer is the right answer; no independent implementation, specialist review, externally operated deployment, or third-party capability registration has yet been demonstrated. Researchers are invited to deploy, reproduce, attack, formally model, compare, and — where the evidence points that way — falsify the project's premise. Negative findings are explicitly valuable.
 
 ## Eight Highlighted Research Questions
 
@@ -19,18 +19,18 @@ The Dillweed Namespace Project is an open research artifact testing one hypothes
 
 ## Ten Project Ideas
 
-| Project                                                                      | Level                    | Duration      |
-| ---------------------------------------------------------------------------- | ------------------------ | ------------- |
-| Independent v1 deployment and reproducibility study                          | Undergraduate            | 4–8 weeks     |
-| Continuity-protocol fire drill (execute key-transfer procedures as written)  | UG/Master's              | 8–12 weeks    |
-| Trust-score gaming study (adversarial score inflation)                       | UG/Master's              | 1 semester    |
-| Formal verification of revocation propagation (TLA+/Alloy)                   | Master's/PhD             | 6–12 months   |
-| Alternative trust-score design + user study of trust-signal interpretation   | Master's/PhD             | 1–2 semesters |
-| Sigstore/Rekor or SPIFFE/SPIRE integration prototype                         | Master's                 | 1–2 semesters |
-| Isolated-deployment red-team exercise against the published threat catalog   | UG (supervised)/Master's | 1 semester    |
-| Verifiable mirror prototype + delta-sync protocol implementation             | Master's/PhD/faculty     | 6–12 months   |
-| Capability-standing incident taxonomy + MCP tool-churn longitudinal study    | Master's/PhD/faculty     | 6–12 months   |
-| "Minimal Dillweed" built solely from existing standards (CT+TUF+OIDC)        | PhD/faculty              | 1–3 years     |
+| Project                                                                      | Level                    | Duration      | Readiness                           |
+| ---------------------------------------------------------------------------- | ------------------------ | ------------- | ----------------------------------- |
+| Independent v1 deployment and reproducibility study                          | Undergraduate            | 4–8 weeks     | Ready (v1 artifact)                 |
+| Continuity-protocol fire drill (execute key-transfer procedures as written)  | UG/Master's              | 8–12 weeks    | Ready (v1 artifact)                 |
+| Trust-score gaming study (adversarial score inflation)                       | UG/Master's              | 1 semester    | Ready (v1 artifact)                 |
+| Formal verification of revocation propagation (TLA+/Alloy)                   | Master's/PhD             | 6–12 months   | Ready (v1 artifact)                 |
+| Alternative trust-score design + user study of trust-signal interpretation   | Master's/PhD             | 1–2 semesters | Requires new prototype              |
+| Sigstore/Rekor or SPIFFE/SPIRE integration prototype                         | Master's                 | 1–2 semesters | Requires new prototype              |
+| Isolated-deployment red-team exercise against the published threat catalog   | UG (supervised)/Master's | 1 semester    | Ready (v1 artifact)                 |
+| Verifiable mirror prototype + delta-sync protocol implementation             | Master's/PhD/faculty     | 6–12 months   | Requires protocol co-design         |
+| Capability-standing incident taxonomy + MCP tool-churn longitudinal study    | Master's/PhD/faculty     | 6–12 months   | Requires external data/participants |
+| "Minimal Dillweed" built solely from existing standards (CT+TUF+OIDC)        | PhD/faculty              | 1–3 years     | Requires new prototype              |
 
 Full table of 26 projects with methods and expected outputs: [potential-research-areas.md §4](potential-research-areas.md#4-suggested-research-projects).
 
@@ -39,11 +39,13 @@ Full table of 26 projects with methods and expected outputs: [potential-research
 - v1 is a single-host reference implementation (SQLite, macOS installers), not production infrastructure; public deployment is gated on GitHub Issue #2.
 - Mirror synchronization is unimplemented; multi-organization identity is a v2 design (Issue #4), not code; Anthill stores but never verifies node signatures (open CRITICAL finding F-3).
 - Append-only logs are conventions, not cryptographic proofs; the resolver's determinism guarantee is not achievable as specified.
-- No independent implementation, specialist review, or third-party deployment has yet been demonstrated; the project's review corpus is self-authored and should be treated as hypotheses to re-derive, not settled findings.
+- No independent implementation, specialist review, externally operated deployment, or third-party capability registration has yet been demonstrated; the project's review corpus is self-authored and should be treated as hypotheses to re-derive, not settled findings.
 - The project owner is not an independent evaluator, and studying the artifact implies no endorsement in either direction.
 
 ## Where to Start
 
 Read [potential-research-areas.md](potential-research-areas.md) — especially "Suggested Starting Points," the researcher onboarding path (§10), and the 18 falsifiable hypotheses (§6). All adversarial work belongs on deployments you own; security findings go through responsible disclosure.
 
-**Contact:** General questions and non-sensitive findings via [GitHub Issues](https://github.com/Dillweed-Namespace/dillweed-namespace/issues). Security findings via responsible disclosure: email the steward through the DNSO contact channel published at [dillweed.com](https://dillweed.com) (DNSO Operations Charter §11; disclosures are acknowledged within 7 days) — not via public issues.
+## Contact
+
+For general research questions, proposed projects, or non-sensitive findings, open a [GitHub Issue](https://github.com/Dillweed-Namespace/dillweed-namespace/issues). For security-sensitive findings, use the private reporting channel documented in the [DNSO Operations Charter](../specs/dnso-operations-charter.html) (§11 "Communication Channels"; disclosures are acknowledged within 7 days). Do not publish exploitable details before coordinated disclosure.
