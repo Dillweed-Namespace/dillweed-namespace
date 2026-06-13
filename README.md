@@ -31,7 +31,7 @@ The v1 ship-verified baseline:
 | Resolver | 0.1.8 | `2e3376a50c8485607c614fccbac44d3ffd9f222550ad1e5f97b6c7e45c814f0a` |
 | Anthill  | 0.1.6 | `3bda022d2213240cfbc4355e6c07e85b8f8b997a7ae398ad626f5cb58f574f36` |
 
-Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of external review per component, install testing on the reference deployment, and a coordinated patch round — lives in [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md).
+Release tarballs are attached to the [v1.0.0 release](../../releases/tag/v1.0.0). The full audit trail — three rounds of AI-assisted review per component (externally prompted, not independent third-party review; see ledger item AI-008 for the distinction), install testing on the reference deployment, and a coordinated patch round — lives in [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md).
 
 ## Trust model
 
@@ -149,7 +149,7 @@ Expected output includes `"signature_valid": true` and `"algorithm": "Ed25519"`.
 
 ## Running test suites
 
-Each component ships a `test.sh` that exercises spec conformance. Run with the appropriate admin token in the environment:
+Each component ships a `test.sh` that exercises spec conformance. The counts below are the **v1.0.0 release-baseline** totals (the tarballs deployed under `/usr/local/dillweed/` by `install.sh`). Run with the appropriate admin token in the environment:
 
 ```bash
 # Registry — expect 79/79 passing
@@ -167,6 +167,9 @@ export ANTHILL_ADMIN_TOKEN=$(security find-generic-password -s "dillweed-anthill
 cd /usr/local/dillweed/anthill/dillweed-anthill
 bash test.sh
 ```
+
+> **Note:** these totals are pinned to the v1.0.0 release baseline. The in-repo suites at the current HEAD include additional tests added by the W0 hardening wave and report higher totals (per [`v2-tracker.md`](v2-tracker.md): Registry 98/98, Anthill 62/62, Resolver 77/77 unit). The Resolver's in-repo integration suite also carries a few known failures tied to the 7-record development seed fixture (multi-version and unsigned records absent from the dev seed); these are environmental, not regressions. See [`docs/finding-disposition-index-2026-06.md`](docs/finding-disposition-index-2026-06.md) (FDI-DOC-003).
+
 ## Known issues
 
 See [`PROJECT_LEDGER.md`](PROJECT_LEDGER.md) for the canonical findings ledger. As of v1.0.0:
