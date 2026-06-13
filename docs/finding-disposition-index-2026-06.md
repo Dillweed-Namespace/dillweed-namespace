@@ -633,7 +633,7 @@ Only W0 has executed. W1–W4 are design-stage (the tracker's "Next Step" record
 | Wave | Intended scope (design) | Findings targeted | Fully closed | Partially closed | Missed / dropped | New issues introduced |
 |---|---|---|---|---|---|---|
 | **W0** | Probe deny-list, fail-closed defaults, CORS, 429s; async/bounded/rotated sinks + retention; ETag/304 + jitter/backoff | F-8, F-9, F-10; Reg S3/S4; Res S1/S5; Anth S8 | F-8 (FDI-RES-002), F-10 (FDI-RES-009) | Reg S3 (server side only — no ETag consumer), rate limiting (Anthill spec undocumented; per-identity W4), Res S1 (jitter/backoff/pagination; no conditional fetch) | **Fail-closed defaults + CORS (F-9)** and **async sinks + retention (Res S5)** — in the design's W0, absent from the tracker's W0, never re-scoped | Spec/impl divergence K1 (client conditional fetch documented, not implemented); K2 (Anthill spec silent on 429); K8 (behavior change at unchanged impl version); jitter widened worst-case revocation propagation (test wait 70→90 s) with no spec note; tracker-noted rate-limit/test-suite interaction |
-| **W1** | Identity keystone: enrollment, dual-signature accept, node-signature verify; signer externalization + intermediate key | FDI-ANT-001/002/003, FDI-ID-001/002/003, FDI-CRY-003 | — not started | — | **Pre-work defect:** serialization spec is W4 (FDI-XST-006); D2 (Phase-B canonicalization) and D4 (quota wave ambiguity) undecided | — |
+| **W1** | Identity keystone: enrollment, dual-signature accept, node-signature verify; signer externalization + intermediate key | FDI-ANT-001/002/003, FDI-ID-001/002/003, FDI-CRY-003 | — not started | — | **Pre-work defect:** serialization spec is W4 (FDI-XST-006); doc-set review D2 (Phase-B canonicalization) and D4 (quota wave ambiguity) undecided | — |
 | **W2** | Signed `registration_date`, tier attestation, JCS, offline root, expiry | FDI-CRY-001/002, FDI-ID-004 | — | — | JCS has no owning area (C9, doc-set review); v1-tarball verifier story during re-sign window unstated | — |
 | **W3** | Delta feed, signed checkpoints, real mirrors, HA, Merkle log | FDI-REG-001/002, FDI-RES-008, FDI-XST-002, FDI-ANT-005 | — | — | Delegation/counter-signature still unassigned to any wave (FDI-CRY-004) | — |
 | **W4** | OTel re-layer, corroboration, completeness attestation, per-identity quotas | FDI-ANT-004/009/010, XST-001 residual | — | — | — | — |
@@ -717,11 +717,11 @@ Ledger-tracked finding closures spot-checked beyond the issues: INST series (jus
 ### C. Protocol design (before/with W1–W3)
 | # | Action | Findings | Priority |
 |---|---|---|---|
-| C1 | Pull Anthill canonical serialization + test vectors into W1; decide Phase-B canonicalization (D1/D2) **before any W1 code** | FDI-XST-006, CRY-002 | **P0 for W1** |
+| C1 | Pull Anthill canonical serialization + test vectors into W1; decide Phase-B canonicalization (doc-set review D1/D2) **before any W1 code** | FDI-XST-006, CRY-002 | **P0 for W1** |
 | C2 | W1: node enrollment + mandatory verified `node_signature`; per-registrant identity; signer externalization | FDI-ANT-001/002/003, ID-001/002/003, CRY-003 | P0 (v2 keystone) |
 | C3 | Mirror sync protocol + signed checkpoints; pin `/list` serialization (the mirror gap report is the requirements doc) | FDI-REG-002, XST-003 | P1 — also the prerequisite for recruiting any external operator |
 | C4 | W2: signed `registration_date` + tier attestation + JCS (assign JCS an owner; state the v1-verifier transition) | FDI-CRY-001/002, ID-004 | P1 |
-| C5 | Assign delegation/counter-signature a wave; adopt real TUF/Rekor or record why not (D3) | FDI-CRY-004, XST-002 | P1 |
+| C5 | Assign delegation/counter-signature a wave; adopt real TUF/Rekor or record why not (doc-set review D3) | FDI-CRY-004, XST-002 | P1 |
 | C6 | Adopt the unmapped spec-gap top-10 items (error precedence, semver grammar, trust-signal vocabulary, probe mechanics, /health schemas) into a spec backlog | FDI-XST-003 | P2 (but **blocks any second implementation**) |
 
 ### D. Institutional / governance
