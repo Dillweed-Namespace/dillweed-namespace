@@ -583,8 +583,8 @@ All documents below should be **preserved unmodified** apart from the banner —
 | Document | Outdated findings | Still accurate | Superseded by |
 |---|---|---|---|
 | `architecture-review-registry-2026-06-10.md` | S3 (pagination/ETag server-side: PARTIALLY CLOSED), S4 (rate limiting: PARTIALLY CLOSED); scope header cites spec v0.1.5 (now v0.1.6) | S1, S2, S5–S9 | FDI-REG-001/002/003, XST-001, CRY-001/003, ID-001/004, XST-002 |
-| `architecture-review-resolver-2026-06-10.md` | S3 (SSRF: CLOSED); S1 partially (jitter/backoff/pagination landed); S2 partially (rate limiting landed); spec now v0.1.8 | S4–S8 | FDI-RES-001/002/003/004…, ID-002 |
-| `architecture-review-anthill-2026-06-10.md` | S8 (rate limiting: code-closed, spec-undocumented) | S1–S7, S9 | FDI-ANT-*, XST-001 |
+| `architecture-review-resolver-2026-06-10.md` | S3 (SSRF: CLOSED); S1 partially (jitter/backoff/pagination landed); S2 partially (rate limiting landed); spec now v0.1.8 | S4–S8 | FDI-RES-001/002/003/004…, ID-002, XST-001 |
+| `architecture-review-anthill-2026-06-10.md` | S8 (rate limiting: code-closed, spec-undocumented) | S1–S7, S9 | FDI-ANT-*, XST-001/002 |
 | `cross-service-trust-boundary-analysis-2026-06-10.md` | F-8 CLOSED, F-10 CLOSED; F-9 half-superseded (rate limiting landed; CORS/fail-open remain) | F-1…F-7, F-11 — re-verified accurate, incl. the CRITICAL F-3 | FDI-ANT-001…003, CRY-001, ID-001/004, RES-008, XST-004 |
 | `docs/README.md` | "4 HIGH and 19 MEDIUM" series total; review-series summary predates W0 dispositions; no current-spec-version note | Index structure | FDI-DOC-004, FDI-DOC-001 |
 | `spec-gap-report-2026-06-10.md` | REG-22 partially closed (v0.1.6 documents `/list` default limit) | The other 87 gaps; all 9 blockers re-spot-checked open | FDI-XST-003, FDI-CRY-002, FDI-ANT-010 |
