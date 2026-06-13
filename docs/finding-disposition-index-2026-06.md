@@ -190,7 +190,7 @@ Blocks column: **E**=evaluation, **B**=public resolver, **C**=mirror, **D**=mult
 | FDI-DOC-006 | Anthill spec silent on implemented rate limiting | Docs/spec | doc-set C2/#3 | MEDIUM | OPEN | round-7 | — |
 | FDI-DOC-007 | Registry spec §2.2 mirror tamper-evidence overclaim | Docs/spec | mirror-gap G-11; doc-set C3 | MEDIUM-HIGH | OPEN | W3 (caveat now) | C, claim |
 | FDI-DOC-008 | DillClaw v0.1.8 documents client conditional fetch that does not exist | Docs/spec | doc-set C1/#2 | HIGH | OPEN | round-7 + code | — |
-| FDI-DOC-009 | Evaluation gated on external issue links without in-repo summary | Docs | dillclaw-gap G-27; doc-set A6 | MEDIUM | OPEN | now | — |
+| FDI-DOC-009 | Evaluation gated on external issue links without in-repo summary | Docs | dillclaw-gap G-27; doc-set A6 | LOW/MEDIUM | OPEN | now | — |
 | FDI-DOC-010 | Ledger/tracker status drift (AI-003 "OPEN" though shipped; tracker "not pushed" though merged) | Docs | this review | LOW | OPEN | now | — |
 | FDI-DOC-011 | `anthill/README.md` self-describes as v0.1.4 (impl is 0.1.6) | Docs | this review | LOW | OPEN | now | — |
 | FDI-DOC-012 | Phantom provisional-tier "weighting penalty" asserted in specs | Docs/spec | consistency r2-H-2, r4, r5 | HIGH (as raised) | SUPERSEDED (→ FDI-ID-004) | done | — |
@@ -521,7 +521,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Evidence:** commit `b7fab11` (2026-06-12) replaces the sentence with a scoped statement disclosing the open CRITICAL F-3, the open HIGH cluster, what W0 closed, and the W1–W2 schedule (diff verified; current README §"Evaluation readiness" confirmed). Note both the doc-set review and the strategic evaluation predate this fix and now carry stale statements about it (§10).
 
 #### FDI-DOC-003 — README test counts pinned to v1.0.0 tarballs, presented as current instructions
-- **Sources:** doc-set C6. **Verification:** README "Running test suites" still says 79/79, 65/65+29/29, 58/58 against `/usr/local/...` installs; current repo suites are larger (tracker: registry 98/98; resolver 77/77 unit + suite with 5 known seed-fixture failures; anthill 62/62). Correct for the frozen tarballs, misleading as repo guidance — and the resolver suite's 5 environmental failures are documented only in the tracker. **Disposition: OPEN** (LOW). **Closure:** label counts as v1.0.0-tarball expectations and state current repo-suite expectations incl. the known-failure set.
+- **Sources:** doc-set C6. **Verification:** README "Running test suites" still says 79/79, 65/65+29/29, 58/58 against `/usr/local/...` installs; current repo suites are larger (tracker: registry 98/98; resolver 77/77 unit + suite with 5 known seed-fixture failures; anthill 62/62). Correct for the frozen tarballs, misleading as repo guidance — and the resolver suite's 5 environmental failures are documented only in the tracker. **Disposition: OPEN** (MEDIUM — per doc-set top-finding #5). **Closure:** label counts as v1.0.0-tarball expectations and state current repo-suite expectations incl. the known-failure set.
 
 #### FDI-DOC-004 — Series-total arithmetic: "4 HIGH and 19 MEDIUM"
 - **Sources:** doc-set C7/#8. **Verification:** `docs/README.md` (line 57) and the ledger series entry still state 4 HIGH/19 MEDIUM; r6's own per-round table sums to 8 HIGH and ≥21 MEDIUM (r1 4H/9M + r2 3H/10M + r3 1H/2M new). All were resolved, so substance stands. **Disposition: OPEN** (LOW, credibility).
@@ -539,7 +539,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Sources:** doc-set C1/#2. **Verification:** spec §7.1 "resolver SHOULD send If-None-Match…" present; zero matching code in `resolver/server.js`. Strictly a SHOULD, so not a conformance violation — but the v0.1.8 revision note presents it as part of the shipped W0 pass, which overstates. **Disposition: OPEN.** **Closure:** implement the client (preferred — small change; see FDI-RES-001) or correct the revision note.
 
 #### FDI-DOC-009 — Evaluation steps gate on external GitHub issues with no in-repo summary
-- **Sources:** dillclaw-gap G-27; doc-set A6. **Verification:** README evaluator steps 5–6 still point to Issues #2/#4; the `b7fab11` paragraph now summarizes much of the substance in-repo, which partially mitigates. **Disposition: OPEN** (LOW).
+- **Sources:** dillclaw-gap G-27; doc-set A6. **Verification:** README evaluator steps 5–6 still point to Issues #2/#4; the `b7fab11` paragraph now summarizes much of the substance in-repo, which partially mitigates. **Disposition: OPEN** (LOW/MEDIUM — G-27 LOW, doc-set A6 MEDIUM).
 
 #### FDI-DOC-010 — Ledger/tracker status drift
 - **Sources:** this review. **Verification:** (a) ledger AI-003 header still reads "OPEN, deferred enhancement" though the validation shipped (FDI-REG-004); (b) `v2-tracker.md` header reads "all changes committed on v2/w0-hardening, not pushed" and "Last Commit: n/a" though the W0 commits are on `main` at origin; (c) STEWARD-SWEEP-2026-06-11 sits under "OPEN ITEMS" while marked COMPLETE. **Disposition: OPEN** (LOW — but the ledger is the project's canonical findings record; its self-accuracy is load-bearing).
