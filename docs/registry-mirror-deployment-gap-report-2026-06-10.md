@@ -1,5 +1,7 @@
 # Dillweed Registry Mirror — First-Time Deployment Gap Report
 
+> **Historical review — still current.** W0 touched none of the mirror surface; the entire report was re-verified accurate on 2026-06-12 (mirror mode remains an env-var echo, `registry/server.js:598–614`; no synchronization protocol exists in spec or code). See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-REG-002, FDI-DOC-007) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)

@@ -1,5 +1,7 @@
 # Anthill Signal Emitter — Implementability Gap Report
 
+> **Historical review — still current.** The Anthill spec is unchanged at v0.1.3; the entire report (including the three blockers GAP-01/02/03) was re-verified accurate on 2026-06-12. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-ANT-010, FDI-ANT-001) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)

@@ -1,5 +1,7 @@
 # DillClaw Resolver — First-Time Deployment Gap Report
 
+> **Historical review.** Findings reflect repository state on 2026-06-10 (spec then v0.1.7, now v0.1.8). The W0 spec pass added none of the report's recommended fixes: G-1/G-2/G-3 (registry-endpoint config, TTL knobs, non-enforcing trust-root SHA check) were re-verified still open on 2026-06-12, and no configuration reference was added. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-OPS-005, FDI-CRY-006) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)

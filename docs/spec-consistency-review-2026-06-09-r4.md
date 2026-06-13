@@ -1,5 +1,7 @@
 # Dillweed Namespace — Consistency Review, Round 4 (Fix-Verification)
 
+> **Historical review — closed series (rounds 1–6).** All HIGH and MEDIUM findings raised across the series were resolved and verified closed by round 6. The series raised 8 HIGH and 21 MEDIUM in total (r1 4H/9M, r2 3H/10M, r3 1H/2M new); some round summaries understated this as "4 HIGH and 19 MEDIUM." See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-DOC-004) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-09
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)

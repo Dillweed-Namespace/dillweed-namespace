@@ -1,5 +1,7 @@
 # Dillweed Namespace Project — v2 Architecture Design
 
+> **Design document — partially outdated.** The Areas 1–6 design content stands, but the W0 row no longer matches what shipped: fail-closed defaults/CORS (F-9) and async/bounded/rotated trace sinks + retention were in this design's W0 but dropped from the executed W0, so "W0 closes F-9" is only half-true. JCS has no owning area, and W1 signature verification depends on a serialization spec scheduled in W4. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-XST-004, FDI-XST-006, FDI-CRY-002) for current status. Preserved as the v2 design of record.
+
 **Status:** Draft for Comment
 **Date:** 2026-06-10
 **Author:** Dillweed Protocol Steward (review-and-recommend)

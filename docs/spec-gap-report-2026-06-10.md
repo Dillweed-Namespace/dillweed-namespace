@@ -1,5 +1,7 @@
 # Dillweed Specification Gap Report — Second-Implementation Analysis
 
+> **Historical review.** Findings reflect repository state on 2026-06-10. Since then: REG-22 is partially closed (Registry spec v0.1.6 documents the `/list` default limit). The other 87 gaps — including all 9 blockers — were re-spot-checked open on 2026-06-12. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) (FDI-XST-003, FDI-CRY-002, FDI-ANT-010) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)
