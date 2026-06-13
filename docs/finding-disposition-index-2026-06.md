@@ -492,7 +492,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 
 #### FDI-OPS-006 — Plaintext admin tokens in launchd plists — ACCEPTED FOR V1 (INST-011, info). Revisit at multi-operator. Also note ledger 2026-05-24: a token was exposed to an AI session inline; rotation recommended before multi-operator use.
 
-#### FDI-OPS-007 — Tarball filename vs extract-directory inconsistency — PARTIALLY CLOSED (INST-008: filename corrected at v1.0.0; still extracts to `dillclaw-resolver/`; cosmetic, README-disclosed).
+#### FDI-OPS-007 — Tarball filename vs extract-directory inconsistency — PARTIALLY CLOSED (INST-008: filename corrected at v1.0.0; still extracts to `dillclaw-resolver/`; cosmetic, README-disclosed). **Target:** future release (cleanup queued per README known-issues).
 
 #### FDI-OPS-008 — Install-test series INST-001…INST-014 — CLOSED
 - **Evidence:** INST-001/004/005/006 closed in the v0.2.8/v0.1.8/v0.1.5 patch round (ledger, ship-verified on dill-p-001 2026-05-17); INST-013 closed 2026-05-24 with a *corrected diagnosis* (the original "server-side enforcement is intact" claim was partially wrong — `req.destroy()` was suppressing the 413; both test and server fixed, commits `7a553f1`/`da6ab0c`); INST-014 closed. Residuals split out: INST-008 → FDI-OPS-007, INST-011 → FDI-OPS-006, INST-012 (unused `resolver-patch.js` in Registry tarball) — cosmetic, still disclosed in README, untracked here as sub-item.
