@@ -93,18 +93,18 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 | **Total** | **70** |
 
 ### By component
-| Component | Findings | Open or deferred |
+| Component | Findings | Open or deferred (excl. partially closed) |
 |---|---|---|
 | Registry | 4 (FDI-REG) | 2 |
-| Resolver | 9 (FDI-RES) | 6 |
+| Resolver | 9 (FDI-RES) | 5 |
 | Anthill | 11 (FDI-ANT) | 10 |
 | Crypto / key management | 6 (FDI-CRY) | 6 |
 | Identity / delegation | 5 (FDI-ID) | 5 |
 | Cross-stack | 7 (FDI-XST) | 6 |
-| Operations / deployment | 10 (FDI-OPS) | 5 |
+| Operations / deployment | 10 (FDI-OPS) | 3 |
 | Documentation / drift | 12 (FDI-DOC) | 10 |
 | Governance | 3 (FDI-GOV) | 3 |
-| Research readiness | 3 (FDI-RESR) | 2.5 (one partial) |
+| Research readiness | 3 (FDI-RESR) | 2 |
 
 ### By original severity (highest label any source applied)
 | Original severity | Count | Still open/deferred |
