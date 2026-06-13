@@ -81,5 +81,6 @@ Dillweed-Backups/
 *-Backups/
 *-backups/
 resolver/traces/
+!resolver/traces/.gitkeep
 registry/keys/
 registry/package-lock.json
