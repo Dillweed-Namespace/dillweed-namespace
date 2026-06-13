@@ -1,9 +1,15 @@
 # v2 Implementation Tracker
 
 ## Current Wave: W0 (Hardening — no protocol changes)
-## Status: W0 COMPLETE (6/6 tasks) — all changes committed on v2/w0-hardening, not pushed
-## Last Session: 2026-06-10
-## Last Commit: n/a (changes in working tree, not yet committed)
+## Status: W0 COMPLETE (6/6 tasks) — all changes landed on `main` and pushed
+## Last Session: 2026-06-10 (W0 implementation); header reconciled 2026-06-12
+## Last Commit: 3d6b159 (W0 spec updates); W0 code commits: 74cad67, 25670a4, a1a95d1, 4447c00, d25bf7b, e523652; post-review fixes d1466c0, 8c87a85
+
+> **Header correction (2026-06-12):** this header previously read "committed on
+> v2/w0-hardening, not pushed" / "Last Commit: n/a" — a stale snapshot from
+> mid-wave. All W0 commits were since merged to `main` and pushed (verified
+> reachable from `origin/main`). Tracked as FDI-DOC-010 in
+> [`docs/finding-disposition-index-2026-06.md`](docs/finding-disposition-index-2026-06.md).
 
 ## W0 Task List (from v2 design document §W0)
 - [x] ETag/If-Modified-Since on Registry /list
@@ -13,7 +19,7 @@
 - [x] Resolver refresh jitter + exponential backoff
 - [x] /list tag filter: add index (replace LIKE scan)
 
-## Current Task: Post-review fixes from steward-report-2026-06-10-r3 (steward-directed): H-3 + M-3 done (d1466c0); M-1 probe-cache guard done (pending commit)
+## Current Task: W0 closed. Post-review fixes from steward-report-2026-06-10-r3 all committed: H-3 + M-3 (d1466c0), M-1 probe-cache guard (8c87a85).
 ## Blocked On: nothing
 ## Next Step: After fixes verified, W1 decision remains pending (Area 1 Phases A–B + Area 5, design §Sequencing); W1 introduces protocol changes, unlike W0.
 
