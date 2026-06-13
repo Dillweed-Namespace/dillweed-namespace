@@ -62,7 +62,11 @@ from being re-litigated every time it resurfaces.
 
 ### AI-003 — RFC 3339 semantic date validation (deferred enhancement)
 
-- **Status:** OPEN, deferred enhancement (not a defect).
+- **Status:** CLOSED — implemented 2026-05-16 via the Round-3 deferral reconsideration
+  ("Item 1 reversed"): calendar-validity checks now apply to `last_updated` and
+  `registration_date` in `registry/server.js`. This status header was left stale
+  ("OPEN, deferred") until the 2026-06-12 disposition pass caught the drift
+  (docs/finding-disposition-index-2026-06.md, FDI-REG-004 / FDI-DOC-010).
 - **Date raised:** 2026-05-15 (surfaced during NS-002 implementation).
 - **The finding:** The `validateRecord` check added in Registry v0.2.7 for
   caller-supplied `last_updated` enforces the *format* required by Namespace
@@ -3289,7 +3293,7 @@ F4 (ledger EOF) — all closed across the 2026-06-02 through 2026-06-06 sweep se
 - **Type:** Full specification-stack and reference-implementation consistency review, six rounds (initial review + re-review + four fix-verification passes)
 - **Agent:** dillweed.protocol-steward (review-and-recommend mode), Fable 5
 - **Scope:** All 8 specs in `specs/`, `registry/server.js`, `resolver/server.js`, `anthill/server.js`, `integration-test.sh`, component READMEs
-- **Result:** 4 HIGH, 19 MEDIUM, ~25 LOW/INFO findings raised across the series; **all HIGH and MEDIUM resolved and verified closed**; 1 cosmetic LOW (R6-1) and a small INFO list left open by accepted disposition
+- **Result:** 8 HIGH, 21 MEDIUM, ~25 LOW/INFO findings raised across the series (per-round sums: r1 4H/9M, r2 3H/10M, r3 1H/2M new; previously misstated here as 4 HIGH / 19 MEDIUM — corrected 2026-06-12, FDI-DOC-004); **all HIGH and MEDIUM resolved and verified closed**; 1 cosmetic LOW (R6-1) and a small INFO list left open by accepted disposition
 
 **Round structure and fix commits:**
 - Round 1 (full review): 4 HIGH / 9 MEDIUM / 6 LOW — notable: Charter-vs-Registry verified-tier

@@ -1,5 +1,7 @@
 # Dillweed Stack — Cross-Service Trust Boundary Analysis
 
+> **Historical review.** Findings reflect repository state on 2026-06-10, before the W0 hardening wave. Subsequently closed: F-8 (probe SSRF, commits `4447c00`/`8c87a85`) and F-10 (pagination truncation, `d1466c0`/`25670a4`). F-9 is partially narrowed (per-IP rate limiting landed; wildcard CORS and fail-open token defaults persist). **F-3 (CRITICAL), F-1, F-2, F-4, F-5, F-6, F-7, and F-11 remain open or deferred** — re-verified 2026-06-12. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) for current status of every finding. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Agent:** dillweed.protocol-steward
 **Mode:** review-and-recommend (read-only)

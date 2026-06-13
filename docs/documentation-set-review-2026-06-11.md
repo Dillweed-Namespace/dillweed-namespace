@@ -1,5 +1,7 @@
 # Dillweed Namespace — Independent Review of the `/docs` Documentation Set
 
+> **Historical review** (reviewed at HEAD `a6ce771`, 2026-06-11). Since publication: the README open-issues claim (§3.5, C5) was corrected by commit `b7fab11`; the dev private key was moved out of the working tree; and the finding-disposition index this review recommended as its highest-impact fix now exists — [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md), which supersedes the per-finding statuses here. Note: §3.4's claim that the dev key was "not covered by `.gitignore`" was a false positive (the unanchored `dnso_private.pem` pattern at `.gitignore:35` has covered it since 2026-05-19; see FDI-OPS-009). Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-11
 **Reviewer role:** Independent senior systems architect / distributed-systems reviewer / security engineer / standards editor / skeptical institutional evaluator
 **Reviewed at:** repo HEAD `a6ce771` (2026-06-11), specs registry v0.1.6 / dillclaw v0.1.8 / anthill v0.1.3, implementations Registry 0.2.8 / Resolver 0.1.8 / Anthill 0.1.6 (post-W0 working tree)

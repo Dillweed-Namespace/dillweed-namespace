@@ -1,5 +1,7 @@
 # Dillweed Namespace Project — Independent Strategic Evaluation
 
+> **Note** (added 2026-06-12, same day): this evaluation was conducted at HEAD `7f09e2e`. The README "No HIGH/MEDIUM open" claim cited in §4 was corrected hours later by commit `b7fab11`. Finding-level statuses are tracked in [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md); the strategic analysis is unaffected.
+
 **Date:** 2026-06-12
 **Reviewer role:** Independent senior strategist / distributed-systems architect / AI infrastructure analyst / cybersecurity reviewer / standards expert / institutional deployment advisor
 **Reviewed at:** repo HEAD `7f09e2e` (2026-06-11) · Specs: Namespace v0.4.4, Registry v0.1.6, DillClaw v0.1.8, Anthill v0.1.3, Governance v1.1.3, Charter v1.0.3, GSP-01 v1.0.3 · Implementations: Registry 0.2.8, Resolver 0.1.8, Anthill 0.1.6 (post-W0)

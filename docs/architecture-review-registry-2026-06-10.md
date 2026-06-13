@@ -1,5 +1,7 @@
 # Dillweed Registry — Production Architecture Review
 
+> **Historical review.** Findings reflect repository state on 2026-06-10, before the W0 hardening wave. Subsequently closed or narrowed: S3 (SQL pagination + ETag/304 landed server-side, commits `25670a4`/`74cad67`/`e523652`) and S4 (per-IP rate limiting, `a1a95d1`) are PARTIALLY CLOSED. S1, S2, S5–S9 remain open or deferred to v2. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) for current status of every finding. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Reviewer role:** System architect (production readiness)
 **Scope:** `registry/server.js` (v0.2.8 reference impl) + `specs/registry-spec.html` (v0.1.5)

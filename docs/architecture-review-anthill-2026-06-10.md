@@ -1,5 +1,7 @@
 # Anthill — Production Architecture Review
 
+> **Historical review.** Findings reflect repository state on 2026-06-10, before the W0 hardening wave. Subsequently changed: S8 (ingestion rate limiting) is closed in code (`a1a95d1`) though not yet documented in the Anthill spec. S1–S7 and S9 — including the unauthenticated-attribution root finding S1 — remain open or deferred to v2. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Reviewer role:** System architect (production readiness)
 **Scope:** `anthill/server.js` (v0.1.6 reference impl) + `specs/anthill-spec.html` (v0.1.3)

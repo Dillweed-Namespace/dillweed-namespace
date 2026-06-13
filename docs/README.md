@@ -58,7 +58,7 @@ Gap reports for deploying or implementing from the specifications alone.
 
 ## Specification Consistency Reviews
 
-Six-round automated review series (Fable 5) covering all 8 specs and 3 implementations. 4 HIGH and 19 MEDIUM findings raised; all resolved and verified.
+Six-round automated review series (Fable 5) covering all 8 specs and 3 implementations. 8 HIGH and 21 MEDIUM findings raised across the rounds (r1: 4H/9M, r2: 3H/10M, r3: 1H/2M new — earlier summaries understated this as "4 HIGH and 19 MEDIUM"); all resolved and verified.
 
 - **spec-consistency-review-2026-06-09.md** — Round 1: 4 HIGH, 9 MEDIUM, 6 LOW
 - **spec-consistency-review-2026-06-09-r2.md** — Round 2: 3 HIGH, 10 MEDIUM, 9 LOW

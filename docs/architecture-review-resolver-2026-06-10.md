@@ -1,5 +1,7 @@
 # DillClaw Resolver — Production Architecture Review
 
+> **Historical review.** Findings reflect repository state on 2026-06-10, before the W0 hardening wave. Subsequently closed or narrowed: S3 (SSRF) is CLOSED (off-by-default probe + internal-range deny-list + host pinning, commits `4447c00`/`8c87a85`); S1 is PARTIALLY CLOSED (jitter/backoff `d25bf7b`, pagination-to-completion `d1466c0`; no client conditional fetch yet); S2 is PARTIALLY CLOSED (per-IP rate limiting `a1a95d1`; no caller auth). S4–S8 remain open or deferred. See [`finding-disposition-index-2026-06.md`](finding-disposition-index-2026-06.md) for current status. Preserved unmodified as historical evidence.
+
 **Date:** 2026-06-10
 **Reviewer role:** System architect (production readiness)
 **Scope:** `resolver/server.js` (v0.1.8 reference impl) + `specs/dillclaw-spec.html` (v0.1.7)
