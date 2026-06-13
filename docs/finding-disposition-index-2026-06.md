@@ -38,7 +38,7 @@ A note on ID collision: the ledger's **F-003** (2026-05-24, a dillweed.com `.hta
 
 ## 3. Executive summary
 
-**69 canonical findings** were normalized from roughly 230 raw findings across 14 finding-bearing documents, 4 GitHub issues, and the ledger. At `c999fdd`: **4 CLOSED, 6 PARTIALLY CLOSED, 30 OPEN, 22 DEFERRED TO V2, 4 ACCEPTED FOR V1, 1 SUPERSEDED, 1 NOT A DEFECT, 1 UNVERIFIED.**
+**70 canonical findings** were normalized from roughly 230 raw findings across 14 finding-bearing documents, 4 GitHub issues, and the ledger. At `c999fdd`: **5 CLOSED, 6 PARTIALLY CLOSED, 30 OPEN, 22 DEFERRED TO V2, 4 ACCEPTED FOR V1, 1 SUPERSEDED, 1 NOT A DEFECT, 1 UNVERIFIED.**
 
 The headline facts an evaluator needs:
 
@@ -85,12 +85,12 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 | OPEN | 30 |
 | DEFERRED TO V2 | 22 |
 | PARTIALLY CLOSED | 6 |
-| CLOSED | 4 |
+| CLOSED | 5 |
 | ACCEPTED FOR V1 | 4 |
 | SUPERSEDED | 1 |
 | NOT A DEFECT | 1 |
 | UNVERIFIED | 1 |
-| **Total** | **69** |
+| **Total** | **70** |
 
 ### By component
 | Component | Findings | Open or deferred |
@@ -110,7 +110,7 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 | Original severity | Count | Still open/deferred |
 |---|---|---|
 | CRITICAL | 1 | 1 |
-| P0 / HIGH | 17 | 13 |
+| P0 / HIGH | 18 | 13 |
 | P1 / MEDIUM | 26 | 21 |
 | P2 / LOW / INFO | 25 | 17 |
 
@@ -739,10 +739,10 @@ Anthill detection/escalation engine and OTel re-layer (W4); HA/replication (W3);
 
 ## 15. Final judgments
 
-1. **Canonical findings:** **69** (normalized from ~230 raw findings).
+1. **Canonical findings:** **70** (normalized from ~230 raw findings).
 2. **Open:** **30** (plus the 22 deferred items, which are functionally open but scheduled).
 3. **Partially closed:** **6**.
-4. **Fully closed:** **4** (FDI-REG-004, FDI-RES-002, FDI-RES-009, FDI-DOC-002) — plus the closed install-test series (FDI-OPS-008) and one superseded, one not-a-defect, one unverified.
+4. **Fully closed:** **5** (FDI-REG-004, FDI-RES-002, FDI-RES-009, FDI-DOC-002, and the install-test series FDI-OPS-008) — plus one superseded, one not-a-defect, one unverified.
 5. **Accepted for v1:** **4**.
 6. **Deferred to v2:** **22**.
 7. **Three greatest current risks:** (1) **FDI-ANT-001** — unauthenticated, forgeable governance signals (the CRITICAL), with its suppression/framing corollaries; (2) **FDI-ID-001 + FDI-XST-004** — fail-open shared-token writes on a `0.0.0.0` bind with wildcard CORS: the one chain that turns network access into *validly signed* capability impersonation (F-6); (3) **FDI-CRY-001 + FDI-ID-004** — the trust score's two heaviest inputs (history 30 %, tier 40 %) are attacker-suppliable, so the system's headline number can be manufactured even where signatures verify.
