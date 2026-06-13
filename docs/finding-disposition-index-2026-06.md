@@ -214,6 +214,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Root cause:** One Node process over one embedded `better-sqlite3` file is the namespace's sole writer and source of truth.
 - **Verification:** `registry/server.js` still opens a single local SQLite DB; no replication code exists anywhere in the tree.
 - **Mitigation landed:** none (W0 was explicitly no-protocol-change).
+- **Disposition: DEFERRED TO V2 (W3).**
 - **Impact:** A: NO CURRENT IMPACT · B: MATERIAL RISK (freshness SPOF) · C/D: BLOCKS.
 - **Residual risk:** total loss/outage of one host stops all writes and, after stale windows lapse, all resolution. Architectural.
 - **Closure criteria:** a documented and implemented availability model — either hardened-single-instance with tested backup/restore/failover runbook, or replication — plus a recovery test on a second host.
@@ -223,6 +224,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Sources:** arch-reg S2 (P0); `registry-mirror-deployment-gap-report-2026-06-10.md` G-1…G-24 (7 HIGH), verdict "no happy path at all"; spec-gap REG-21/XC-01.
 - **Root cause:** The spec names a mirror deployment mode and imposes conformance obligations on it but defines no sync mechanism; the implementation's mirror mode only rejects writes and echoes two operator-set env vars into `/health`.
 - **Verification:** `registry/server.js:598–614` — `AUTHORITATIVE_SNAPSHOT_TIMESTAMP`/`AUTHORITATIVE_SIGNATURE_HASH` are env-var pass-throughs; no code computes or verifies the hash; no import path exists (and `POST /register` re-signs, so authoritative records cannot be imported verbatim — mirror-gap G-7 reasoning confirmed against the signing path).
+- **Disposition: DEFERRED TO V2 (W3).**
 - **Impact:** A: NO CURRENT IMPACT · B: LIMITATION · C: **BLOCKS** · D: BLOCKS.
 - **Residual risk:** the spec's only availability answer to FDI-REG-001 does not exist; recruiting any independent mirror operator (the strategic evaluation's highest-leverage external act) is impossible until this is specified.
 - **Closure criteria:** a normative sync protocol (snapshot + delta or equivalent), an import path preserving authoritative signatures, mirror-computed freshness replaced by registry-signed checkpoints, a conformance bound on sync staleness, and a demonstrated third-party-operable mirror with tests.
@@ -231,6 +233,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 #### FDI-REG-003 — `/list` hot path: full-table scan, JS-slice pagination, no conditional fetch (server side)
 - **Sources:** arch-reg S3 (P0); trust-boundary F-10 (server half).
 - **Mitigation landed (W0, all verified in code):** SQL `LIMIT ? OFFSET ?` with deterministic `ORDER BY name, version` and separate COUNT (`registry/server.js:114–118`, commit `25670a4`); strong `ETag` + `Last-Modified` + 304 with RFC 7232 weak-comparison handling, catalog version seeded from the registration log so ETags survive restarts (`:143–146, 501–545`, commit `74cad67`); normalized `capability_tags` table + index replacing the `LIKE` scan, with startup backfill migration (`:77–92`, commit `e523652`). Test evidence: ETag (6), pagination (6), tag-filter (3) tests present in `registry/test.sh` (verified by inspection); tracker claims 98/98 passing on an isolated instance — not re-executed this session. Spec evidence: Registry spec bumped to v0.1.6 documenting ETag/rate-limiting/pagination (commit `3d6b159`).
+- **Disposition: PARTIALLY CLOSED.**
 - **Residual (why not CLOSED):** no delta feed (every refresh that *does* change still transfers the full catalog); the ETag mechanism has **zero consumers** because the reference Resolver never sends `If-None-Match` (see FDI-RES-001/FDI-DOC-008) — the W0 headline benefit is latent, not realized.
 - **Impact:** A: NO CURRENT IMPACT · B: LIMITATION · C/D: MATERIAL RISK at fleet scale.
 - **Closure criteria:** resolver-side conditional fetch consuming the ETag (small client change) and, for fleet scale, the W3 delta feed.
@@ -246,6 +249,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 #### FDI-RES-001 — Full-catalog polling every 60 s; no client-side conditional fetch; thundering herd
 - **Sources:** arch-res S1 (P0); v2 design Area 2.
 - **Mitigation landed (verified):** jitter ±20 % + exponential backoff capped at 15 min via self-scheduling `refreshDelay()` (`resolver/server.js:48–49, 183–187, 304–305`, commit `d25bf7b`), with `/health` exposure of refresh state; pagination-to-completion with mid-pagination dedupe (`:241–267`, commit `d1466c0`). Unit-test evidence: 12 `refreshDelay` assertions in `resolver/unit-tests.js` (in tree); tracker claims 77/77.
+- **Disposition: PARTIALLY CLOSED.**
 - **Residual (why not CLOSED):** the resolver sends **no** `If-None-Match`/`If-Modified-Since` and has no 304 handling — grep of `resolver/server.js` for `etag|if-none-match|if-modified|304` returns nothing — despite DillClaw spec v0.1.8 §7.1 stating the resolver "SHOULD send If-None-Match" (verified in `specs/dillclaw-spec.html`). Every refresh still transfers the full catalog. No delta feed (W3).
 - **Impact:** A: NO CURRENT IMPACT · B: LIMITATION · C: LIMITATION · D: MATERIAL RISK (bandwidth/CPU scale with records × resolvers).
 - **Closure criteria:** client conditional fetch implemented + a test demonstrating a 304 cycle; herd-revalidation test; delta feed for full closure at scale.
@@ -427,6 +431,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 #### FDI-XST-001 — No rate limiting on any service → per-IP limiting landed; per-identity remains
 - **Sources:** arch-reg S4 (P1); arch-res S2 (P0, half); arch-ant S8 (P1); Issue #2 (requirement 2).
 - **Mitigation (verified):** per-IP fixed-window limiter on all three services — separate read vs write/expensive budgets (default 300/100 per 60 s, env-overridable), `/health` + OPTIONS exempt, 429 + `Retry-After`, `rate_limit` exposed in `/health` (commit `a1a95d1`; `anthill/server.js:819–867` confirmed; registry and resolver confirmed by grep). Test evidence: 4 self-calibrating rate-limit tests per service in the tree; tracker claims Registry 95/95→98/98, Anthill 62/62.
+- **Disposition: PARTIALLY CLOSED.**
 - **Residual (why not CLOSED):** (a) Anthill spec v0.1.3 documents none of it (FDI-DOC-006) — closure requires spec parity; (b) fixed-window per-IP does not address distributed abuse or per-identity cost weighting (W4, by design); (c) operational interaction noted in tracker: back-to-back test suites from one IP hit the saturated window.
 - **Impact:** B: LIMITATION (adequate first line) · D: MATERIAL RISK until per-identity quotas.
 - **Closure criteria:** Anthill spec documents 429/limits; W4 per-identity quotas for multi-org.
