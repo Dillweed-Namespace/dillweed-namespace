@@ -21,7 +21,7 @@ The Dillweed® mark is registered in the United States; DillClaw™ and Dillweed
 
 ---
 
-## What's new in v0.1.4
+## What's new in v0.1.6
 
 - **License changed to Apache 2.0** — the per-service `LICENSE` file is now the Apache License 2.0, matching the project-wide licensing decision. A `NOTICE` file has been added carrying attribution and the trademark policy (Apache 2.0 §4d). The `package.json` `license` field is now `Apache-2.0`. This supersedes the MIT license that shipped with earlier reference-implementation tarballs; the change was made before any public distribution.
 - **Internal version-stamp corrections** — the `version` field returned by the `/health` endpoint was stale at `0.1.0` across several prior releases; it now tracks the package version. The `setup.js` and `test.sh` header comments were likewise corrected. The earlier reconciliation rounds bumped `package.json` but did not reach these internal strings; that gap is now closed.
@@ -114,7 +114,7 @@ Timestamp format: RFC 3339 UTC, second precision — `YYYY-MM-DDTHH:MM:SSZ`. No 
 
 ## Replay Protection (Spec §4)
 
-- **Nonce uniqueness** — every `signal_nonce` must be unique across the aggregation layer's lifetime. Reused nonces return `409 NONCE_COLLISION` and trigger a CRITICAL ANT-RA signal naming the offending node. Spec §4 describes `signal_nonce` as a cryptographically random 128-bit value; **v0.1.4 enforces presence and uniqueness but not a specific 128-bit encoding**. Submitters are responsible for supplying cryptographically random nonces. A future strictness profile may require UUID or 32-byte hex format; the current reference implementation accepts any non-empty string so test fixtures and implementation work can use readable nonces.
+- **Nonce uniqueness** — every `signal_nonce` must be unique across the aggregation layer's lifetime. Reused nonces return `409 NONCE_COLLISION` and trigger a CRITICAL ANT-RA signal naming the offending node. Spec §4 describes `signal_nonce` as a cryptographically random 128-bit value; **v0.1.6 enforces presence and uniqueness but not a specific 128-bit encoding**. Submitters are responsible for supplying cryptographically random nonces. A future strictness profile may require UUID or 32-byte hex format; the current reference implementation accepts any non-empty string so test fixtures and implementation work can use readable nonces.
 - **Node sequence** — `node_sequence` must strictly increase per `originating_node`. Out-of-order sequences return `409 SEQUENCE_VIOLATION`.
 
 ## Immutable Signal Log
@@ -130,7 +130,7 @@ Anthill maintains two complementary stores for each signal that passes validatio
 
 Under the log-first-then-DB write ordering, the JSONL log may contain entries whose SQLite insert later failed and returned `500 STORAGE_FAULT` to the caller. The caller is informed; the JSONL preserves the attempt for forensic reconciliation. To find entries that were attempted but not accepted, diff JSONL against SQLite by `signal_id`.
 
-The reference implementation maintains **application-level append-only** semantics — the server only ever opens the JSONL file with `appendFileSync` and never updates or deletes prior entries. Stronger filesystem immutability (chattr +a, WORM storage), remote attestation, or hash-chained tamper-evidence are deployment hardening options outside this v0.1.4 local reference implementation.
+The reference implementation maintains **application-level append-only** semantics — the server only ever opens the JSONL file with `appendFileSync` and never updates or deletes prior entries. Stronger filesystem immutability (chattr +a, WORM storage), remote attestation, or hash-chained tamper-evidence are deployment hardening options outside this v0.1.6 local reference implementation.
 
 For accepted signals, the `received_at` value is identical between the SQLite row and the JSONL entry, allowing direct equality matching across stores during reconciliation.
 
