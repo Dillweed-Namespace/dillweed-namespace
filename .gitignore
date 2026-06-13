@@ -80,3 +80,6 @@ scratch/
 Dillweed-Backups/
 *-Backups/
 *-backups/
+resolver/traces/
+registry/keys/
+registry/package-lock.json
