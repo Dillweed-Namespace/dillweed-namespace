@@ -13,7 +13,7 @@ This directory contains operational documentation, review reports, and design do
 
 ## v2 Design
 
-- **dillweed-v2-design-2026-06-10.md** — v2 architecture design: authenticated identity, scalable sync, OTel re-layering, rate limiting, key isolation, tamper-evident logging. Five-wave release plan.
+- **dillweed-v2-design-2026-06-10.md** — v2 architecture design: authenticated identity, scalable sync, OTel re-layering, rate limiting, key isolation, tamper-evident logging. Five-wave release plan. *Partially outdated: the W0 row no longer matches what shipped (fail-closed/CORS and async trace sinks dropped) — see index FDI-XST-004/006.*
 
 ## Research
 
@@ -30,11 +30,11 @@ This directory contains operational documentation, review reports, and design do
 
 ## Architecture Reviews
 
-Production-readiness assessments for a 100-resolver, multi-organization deployment target.
+Production-readiness assessments for a 100-resolver, multi-organization deployment target. Each carries a historical-review banner; current finding status is in the disposition index.
 
-- **architecture-review-registry-2026-06-10.md** — 9 structural findings
-- **architecture-review-resolver-2026-06-10.md** — 8 structural findings
-- **architecture-review-anthill-2026-06-10.md** — 9 structural findings
+- **architecture-review-registry-2026-06-10.md** — 9 structural findings (S1–S9). *S3 (pagination/ETag) and S4 (rate limiting) partially closed by W0; S1/S2/S5–S9 open or deferred to v2.*
+- **architecture-review-resolver-2026-06-10.md** — 8 structural findings (S1–S8). *S3 (SSRF) closed by W0; S1/S2 partially closed; S4–S8 open or deferred.*
+- **architecture-review-anthill-2026-06-10.md** — 9 structural findings (S1–S9). *S8 (rate limiting) closed in code; S1 (unauthenticated `node_signature`) and the rest open or deferred to v2.*
 
 ## Comparative Analyses
 
@@ -45,16 +45,16 @@ Where Dillweed's design is genuinely unique vs. where it should integrate with e
 
 ## Security
 
-- **cross-service-trust-boundary-analysis-2026-06-10.md** — Cross-service attack chains: 1 CRITICAL, 4 HIGH, 4 MEDIUM, 2 LOW
+- **cross-service-trust-boundary-analysis-2026-06-10.md** — Cross-service attack chains: 1 CRITICAL, 4 HIGH, 4 MEDIUM, 2 LOW. *F-8 (SSRF) and F-10 (truncation) closed by W0; F-9 partially narrowed; **F-3 (CRITICAL, unverified `node_signature`)** and the HIGH cluster (F-1/F-2/F-4/F-6) remain open — see index.*
 
 ## Implementer Experience
 
-Gap reports for deploying or implementing from the specifications alone.
+Gap reports for deploying or implementing from the specifications alone. The mirror and emitter reports were re-verified fully current; the others are partially stale (see per-document banners and the index).
 
-- **dillclaw-deployment-gap-report-2026-06-10.md** — Resolver first-deployment experience
-- **anthill-signal-emitter-gap-report-2026-06-10.md** — Anthill signal emitter integration
-- **registry-mirror-deployment-gap-report-2026-06-10.md** — Registry mirror deployment
-- **spec-gap-report-2026-06-10.md** — Second-implementer analysis: 88 gaps, 9 blockers for cross-implementation compatibility
+- **dillclaw-deployment-gap-report-2026-06-10.md** — Resolver first-deployment experience. *G-1/G-2/G-3 (config reference, TTL knobs, non-enforcing SHA check) still open.*
+- **anthill-signal-emitter-gap-report-2026-06-10.md** — Anthill signal emitter integration. *Still current (Anthill spec unchanged at v0.1.3).*
+- **registry-mirror-deployment-gap-report-2026-06-10.md** — Registry mirror deployment. *Still current — W0 touched no mirror surface; no sync protocol exists.*
+- **spec-gap-report-2026-06-10.md** — Second-implementer analysis: 88 gaps, 9 blockers for cross-implementation compatibility. *REG-22 partially closed by spec v0.1.6; the other 87 gaps and all 9 blockers remain open.*
 
 ## Specification Consistency Reviews
 
