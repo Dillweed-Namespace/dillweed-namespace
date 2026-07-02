@@ -1,4 +1,4 @@
-# Independent Review Methodology for Trust Infrastructure in Agentic Systems
+# An Evidence-Layered, Temporally Maintained Review Method for Agentic Trust Infrastructure
 
 **Authors:** [Author Name], [Affiliation] · [Author Name], [Affiliation]
 *(placeholders — to be completed before circulation)*
