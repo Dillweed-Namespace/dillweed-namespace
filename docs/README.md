@@ -40,6 +40,7 @@ Production-readiness assessments for a 100-resolver, multi-organization deployme
 
 Where Dillweed's design is genuinely unique vs. where it should integrate with existing infrastructure.
 
+- **ans-v2-and-capability-standing-boundary-analysis-2026-06.md** — Independent comparative review of ANS v2 (draft-narajala-courtney-ansv2-01, Linux Foundation intent, agentnameservice repos) vs the Dillweed stack at `310d503`: primary-object comparison, responsibility matrix, lifecycle/revocation scenarios, AIM vs Anthill, component disposition, non-normative capability-standing profile sketch, 90-day plan. Verdict: complementary profile over ANS identity is the strongest path; capability-granular standing and resolution traces are the retained assets.
 - **architecture-review-registry-vs-existing-infrastructure-2026-06-10.md** — Registry vs DNS registries, PKI CAs, npm/crates.io, Consul/etcd, SPIFFE/SPIRE
 - **anthill-vs-observability-stack-2026-06-10.md** — Anthill vs OpenTelemetry, Prometheus, Grafana
 
