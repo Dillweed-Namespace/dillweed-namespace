@@ -2,6 +2,10 @@
 
 This directory contains operational documentation, review reports, and design documents for the Dillweed Namespace Project. Formal specifications are in `specs/` and mirrored at [dillweed.com](https://dillweed.com).
 
+## Preservation and Transition (draft)
+
+- **dillweed-v1-preservation-and-transition-plan.md** — *Dillweed v1 Preservation and Transition Plan* (**DRAFT**, 2026-07-02, prepared against `7eab9b5`). Records the steward's decision that v1 is the final implementation state — no W1 phase, no continued development of the parallel namespace architecture — and defines the controlled endpoint: preservation baseline (last behavioral commit `8c87a85`), proposed archival tag `dillweed-v1-preservation-baseline`, master artifact-disposition table, claim audit, unresolved-risk register, supported/unsupported uses, bounded post-transition maintenance policy, and completion checklist. Becomes authoritative when its §29 manual-verification checklist is complete and the documentation-only preservation commit is tagged.
+
 ## Finding Disposition (start here)
 
 - **finding-disposition-index-2026-06.md** — Authoritative index of all 69 canonical findings across the review corpus, independently verified against repo HEAD `c999fdd` (2026-06-12): current disposition (open / partially closed / closed / accepted for v1 / deferred to v2), evidence, deployment gates, contradiction table, hardening-wave assessment, and claim-safety review. **The review documents below are historical snapshots; consult the index for current finding status.**
