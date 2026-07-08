@@ -1,11 +1,8 @@
 # An Evidence-Layered, Temporally Maintained Review Method for Agentic Trust Infrastructure
 
-**Authors:** [Author Name], [Affiliation] · [Author Name], [Affiliation]
-*(placeholders — to be completed before circulation)*
+**Author:** Richard McClelland, Independent Researcher
 
-**Corresponding author:** [email placeholder]
-
-**Version:** Working draft, 2026-07-02
+**Version:** Working draft, 2026-07-02. AI-assisted; citations and case-study counts require human verification before circulation (see Disclosure).
 
 ---
 
