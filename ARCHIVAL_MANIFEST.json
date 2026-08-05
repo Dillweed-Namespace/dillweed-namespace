@@ -1,9 +1,10 @@
 {
   "manifest_version": "1.0",
-  "status": "DRAFT — authoritative when the preservation commit is created and the plan §29 checklist is complete",
+  "status": "FINAL — authoritative; preservation content committed at 58e51e6 (2026-07-21), §29 checklist complete",
   "repository_url": "https://github.com/Dillweed-Namespace/dillweed-namespace",
   "archival_tag": "dillweed-v1-preservation-baseline",
-  "archival_commit": "PENDING — created by executing plan §14",
+  "archival_commit": "58e51e6ed83b2622f8187a72fa426dc2941b7e34",
+  "archival_commit_note": "This SHA is the preservation content commit. Its own manifest states this SHA; the value was recorded in the immediately following bookkeeping commit, which carries the annotated tag dillweed-v1-preservation-baseline.",
   "last_behavioral_commit": "8c87a85",
   "behavioral_commit_notes": "257a910 later changed comment/banner strings only; classified non-behavioral (plan §5.1). W0 hardening changed Registry and Resolver runtime behavior after the v1.0.0 tarballs were built without a version bump (FDI-XST-007) — commits, not version strings, identify the baseline.",
   "components": [
@@ -97,7 +98,7 @@
     "FDI-ANT-001 (CRITICAL) — Anthill node_signature stored but never verified; signals unauthenticated; deferred to v2 (never pursued)",
     "FDI-OPS-010 (LOW) — Anthill v0.1.6 tarball packaging bloat; VERIFIED 2026-07-21 (see components.anthill.asset_audit)",
     "FDI-CRY-001, FDI-ID-001, FDI-ID-004, FDI-ANT-002, FDI-REG-001, FDI-REG-002, FDI-XST-003 (HIGH-class, open/deferred)",
-    "Full reconciled list PENDING — checklist item 9 (finding-index endpoint pass)"
+    "Finding-disposition index reconciled to this baseline 2026-07-21: FDI-DOC-005 RESOLVED (reports committed to reports/), FDI-OPS-010 VERIFIED but defect remains OPEN; c999fdd count snapshot preserved with dated delta notes"
   ],
   "unsupported_profiles": [
     "public read-only resolver",
@@ -110,5 +111,5 @@
   ],
   "license": "Apache-2.0",
   "review_provenance": "Reviews AI-assisted, steward-commissioned (ledger AI-008); not independent third-party assessment or peer review.",
-  "file_inventory": "PENDING — `git ls-files` at the archival commit (84 files at review baseline 7eab9b5)"
+  "file_inventory": "103 tracked files at the preservation baseline (git ls-files at 58e51e6)"
 }

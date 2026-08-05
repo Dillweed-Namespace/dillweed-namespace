@@ -1,7 +1,6 @@
 # PRESERVATION.md — Dillweed v1 Preservation Baseline
 
-**Status:** DRAFT — authoritative when merged as part of the preservation commit and the
-Preservation and Transition Plan §29 checklist is complete.
+**Status:** FINAL — authoritative. Preservation content committed at 58e51e6 (2026-07-21); §29 checklist complete. The one deferred action is the GitHub release-body preservation note (§9), applied when the release is updated; it is outside this repository.
 **Authoritative source:** This file is the authoritative human-readable status of the
 preserved v1 baseline. Where it conflicts with `ARCHIVAL_MANIFEST.json`, this file governs
 prose interpretation and the manifest governs machine-readable values; the two are kept in
@@ -17,8 +16,8 @@ file executes), `docs/finding-disposition-index-2026-06.md`, `ARCHIVAL_MANIFEST.
 |---|---|---|
 | Repository | https://github.com/Dillweed-Namespace/dillweed-namespace | VERIFIED |
 | Final behavioral commit | `8c87a85` (2026-06-10) | VERIFIED (plan §6) |
-| Preservation commit | `[PENDING — created when this file + manifest + banners are merged]` | PENDING |
-| Archival tag | `dillweed-v1-preservation-baseline` (applied to the preservation commit) | PENDING |
+| Preservation commit | `58e51e6` (content) — this reference recorded in the immediately following commit | VERIFIED |
+| Archival tag | `dillweed-v1-preservation-baseline` (annotated, unsigned; applied to the reference-recording commit) | APPLIED |
 | Component versions | Registry 0.2.8 · Resolver 0.1.8 · Anthill 0.1.6 · MCP server 1.0.0 | VERIFIED |
 | Version caveat (FDI-XST-007) | W0 hardening changed Registry and Resolver runtime behavior after the v1.0.0 tarballs were built, without bumping version strings. **Version strings do not identify the baseline; commits do.** | VERIFIED |
 | Trust root | `https://dillweed.com/dnso_public.pem`, SHA-256 `909891e92cfa7362ee88fd75e85f379a317680a2c987fc4d88ecae150deb6f33` | VERIFIED — live key re-fetched and hashed 2026-07-21, matches (item 6) |
@@ -175,7 +174,7 @@ independent restart are recorded in `PROJECT_LEDGER.md` (entry dated 2026-07-21)
 
 The preservation endpoint intentionally freezes with open findings. This section summarizes;
 the authoritative register is `docs/finding-disposition-index-2026-06.md` (reconciled to the
-preservation baseline per checklist item 9, PENDING).
+preservation baseline; the finding-disposition index was reconciled to this baseline on 2026-07-21 — FDI-DOC-005 resolved, FDI-OPS-010 verified-but-open, with dated preservation-endpoint notes preserving the c999fdd count snapshot).
 
 - **1 CRITICAL — FDI-ANT-001**: Anthill `node_signature` stored but never verified; signals
   unauthenticated. Deferred to v2 (never pursued). Blocks any evidentiary/governance use of
