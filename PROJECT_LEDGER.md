@@ -3331,3 +3331,24 @@ Verify-after-fix is retained as standard practice for any multi-document sweep.
 
 **Reports:** docs/spec-consistency-review-2026-06-09.md (r1), -r2.md, -r3.md, -r4.md,
 spec-consistency-review-2026-06-09-r5.md, spec-consistency-review-2026-06-10-r6.md (closure).
+
+---
+
+### 2026-07-21 — Reference deployment on dill-p-001 decommissioned (v1 preservation)
+
+Reference deployment on dill-p-001 decommissioned on 2026-07-21 as part of
+v1 preservation. The project asserts no operational deployment beyond this
+point.
+
+**Final verified state:** registry 0.2.8, resolver 0.1.8, anthill 0.1.6;
+test results recorded in PRESERVATION.md §2 (registry 79/79, resolver-unit
+29/29, anthill 58/58, integration 19/19, resolver-conformance 63/2 with the
+two residual failures classified as non-defects).
+
+**Decommission:** performed by stopping all three launchd services (verified
+down: registry health returned no response) and the host operator then
+independently elected to restart the preserved software (verified up: all
+three services returned HTTP 200). Continued execution is independent
+host-operator activity, local-only (Profile A), and carries no project
+support, maintenance, or standing. Public exposure is not supported and
+would operate outside the verified profile.

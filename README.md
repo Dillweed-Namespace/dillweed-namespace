@@ -2,7 +2,14 @@
 
 A capability-registration and resolution system with a publicly verifiable trust root.
 
-This project is in early stewardship phase. Response times may be extended.
+> **⁂ Preservation status (2026-07-21).** This project is preserved as a completed
+> reference artifact. Active development and operation have ended; the reference
+> deployment has been decommissioned, and the project asserts no operational
+> deployment. See [`PRESERVATION.md`](PRESERVATION.md) for the endpoint record and
+> [`ARCHIVAL_MANIFEST.json`](ARCHIVAL_MANIFEST.json) for the machine-readable
+> baseline. The trademark and license terms in [`NOTICE`](NOTICE) remain in effect.
+> Any continued execution of the preserved software is independent operator activity
+> outside project scope (local Profile A only).
 
 The Dillweed Namespace defines how capabilities — addressable, versioned, signed descriptions of what a service can do — are registered, resolved, and audited. Three components implement the v1 specification:
 

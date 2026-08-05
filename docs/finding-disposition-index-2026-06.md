@@ -40,6 +40,8 @@ A note on ID collision: the ledger's **F-003** (2026-05-24, a dillweed.com `.hta
 
 **70 canonical findings** were normalized from roughly 230 raw findings across 14 finding-bearing documents, 4 GitHub issues, and the ledger. At `c999fdd`: **5 CLOSED, 6 PARTIALLY CLOSED, 30 OPEN, 22 DEFERRED TO V2, 4 ACCEPTED FOR V1, 1 SUPERSEDED, 1 NOT A DEFECT, 1 UNVERIFIED.**
 
+> **Preservation-endpoint update (2026-07-21).** The dispositions above are the `c999fdd` corpus baseline and are left unchanged as a historical snapshot. Two findings changed status during the preservation pass: **FDI-DOC-005** moved OPEN → RESOLVED (the cited steward reports were committed to `reports/`), and **FDI-OPS-010** moved UNVERIFIED → VERIFIED with the defect remaining open (counted under OPEN). Net effect on the baseline tallies: UNVERIFIED 1 → 0; one finding (DOC-005) resolved out of OPEN while OPS-010 enters OPEN, leaving OPEN unchanged at 30. See PRESERVATION.md for the endpoint status.
+
 The headline facts an evaluator needs:
 
 1. **The single CRITICAL is real and unchanged.** Anthill stores but never verifies `node_signature`; `originating_node` is a free-form string; the field is not even required (`anthill/server.js:397–399, 595` — type-check only; absent from the required-field list at `:332–381`). Every Anthill-derived governance signal is forgeable (FDI-ANT-001). The README now discloses this (commit `b7fab11`, 2026-06-12).
@@ -57,7 +59,7 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 
 ### Formal external evaluation (Profile A)
 - **Blocks:** nothing. The local stack runs, tests exist, the trust chain is exercisable end-to-end (`integration-test.sh`, 19 checks).
-- **Complicates:** FDI-DOC-001 (no disposition banners on stale reviews — mitigated by this index), FDI-DOC-005 (cited steward reports `steward-report-2026-06-10-r3` and `reports/steward-report-2026-06-11.md` absent from the repo — the audit chain for three W0-era commits cannot be independently read), FDI-DOC-003/004 (stale test counts, series-total arithmetic), FDI-RESR-002 (README's "external review" wording — the reviews were AI-assisted, as the ledger itself states in AI-008).
+- **Complicates:** FDI-DOC-001 (no disposition banners on stale reviews — mitigated by this index), FDI-DOC-005 (**resolved 2026-07-21** — the cited steward reports `steward-report-2026-06-10-r3` and `reports/steward-report-2026-06-11.md`, previously absent, are now committed under `reports/`; the audit chain for the three W0-era commits is independently readable), FDI-DOC-003/004 (stale test counts, series-total arithmetic), FDI-RESR-002 (README's "external review" wording — the reviews were AI-assisted, as the ledger itself states in AI-008).
 
 ### Public read-only Resolver (Profile B)
 - **Blocks (Issue #2's own gate, all verified still unmet):** FDI-OPS-001 (no TLS for cross-network links), FDI-OPS-002 (no `docs/threat-model.md`; the trust-boundary analysis partially substitutes), FDI-XST-004 (wildcard CORS + fail-open token defaults on a `0.0.0.0` bind), FDI-RES-004 (unbounded synchronous trace writes — a disk-fill DoS on a public node), FDI-ID-002 (no caller identity; rate limiting alone is the only abuse control).
@@ -92,6 +94,8 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 | UNVERIFIED | 1 |
 | **Total** | **70** |
 
+> *Preservation-endpoint note (2026-07-21): counts are the `c999fdd` baseline. Since then FDI-DOC-005 resolved (reports committed) and FDI-OPS-010 moved UNVERIFIED → VERIFIED (defect remains open, counted under OPEN); UNVERIFIED is now 0. Historical counts above are unchanged. See PRESERVATION.md.*
+
 ### By component
 | Component | Findings | Open or deferred (excl. partially closed) |
 |---|---|---|
@@ -119,7 +123,7 @@ Findings that genuinely gate each step. "Blocks" means the step should not proce
 - **Closed by documentation fixes:** README unscoped "no HIGH/MEDIUM open" claim (`b7fab11`, 2026-06-12).
 - **Closed and discovered closed by this review:** semantic calendar-date validation (ledger AI-003 still says OPEN; the code implements it — `registry/server.js:434–451`).
 - **New findings raised post-corpus (doc-set review 2026-06-11, strategic evaluation 2026-06-12, and this review):** resolver ETag client gap, Anthill-spec rate-limit silence, W0 definition drift, anthill/README self-describing as v0.1.4, Anthill release-asset size anomaly, delegation/counter-signature absent from any v2 wave, continuity instruments unexecuted.
-- **Reopened:** none. **Insufficient evidence:** 1 (FDI-OPS-010).
+- **Reopened:** none. **Insufficient evidence:** none (FDI-OPS-010 was verified 2026-07-21 — see §7 — and is now a confirmed open defect).
 
 ---
 
@@ -181,12 +185,12 @@ Blocks column: **E**=evaluation, **B**=public resolver, **C**=mirror, **D**=mult
 | FDI-OPS-007 | Tarball name vs extract-dir name inconsistency | Ops | INST-008 | LOW | PARTIALLY CLOSED | future release | — |
 | FDI-OPS-008 | Install-test finding series INST-001…014 | Ops | ledger INST entries | HIGH…LOW | CLOSED | v1.0.0 | — |
 | FDI-OPS-009 | Claim: dev private key not covered by `.gitignore` | Ops | doc-set §3.4 | HIGH (as raised) | NOT A DEFECT | — | — |
-| FDI-OPS-010 | Anthill v0.1.6 release asset ~9.9 MB vs ~51 KB peers | Ops | STEWARD-SWEEP-2026-06-11 | LOW | UNVERIFIED | audit recommended | — |
+| FDI-OPS-010 | Anthill v0.1.6 release asset ~9.9 MB vs ~51 KB peers | Ops | STEWARD-SWEEP-2026-06-11 | LOW | VERIFIED | defect remains (not remediated) | — |
 | FDI-DOC-001 | Review corpus carries no post-W0 disposition layer | Docs | doc-set A1/#1 | HIGH | OPEN (this index = partial remedy) | now | E |
 | FDI-DOC-002 | README unscoped "No HIGH/MEDIUM issues open" | Docs | doc-set C5; strategic-eval §4 | HIGH | CLOSED | done | — |
 | FDI-DOC-003 | README test counts pinned to v1.0.0, read as current | Docs | doc-set C6 | MEDIUM | OPEN | now | — |
 | FDI-DOC-004 | Series-total arithmetic error ("4 HIGH, 19 MEDIUM") | Docs | doc-set C7/#8 | LOW | OPEN | now | — |
-| FDI-DOC-005 | Dangling evidence pointers to absent steward reports | Docs | doc-set §7.2 | MEDIUM | OPEN | now | E |
+| FDI-DOC-005 | Dangling evidence pointers to steward reports (now committed to reports/) | Docs | doc-set §7.2 | MEDIUM | RESOLVED 2026-07-21 | done | E |
 | FDI-DOC-006 | Anthill spec silent on implemented rate limiting | Docs/spec | doc-set C2/#3 | MEDIUM | OPEN | round-7 | — |
 | FDI-DOC-007 | Registry spec §2.2 mirror tamper-evidence overclaim | Docs/spec | mirror-gap G-11; doc-set C3 | MEDIUM-HIGH | OPEN | W3 (caveat now) | C, claim |
 | FDI-DOC-008 | DillClaw v0.1.8 documents client conditional fetch that does not exist | Docs/spec | doc-set C1/#2 | HIGH | OPEN | round-7 + code | — |
@@ -301,7 +305,7 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Closure criteria:** signed freshness assertion or positive-acknowledgement revocation feed; §7.5 documents the adversarial bound including jitter.
 
 #### FDI-RES-009 — `/list` 500-record cap silently truncated the resolver worldview — CLOSED
-- **Sources:** trust-boundary F-10 (LOW/MED); steward-report-2026-06-10-r3 H-3 (report absent from repo — see FDI-DOC-005).
+- **Sources:** trust-boundary F-10 (LOW/MED); steward-report-2026-06-10-r3 H-3 (now committed to reports/ — see FDI-DOC-005).
 - **Mitigation (verified):** client pages `/list` to completion — limit-500 pages, offset advance, envelope-`total` honoring, name:version dedupe against mid-pagination shifts, legacy bare-array handling, 1M-record sanity bound (`resolver/server.js:241–267`, commit `d1466c0`); server-side SQL pagination (FDI-REG-003).
 - **Test evidence:** tracker records an E2E proof against an isolated 117-record registry (bare `/list` returns 100; fixed resolver loads all 117 and resolves a record beyond page 1). Test proves pagination-to-completion; it does not prove behavior under catalog mutation mid-pagination beyond dedupe.
 - **Why CLOSED:** code + E2E evidence + spec (DillClaw v0.1.8 documents pagination-to-completion, commit `3d6b159`).
@@ -506,8 +510,11 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 - **Sources:** doc-set §3.4 ("**not covered** by `.gitignore` (the `keys/*` pattern is anchored to the repo root)").
 - **Verification:** the *additional* unanchored pattern `dnso_private.pem` at `.gitignore:35` has covered the file since commit `539d4c9` (2026-05-19) — `git check-ignore -v` confirms. The doc-set review evaluated only the `keys/*` pattern. The legitimate core of the concern (key material physically present in the tree) was real and is tracked/closed under FDI-OPS-003. Recorded so the corpus's one verified reviewer false-positive at HIGH severity is on the record — consistent with the project's own practice of documenting reviewer overreach (ledger, Resolver final-pass addendum).
 
-#### FDI-OPS-010 — Anthill v0.1.6 release asset is ~9.9 MB vs ~51 KB peers — UNVERIFIED
-- **Sources:** ledger STEWARD-SWEEP-2026-06-11 finding 1. **Verification:** size anomaly confirmed via GitHub API (`dillweed-anthill-v0.1.6.tar.gz` = 9,907,578 bytes; registry 52,012; resolver 51,291). Contents not inspected this session; SHA matches docs per the sweep. Likely cause (inference): bundled `node_modules`. **Closure criteria:** unpack audit; republish lean tarball or document the contents.
+#### FDI-OPS-010 — Anthill v0.1.6 release asset is ~9.9 MB vs ~51 KB peers — VERIFIED (defect remains open)
+- **Sources:** ledger STEWARD-SWEEP-2026-06-11 finding 1.
+- **Verification (2026-07-21, preservation baseline):** the bloat and its cause are now confirmed. Tarball SHA `3bda022d…74f36` matches the release; **512 of 532** archive entries are under `node_modules/` — the `better-sqlite3` native build tree (two identical 9,028,526-byte `sqlite3.c` copies, `sqlite3.a` 2.56 MB, `sqlite3.o` 2.55 MB, a macOS-built `better_sqlite3.node` 1.78 MB) — and the asset additionally ships a populated runtime database (`data/anthill.db` plus `-wal`/`-shm`). This explains the original size anomaly (via GitHub API: `dillweed-anthill-v0.1.6.tar.gz` = 9,907,578 bytes vs registry 52,012, resolver 51,291). **Cause:** the tarball was packaged from a post-`npm install` working tree, not a clean source export. The clean predecessor v0.1.5 (36.7 KiB) is the last-good state.
+- **Disposition: VERIFIED — defect remains OPEN** (counted under OPEN in the §3 and §5 summaries). The anomaly and its cause are confirmed, but the asset was not rebuilt or republished before the preservation endpoint; this is verified-but-open, not resolved, and is frozen with the other disclosed open findings at preservation.
+- **Closure criteria:** republish a lean tarball built from a clean source export (or document the shipped contents).
 
 ### Documentation and version drift
 
@@ -526,8 +533,11 @@ All entries: **Last verified 2026-06-12 @ `c999fdd`** unless noted. "Sources" ci
 #### FDI-DOC-004 — Series-total arithmetic: "4 HIGH and 19 MEDIUM"
 - **Sources:** doc-set C7/#8. **Verification:** `docs/README.md` (line 57) and the ledger series entry still state 4 HIGH/19 MEDIUM; r6's own per-round table sums to 8 HIGH and ≥21 MEDIUM (r1 4H/9M + r2 3H/10M + r3 1H/2M new). All were resolved, so substance stands. **Disposition: OPEN** (LOW, credibility).
 
-#### FDI-DOC-005 — Dangling evidence pointers: cited steward reports absent from the repository
-- **Sources:** doc-set §7.2. **Verification:** no `reports/` directory and no `docs/*steward*` file exist; yet commits `d1466c0` and `8c87a85` cite findings H-3/M-1/M-3 from `steward-report-2026-06-10-r3`, and the ledger cites `reports/steward-report-2026-06-11.md`. The audit chain for three W0-era remediation commits cannot be independently read. **Disposition: OPEN.** **Closure:** commit the reports into `docs/` or annotate the references with their substance.
+#### FDI-DOC-005 — Dangling evidence pointers: cited steward reports (RESOLVED 2026-07-21 — now committed to reports/)
+- **Sources:** doc-set §7.2.
+- **Verification (2026-06-12):** no `reports/` directory and no `docs/*steward*` file existed; yet commits `d1466c0` and `8c87a85` cite findings H-3/M-1/M-3 from `steward-report-2026-06-10-r3`, and the ledger cites `reports/steward-report-2026-06-11.md`. The audit chain for three W0-era remediation commits could not be independently read.
+- **Resolution (2026-07-21, preservation baseline):** the reports were located in the steward agent's working directory, confirmed credential-free, and committed to `reports/` in the preservation baseline (15 steward reports + the ledger-sweep patch). The previously dangling references are now valid; the audit chain is independently readable.
+- **Disposition: RESOLVED** (reports committed 2026-07-21).
 
 #### FDI-DOC-006 — Anthill spec is silent on the rate limiting the implementation enforces
 - **Sources:** doc-set C2/#3. **Verification:** `specs/anthill-spec.html` (v0.1.3) contains no 429/limiter documentation (its single "rate limiting" match is an unrelated DNSO-response passage); `anthill/server.js:819–867` enforces it. The one-document-fix/echo-missed defect class the consistency series existed to catch, recurring in the W0 spec pass with no round-7. **Disposition: OPEN.** **Closure:** Anthill spec documents limits/429/Retry-After and bumps with a revision note.
@@ -598,7 +608,7 @@ All documents below should be **preserved unmodified** apart from the banner —
 | `anthill-signal-emitter-gap-report-2026-06-10.md` | Nothing (anthill spec unchanged at v0.1.3) | Entire report | FDI-ANT-010, FDI-ANT-001 |
 | `dillweed-v2-design-2026-06-10.md` | W0 row ≠ shipped W0 (fail-closed/CORS, async sinks + retention dropped); "W0 closes F-9" half-true; JCS owner unassigned; W1/W4 serialization sequencing | Areas 1–6 design content | FDI-XST-004/006, FDI-CRY-002 |
 | `v2-tracker.md` | Header ("not pushed", "Last Commit: n/a") contradicts merged history | Session notes (the best W0 evidence in the repo) | FDI-DOC-010 |
-| `PROJECT_LEDGER.md` | AI-003 marked OPEN (shipped); STEWARD-SWEEP under "OPEN ITEMS" while complete; cites absent `reports/…` files | Everything else spot-checked | FDI-REG-004, FDI-DOC-005/010 |
+| `PROJECT_LEDGER.md` | AI-003 marked OPEN (shipped); STEWARD-SWEEP under "OPEN ITEMS" while complete; cited reports/… files now committed (FDI-DOC-005 resolved) | Everything else spot-checked | FDI-REG-004, FDI-DOC-005/010 |
 | `documentation-set-review-2026-06-11.md` | README-claim item (fixed by `b7fab11`); gitignore-coverage sub-claim (FDI-OPS-009); ".DS_Store committed" (none tracked at HEAD) | The rest — it is the closest precursor to this index and verified well |  this index |
 | `strategic-evaluation-2026-06-12.md` | "README still claims No HIGH/MEDIUM open" (fixed hours later by `b7fab11`) | All strategic content | FDI-DOC-002 |
 | Consistency reviews r1–r6 | r5/r6 carry the series-total arithmetic | Internally well-dispositioned; closed series | FDI-DOC-004 |
@@ -703,7 +713,7 @@ Ledger-tracked finding closures spot-checked beyond the issues: INST series (jus
 | # | Action | Findings | Priority | Evidence of completion |
 |---|---|---|---|---|
 | A1 | Add the §8 banner to the four 2026-06-10 review docs + doc-set review + strategic eval; link this index from `docs/README.md` | FDI-DOC-001 | **P0** | Banners present; index linked |
-| A2 | Commit the two cited steward reports into `docs/` (or annotate the three commits' finding IDs with substance) | FDI-DOC-005 | **P0** | `docs/steward-report-2026-06-10-r3.md` + `…-06-11.md` exist |
+| A2 | ✅ DONE 2026-07-21 — steward reports committed to reports/ (15 reports + ledger-sweep patch) | FDI-DOC-005 | ~~P0~~ done | reports/steward-report-*.md present |
 | A3 | Fix series totals (docs/README, ledger); fix `anthill/README.md` version prose; refresh ledger AI-003 header and tracker header; scope README test counts | FDI-DOC-003/004/010/011 | P1 | Greps return corrected text |
 | A4 | Qualify "external review" wording in README + release notes | FDI-RESR-002 | P1 | Wording cites AI-008 |
 | A5 | Finish repo hygiene: ignore `resolver/traces/`, prune corpus, decide lockfile | FDI-OPS-003 | P1 | Clean `git status` after a service run |
@@ -790,7 +800,7 @@ Anthill detection/escalation engine and OTel re-layer (W4); HA/replication (W3);
 | GitHub release v1.0.0 assets | live via `gh` | SHAs/sizes (FDI-OPS-010) |
 | Code: `registry/server.js`, `resolver/server.js`, `anthill/server.js`, `mcp-server/server.js`, `*/test.sh`, `resolver/unit-tests.js`, `integration-test.sh`, `.gitignore`, working tree | `c999fdd` | All implementation evidence in §7 |
 
-**Evidence gaps (could not verify):** test-suite pass counts (suites not executed); release-tarball contents (FDI-OPS-010); the live dill-p-001 deployment and dillweed.com site; off-repo continuity instruments (FDI-GOV-002); the two missing steward reports (FDI-DOC-005); the resolver hot-path linear-scan sub-claim (FDI-RES-005, immaterial to disposition).
+**Evidence gaps (could not verify at corpus time; several since closed):** test-suite pass counts (executed 2026-07-21, see PRESERVATION.md); release-tarball contents (verified 2026-07-21, FDI-OPS-010); the live dill-p-001 deployment and dillweed.com site (reconciled 2026-07-21); off-repo continuity instruments (FDI-GOV-002, still unverified); the steward reports (now committed, FDI-DOC-005 resolved); the resolver hot-path linear-scan sub-claim (FDI-RES-005, immaterial to disposition).
 
 ---
 
